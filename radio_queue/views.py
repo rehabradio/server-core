@@ -203,10 +203,7 @@ class QueueNextTrack(generics.GenericAPIView):
         ])
 
         # Return the url for mopidy, and set CORS headers for ajax
-        return Response(
-            response,
-            headers={'Access-Control-Allow-Origin': '*'}
-        )
+        return Response(response)
 
 
 class QueueAddTrack(generics.GenericAPIView):

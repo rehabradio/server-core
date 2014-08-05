@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'django_rq',
     'social_auth',
+    'corsheaders',
 
     # local apps
     'radio_metadata',
@@ -46,6 +47,8 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,6 +59,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'radio.middlewares.LoginRequiredMiddleware',
 )
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'radio.urls'
 
@@ -202,5 +207,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', None)
 SOUNDCLOUD_CLIENT_ID = os.environ.get('SOUNDCLOUD_CLIENT_ID', None)
 
 GOOGLE_OAUTH2_CLIENT_ID = os.environ.get('GOOGLE_OAUTH2_CLIENT_ID', None)
-GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH2_CLIENT_SECRET', None)
-GOOGLE_WHITE_LISTED_DOMAINS = os.environ.get('GOOGLE_WHITE_LISTED_DOMAINS', None)
+GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get(
+    'GOOGLE_OAUTH2_CLIENT_SECRET',
+    None
+)
+GOOGLE_WHITE_LISTED_DOMAINS = os.environ.get(
+    'GOOGLE_WHITE_LISTED_DOMAINS',
+    None
+)
