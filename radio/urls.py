@@ -4,9 +4,6 @@ from django.conf.urls import *
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from django.contrib.auth.views import logout
-from django.views.generic import TemplateView
-
 # local imports
 from .views.api import APIRootView
 
@@ -16,13 +13,6 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'', include('social_auth.urls')),
-    url(r'^login/$', TemplateView.as_view(template_name="frontend/login.html")),
-    url(r'^logout/$', logout, {'next_page': '/'}, name='gauth_logout'),
-    url(r'^login-error/$', TemplateView.as_view(template_name="login-error.html")), 
-
-    # Frontend views
-    url(r'^', include('radio_frontend.urls')),
     # Django admin URLs
     url(r'^admin/', include(admin.site.urls)),
     # monitoring/admin URL for Django-RQ

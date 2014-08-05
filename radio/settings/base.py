@@ -196,3 +196,11 @@ RQ_QUEUES = {
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
+
+SECRET_KEY = os.environ.get('SECRET_KEY', None)
+
+SOUNDCLOUD_CLIENT_ID = os.environ.get('SOUNDCLOUD_CLIENT_ID', None)
+
+GOOGLE_OAUTH2_CLIENT_ID = os.environ.get('GOOGLE_OAUTH2_CLIENT_ID', None)
+GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH2_CLIENT_SECRET', None)
+GOOGLE_WHITE_LISTED_DOMAINS = os.environ.get('GOOGLE_WHITE_LISTED_DOMAINS', None)
