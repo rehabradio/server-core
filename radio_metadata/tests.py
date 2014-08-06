@@ -3,10 +3,17 @@ from django.test import TestCase
 
 
 class BaseTestCase(TestCase):
+    """
+    Load in default data for tests
+    """
     fixtures = ['radio/fixtures/testdata.json']
 
 
 class MetadataAPIRootViewTestCase(BaseTestCase):
+    """
+    Root index for all metadata routes
+    List of endpoint links for further navigation
+    """
     def test_get(self):
         resp = self.client.get('/api/metadata/')
         data = json.loads(resp.content)
@@ -17,6 +24,10 @@ class MetadataAPIRootViewTestCase(BaseTestCase):
         self.assertTrue(data['endpoints']['lookup'])
 
 class LookupRootViewTestCase(BaseTestCase):
+    """
+    Root index for all metadata/lookup routes
+    List of endpoint links for track lookups, example urls provided under "tracks"
+    """
     def test_get(self):
         resp = self.client.get('/api/metadata/lookup/')
         data = json.loads(resp.content)
@@ -30,6 +41,9 @@ class LookupRootViewTestCase(BaseTestCase):
 
 
 class LookupViewTestCase(BaseTestCase):
+    """
+    Test looking up a track using the spotify and soundcloud backends
+    """
     def test_get(self):
         track_attrs = (
             'source_type',
@@ -57,6 +71,9 @@ class LookupViewTestCase(BaseTestCase):
         self.assertEqual(resp2.status_code, 200)
         self.assertTrue(set(track_attrs) <= set(data2))
 
+    """
+    Test 404 error and detail message returns, using a bad backend
+    """
     def test_get_bad_backend(self):
         resp = self.client.get('/api/metadata/lookup/test/153868082/')
         data = json.loads(resp.content)
@@ -67,6 +84,10 @@ class LookupViewTestCase(BaseTestCase):
 
 
 class SearchRootViewTestCase(BaseTestCase):
+    """
+    Root index for all metadata/search routes
+    List of endpoint links for search lookups, example urls provided under "tracks"
+    """
     def test_get(self):
         resp = self.client.get('/api/metadata/search/')
         data = json.loads(resp.content)
@@ -80,6 +101,9 @@ class SearchRootViewTestCase(BaseTestCase):
 
 
 class SearchViewTestCase(BaseTestCase):
+    """
+    Test searching for tracks using the spotify and soundcloud backends
+    """
     def test_get(self):
         result_attrs = (
             'count',
@@ -117,6 +141,9 @@ class SearchViewTestCase(BaseTestCase):
         self.assertTrue(set(result_attrs) <= set(data2))
         self.assertTrue(set(track_attrs) <= set(tracks2))
 
+    """
+    Test 404 error and detail message returns, using a bad backend
+    """
     def test_get_bad_backend(self):
         resp = self.client.get('/api/metadata/search/test/?q=Haim/')
         data = json.loads(resp.content)
@@ -124,6 +151,9 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(resp.status_code, 404)
         self.assertEqual(data['detail'], 'Invalid backend, provider not recognised.')
 
+    """
+    Test 400 error and detail message returns, if no "q" parameter is set
+    """
     def test_get_no_parameter(self):
         resp = self.client.get('/api/metadata/search/soundcloud/')
         data = json.loads(resp.content)
