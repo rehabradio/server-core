@@ -136,6 +136,7 @@ SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 
 
 # Django Caching settings
+"""
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.cache.RedisCache',
@@ -143,7 +144,7 @@ CACHES = {
         'TIMEOUT': 3600 * 24,
     }
 }
-
+"""
 # Django session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
