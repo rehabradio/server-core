@@ -151,7 +151,7 @@ class PlaylistViewSetTestCase(BaseTestCase):
             'description': 'playlist is now updated',
         }
 
-        resp = self.client.put('/api/playlists/1', data=post_data)
+        resp = self.client.put('/api/playlists/1/', data=post_data)
         data = json.loads(resp.content)
 
         # Ensure request was successful
@@ -160,20 +160,52 @@ class PlaylistViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_record, new_records_count)
         self.assertEqual(existing_record, data)
         # Ensure the returned json keys match the expected
-        self.assertEqual(existing_record['name'], data['name'])
-        self.assertEqual(existing_record['description'], data['description'])
+        self.assertEqual(existing_record['name'], post_data['name'])
+        self.assertEqual(existing_record['description'], post_data['description'])
 
     """
     Update a single piece of playlist's data
     """
     def test_partial_update(self):
-        pass
+        # Count the number of records before the save
+        existing_record = Playlist.objects.filter(id=1).values()[0]
+        existing_records_count = Playlist.objects.all().count()
+        post_data = {
+            'name': 'patched playlist',
+        }
+
+        resp = self.client.patch('/api/playlists/1/', data=post_data)
+        data = json.loads(resp.content)
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 201)
+        # Ensure a the record was updated and a new records was not added to the database
+        self.assertEqual(existing_record, new_records_count)
+        self.assertEqual(existing_record, data)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(existing_record['name'], post_data['name'])
 
     """
     Cascade remove a playlist from the database
     """
     def test_destroy(self):
-        pass
+        # Count the number of records before the save
+        existing_records_count = Playlist.objects.all().count()
+        post_data = {
+            'name': 'updated playlist',
+            'description': 'playlist is now updated',
+        }
+
+        resp = self.client.delete('/api/playlists/2/', data=post_data)
+        data = json.loads(resp.content)
+        new_records_count = Playlist.objects.all().count()
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the record was removed from the database
+        self.assertEqual(existing_records_count-1, new_records_count)
+        # Ensure "detail" message is set, and the message matches expected
+        self.assertEqual(data['detail'], 'playlist successfully removed')
 
 
 class PlaylistTrackViewSetTestCase(BaseTestCase):
