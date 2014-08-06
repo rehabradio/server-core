@@ -1,5 +1,7 @@
 import json
 from django.test import TestCase
+from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient
 
 
 class BaseTestCase(TestCase):
@@ -7,6 +9,8 @@ class BaseTestCase(TestCase):
     Load in default data for tests
     """
     fixtures = ['radio/fixtures/testdata.json']
+    factory = APIRequestFactory()
+    api_client = APIClient()
 
 
 class MetadataAPIRootViewTestCase(BaseTestCase):
@@ -15,7 +19,7 @@ class MetadataAPIRootViewTestCase(BaseTestCase):
     List of endpoint links for further navigation
     """
     def test_get(self):
-        resp = self.client.get('/api/metadata/')
+        resp = self.api_client.get('/api/metadata/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
@@ -31,7 +35,7 @@ class LookupRootViewTestCase(BaseTestCase):
     List of endpoint links for track lookups, example urls provided under "tracks"
     """
     def test_get(self):
-        resp = self.client.get('/api/metadata/lookup/')
+        resp = self.api_client.get('/api/metadata/lookup/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
@@ -63,7 +67,7 @@ class LookupViewTestCase(BaseTestCase):
             'image_large',
         )
 
-        resp1 = self.client.get('/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/')
+        resp1 = self.api_client.get('/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/')
         data1 = json.loads(resp1.content)
 
         # Ensure request was successful
@@ -71,7 +75,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertTrue(set(track_attrs) <= set(data1))
 
-        resp2 = self.client.get('/api/metadata/lookup/soundcloud/153868082/')
+        resp2 = self.api_client.get('/api/metadata/lookup/soundcloud/153868082/')
         data2 = json.loads(resp2.content)
 
         # Ensure request was successful
@@ -83,7 +87,7 @@ class LookupViewTestCase(BaseTestCase):
     Test 404 error and detail message returns, using a bad backend
     """
     def test_get_bad_backend(self):
-        resp = self.client.get('/api/metadata/lookup/test/153868082/')
+        resp = self.api_client.get('/api/metadata/lookup/test/153868082/')
         data = json.loads(resp.content)
 
         # Ensure request failed
@@ -99,7 +103,7 @@ class SearchRootViewTestCase(BaseTestCase):
     List of endpoint links for search lookups, example urls provided under "tracks"
     """
     def test_get(self):
-        resp = self.client.get('/api/metadata/search/')
+        resp = self.api_client.get('/api/metadata/search/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
@@ -137,7 +141,7 @@ class SearchViewTestCase(BaseTestCase):
             'image_large',
         )
 
-        resp1 = self.client.get('/api/metadata/search/spotify/?q=Haim/')
+        resp1 = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
         data1 = json.loads(resp1.content)
         tracks1 = data1['results'][0]
 
@@ -147,7 +151,7 @@ class SearchViewTestCase(BaseTestCase):
         self.assertTrue(set(result_attrs) <= set(data1))
         self.assertTrue(set(track_attrs) <= set(tracks1))
 
-        resp2 = self.client.get('/api/metadata/search/soundcloud/?q=narsti/')
+        resp2 = self.api_client.get('/api/metadata/search/soundcloud/?q=narsti/')
         data2 = json.loads(resp2.content)
         tracks2 = data2['results'][0]
 
@@ -161,7 +165,7 @@ class SearchViewTestCase(BaseTestCase):
     Test 404 error and detail message returns, using a bad backend
     """
     def test_get_bad_backend(self):
-        resp = self.client.get('/api/metadata/search/test/?q=Haim/')
+        resp = self.api_client.get('/api/metadata/search/test/?q=Haim/')
         data = json.loads(resp.content)
 
         # Ensure request failed
@@ -173,7 +177,7 @@ class SearchViewTestCase(BaseTestCase):
     Test 400 error and detail message returns, if no "q" parameter is set
     """
     def test_get_no_parameter(self):
-        resp = self.client.get('/api/metadata/search/soundcloud/')
+        resp = self.api_client.get('/api/metadata/search/soundcloud/')
         data = json.loads(resp.content)
 
         # Ensure request failed
