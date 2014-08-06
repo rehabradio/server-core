@@ -48,10 +48,12 @@ def _get_track_from_queue():
         # Ensure the track has not been downvoted to dead
         # If track is dead, then remove from queue,
         # reset postions, and try again
+        """
         if queued_track.alive is False:
             queued_track.delete()
             _reset_queue_positions()
             return _get_track_from_queue()
+        """
 
         # Check to see if the track has started
         if queued_track.started:
@@ -142,7 +144,7 @@ class QueueList(generics.GenericAPIView):
                 ('artists', [x.name for x in artists]),
                 ('votes', votes.values()),
                 ('total_votes', sum(votes.values_list('value', flat=True))),
-                ('alive', queued_track.alive),
+                #('alive', queued_track.alive),
                 ('image_small', track.image_small),
                 ('image_medium', track.image_medium),
                 ('image_large', track.image_large),
@@ -195,7 +197,7 @@ class QueueNextTrack(generics.GenericAPIView):
             ('total_votes', sum(
                 queued_track.votes.values_list('value', flat=True)
             )),
-            ('alive', queued_track.alive),
+            #('alive', queued_track.alive),
             ('image_small', track.image_small),
             ('image_medium', track.image_medium),
             ('image_large', track.image_large),
@@ -311,6 +313,7 @@ class QueueTrackVote(generics.GenericAPIView):
             queued_track_id=queued_track.id
         ).values_list('value', flat=True)
 
+        """
         # If a track is upvoted from being dead, then toggle alive
         if sum(votes) > -3 and queued_track.alive is False:
             queued_track.alive = True
@@ -321,5 +324,6 @@ class QueueTrackVote(generics.GenericAPIView):
             if queued_track.position != 1:
                 queued_track.alive = False
                 queued_track.save()
+        """
 
         return Response({'message': 'Your vote has been saved'})

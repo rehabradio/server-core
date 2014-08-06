@@ -12,7 +12,7 @@ class QueuedTrack(models.Model):
     started = models.DateTimeField(null=True)
     # Playing order [Position 1 is the active track]
     position = models.PositiveIntegerField(null=True)
-    alive = models.BooleanField(default=True)
+    #alive = models.BooleanField(default=True)
     owner = models.ForeignKey('auth.User', null=True)
 
     class Meta:
