@@ -57,6 +57,13 @@ class LookupViewTestCase(BaseTestCase):
         self.assertEqual(resp2.status_code, 200)
         self.assertTrue(set(track_attrs) <= set(data2))
 
+    def test_get_bad_backend(self):
+        resp = self.client.get('/api/metadata/lookup/test/153868082/')
+        data = json.loads(resp.content)
+
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(data['detail'], 'Invalid backend, provider not recognised.')
+
 
 
 class SearchRootViewTestCase(BaseTestCase):
@@ -109,3 +116,17 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(resp2.status_code, 200)
         self.assertTrue(set(result_attrs) <= set(data2))
         self.assertTrue(set(track_attrs) <= set(tracks2))
+
+    def test_get_bad_backend(self):
+        resp = self.client.get('/api/metadata/search/test/?q=Haim/')
+        data = json.loads(resp.content)
+
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(data['detail'], 'Invalid backend, provider not recognised.')
+
+    def test_get_no_parameter(self):
+        resp = self.client.get('/api/metadata/search/soundcloud/')
+        data = json.loads(resp.content)
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(data['detail'], 'Required parameters are missing')
