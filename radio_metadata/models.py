@@ -46,7 +46,6 @@ class Track(MetadataBase):
 
     # track stats
     play_count = models.IntegerField(default=0)
-    vote_count = models.IntegerField(default=0)
     owner = models.ForeignKey('auth.User', null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -815,7 +815,6 @@
         "track_number": 3,
         "play_count": 1,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [
             1
         ],
@@ -839,7 +838,6 @@
         "track_number": 0,
         "play_count": 1,
         "source_type": "soundcloud",
-        "vote_count": 0,
         "artists": [
             2
         ],
@@ -863,7 +861,6 @@
         "track_number": 2,
         "play_count": 1,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [
             1
         ],
@@ -887,7 +884,6 @@
         "track_number": 0,
         "play_count": 1,
         "source_type": "soundcloud",
-        "vote_count": 0,
         "artists": [
             3
         ],
@@ -911,7 +907,6 @@
         "track_number": 4,
         "play_count": 1,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [
             1
         ],
@@ -935,7 +930,6 @@
         "track_number": 0,
         "play_count": 2,
         "source_type": "soundcloud",
-        "vote_count": -1,
         "artists": [
             3
         ],
@@ -959,7 +953,6 @@
         "track_number": 5,
         "play_count": 2,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [
             4,
             5
@@ -984,7 +977,6 @@
         "track_number": 0,
         "play_count": 2,
         "source_type": "soundcloud",
-        "vote_count": 0,
         "artists": [
             6
         ],
@@ -1008,7 +1000,6 @@
         "track_number": 3,
         "play_count": 2,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [],
         "source_id": "2pq4oxNwTmBWXUIEyL7cBZ"
     },
@@ -1030,7 +1021,6 @@
         "track_number": 0,
         "play_count": 2,
         "source_type": "soundcloud",
-        "vote_count": 0,
         "artists": [],
         "source_id": "156926930"
     },
@@ -1052,7 +1042,6 @@
         "track_number": 6,
         "play_count": 0,
         "source_type": "spotify",
-        "vote_count": 0,
         "artists": [
             12,
             13,

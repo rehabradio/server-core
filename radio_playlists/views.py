@@ -3,7 +3,6 @@ import collections
 
 # third-party imports
 from rest_framework import generics, status, viewsets
-from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
 # local imports

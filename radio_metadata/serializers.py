@@ -2,8 +2,10 @@
 from rest_framework import pagination
 from rest_framework import serializers
 
+from .models import Album, Artist, Track
 
-class BaseSerializer(serializers.Serializer):
+
+class BaseSerializer(serializers.ModelSerializer):
 
     source_type = serializers.CharField()
     source_id = serializers.CharField()
@@ -13,16 +15,17 @@ class BaseSerializer(serializers.Serializer):
 
 class ArtistSerializer(BaseSerializer):
 
-    pass
+    class Meta:
+        model = Artist
 
 
 class AlbumSerializer(BaseSerializer):
 
-    pass
+    class Meta:
+        model = Album
 
 
 class TrackSerializer(BaseSerializer):
-
     # relationships to other models
     artists = ArtistSerializer(many=True)
     album = AlbumSerializer(required=False)
@@ -40,6 +43,9 @@ class TrackSerializer(BaseSerializer):
     play_count = serializers.IntegerField()
     created = serializers.DateTimeField()
     updated = serializers.DateTimeField()
+
+    class Meta:
+        model = Track
 
 
 class PaginatedTrackSerializer(pagination.PaginationSerializer):

@@ -7,8 +7,7 @@ import datetime
 
 # third-party imports
 from django.core.cache import cache
-from django.shortcuts import redirect
-from rest_framework import generics, mixins, status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -20,27 +19,6 @@ from .sources import soundcloud
 from .sources import spotify
 
 from radio.custom_exceptions import InvalidBackend, MissingParameter
-from radio_playlists.models import Playlist, PlaylistTrack
-
-
-def _create_user_playlist(user):
-    """
-    Creates a default user playlist, for the user to store tracks
-    Returns a Playlist model reference
-    """
-    if user.first_name:
-        username = user.first_name.capitalize() + ' ' + user.last_name.capitalize()
-    else:
-        username = user.username.capitalize()
-
-    playlist = Playlist.objects.create(
-        name='Starred',
-        description=username + '\'s starred playlist',
-        owner=user,
-        protected=1,
-    )
-
-    return playlist
 
 
 def _getTrackData(source_type, source_id):
@@ -305,26 +283,21 @@ class SearchView(APIView):
         return Response(response)
 
 
-class TrackList(mixins.ListModelMixin, generics.GenericAPIView):
+class TrackViewSet(viewsets.ModelViewSet):
+    """
+    CRUD API endpoints that allow managing playlists.
+    """
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-
-class TrackAdd(generics.GenericAPIView):
-    """
-    Adds a track to database and queue
-    """
-    def get(self, request, *args, **kwargs):
-        source_type = request.QUERY_PARAMS.get('source_type', None)
-        source_id = request.QUERY_PARAMS.get('source_id', None)
-        queue_track = int(request.QUERY_PARAMS.get('queue_track', False))
-
+    def create(self, request, *args, **kwargs):
         # Use api to fetch track information
+        post_data = request.POST
         try:
-            track_data = _getTrackData(source_type, source_id)
+            track_data = _getTrackData(
+                post_data['source_type'],
+                post_data['source_id']
+            )
         except:
             response = {
                 'message': 'Track could not be found',
@@ -342,112 +315,18 @@ class TrackAdd(generics.GenericAPIView):
 
         # Save the track artists
         try:
-            _getOrCreateArtists(track_data['artists'], source_type)
+            _getOrCreateArtists(
+                track_data['artists'],
+                post_data['source_type']
+            )
         except:
             response = {
                 'message': 'Artists could not be saved',
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        if queue_track:
-            return redirect('radio-queue-api-add', track.id)
-        else:
-            return Response('Track successfully added to database')
+        return Response(track)
 
-
-class TrackAddToPlaylist(generics.GenericAPIView):
-    """
-    Adds a track to a selected playlist and queue
-    """
-    def get(self, request, *args, **kwargs):
-        playlist_id = request.QUERY_PARAMS.get('playlist_id', None)
-        source_type = request.QUERY_PARAMS.get('source_type', None)
-        source_id = request.QUERY_PARAMS.get('source_id', None)
-        queue_track = int(request.QUERY_PARAMS.get('queue_track', False))
-
-        if playlist_id is None:
-            try:
-                user_playlist = Playlist.objects.get(owner=self.request.user, protected=1)
-            except:
-                user_playlist = _create_user_playlist(self.request.user)
-            playlist_id = user_playlist.id
-
-        if source_id and source_type:
-            # Use api to fetch track information
-            try:
-                track_data = _getTrackData(source_type, source_id)
-            except:
-                response = {
-                    'message': 'Track could not be found',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-            # Save the track
-            try:
-                trackObj = _getOrCreateTrack(track_data, self.request.user)
-                track = trackObj['track']
-                if trackObj['created'] is False:
-                    response = {
-                        'message': 'Track already in playlist',
-                    }
-                    return Response(response)
-
-            except:
-                response = {
-                    'message': 'Track could not be saved to playlist',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-            # Save the track artists
-            try:
-                track_artists = _getOrCreateArtists(
-                    track_data['artists'],
-                    source_type
-                )
-            except:
-                response = {
-                    'message': 'Artists could not be saved',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-            # Append each artist record to the track instance to be saved later
-            for artist in track_artists:
-                track.artists.add(artist)
-
-            # Grab the selected playlist instance
-            try:
-                playlist = Playlist.objects.get(id=playlist_id)
-            except:
-                response = {
-                    'message': 'Playlist not found',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-            # Count existing records in playlist,
-            # to determine new tracks position
-            current_num_records = PlaylistTrack.objects.filter(
-                playlist_id=playlist_id
-            ).count()
-
-            try:
-                # Pass everything to the Playlist Track model to be saved
-                playlist_track, created = PlaylistTrack.objects.get_or_create(
-                    playlist=playlist,
-                    track=track,
-                    owner=self.request.user
-                )
-                # If new track, append to the bottom of the playlist
-                if created:
-                    playlist_track.position = current_num_records+1
-                    playlist_track.save()
-
-            except:
-                response = {
-                    'message': 'Playlist Track not found, and could not create a new one',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-            if queue_track:
-                return redirect('radio-queue-api-add', track.id)
-            else:
-                return Response('Track successfully added to playlist')
-
-        raise MissingParameter
+    # Set user id, for each record saved
+    def pre_save(self, obj):
+        obj.owner = self.request.user
