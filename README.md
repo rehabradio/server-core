@@ -79,14 +79,15 @@ Preparing your Django environment
 ---------------------------------
 
 Almost there... Before we can get started we need to complete a few final steps to set up our Django environment locally, such as creating database tables and a superuser.
+
     (rehabradio)vagrant@rehabradio:~/server-core$ mkdir databases
     (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py migrate
 
 `migrate` will ask a few questions on the terminal, fill in the required details as appropriate. You should now be ready to start the application locally.
 
-    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py runserver 0.0.0.0:8000
+    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py runserver
 
-You should now be able to access the running Django application in a browser at `http://rehabradio.vagrant.local:8000/api/`
+You should now be able to access the running Django application in a browser at `http://localhost:8000/api/`
 
 ***
 
