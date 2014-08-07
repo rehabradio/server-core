@@ -91,7 +91,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             playlist = Playlist.objects.get(id=kwargs['playlist_id'])
         except:
             response = {
-                'message': 'Playlist not found',
+                'detail': 'Playlist not found',
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
@@ -120,7 +120,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             trackData = _build_track(playlist_track)
         except:
             response = {
-                'message': 'Playlist track not found',
+                'detail': 'Playlist track not found',
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
@@ -135,12 +135,13 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             _reset_track_positions(playlist_id)
         except:
             response = {
-                'message': 'Playlist track not found',
+                'detail': 'Playlist track not found',
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'message': 'Track removed from playlist'})
+        return Response({'detail': 'Track removed from playlist'})
 
+    # Set user id, for each record saved
     def pre_save(self, obj):
         obj.owner = self.request.user
 
@@ -158,7 +159,7 @@ class PlaylistTrackUpdateOrder(generics.GenericAPIView):
             new_position = int(track.position) + int(direction)
         except:
             response = {
-                'message': 'Playlist track not found',
+                'detail': 'Playlist track not found',
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
@@ -178,4 +179,4 @@ class PlaylistTrackUpdateOrder(generics.GenericAPIView):
         track.position = new_position
         track.save()
 
-        return Response({'message': 'track position updated'})
+        return Response({'detail': 'track position updated'})
