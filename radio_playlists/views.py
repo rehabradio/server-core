@@ -2,12 +2,11 @@
 import collections
 
 # third-party imports
-from rest_framework import generics, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 # local imports
 from .models import Playlist, PlaylistTrack
-from radio_metadata.models import Track
 from .serializers import PlaylistSerializer, PlaylistTrackSerializer
 
 
@@ -35,8 +34,7 @@ def _build_track(record):
         ('source_id', track.source_id),
         ('source_type', track.source_type),
         ('name', track.name),
-        # Artists is a list of the artist names
-        ('artists', [{'name': artist.name} for artist in track.artists.all()]),
+        ('artists', track.artists.all().values()),
         ('duration_ms', track.duration_ms),
         ('track_number', track.track_number),
         ('preview_url', track.preview_url),
@@ -58,6 +56,9 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
     # Removes playlist from db (Cascading)
     def destroy(self, request, *args, **kwargs):
+        """
+        Removes playlist from database, and returns a detail reponse
+        """
         try:
             playlist = Playlist.objects.get(id=kwargs['pk'])
         except:
@@ -74,8 +75,10 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'playlist successfully removed'})
 
-    # Set user id, for each record saved
     def pre_save(self, obj):
+        """
+        Set user id, for each record saved/updated
+        """
         obj.owner = self.request.user
 
 
@@ -87,6 +90,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
     serializer_class = PlaylistTrackSerializer
 
     def list(self, request, *args, **kwargs):
+        """
+        Returns a list of all the playlist tracks with track data
+        """
         try:
             playlist = Playlist.objects.get(id=kwargs['playlist_id'])
         except:
@@ -115,7 +121,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         return Response(orderedPlaylist)
 
     def create(self, request, *args, **kwargs):
-        # Use api to fetch track information
+        """
+        Uses a track id to add a track to the playlist
+        """
         post_data = {
             'track': request.POST['track'],
             'playlist': kwargs['playlist_id'],
@@ -132,6 +140,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         return Response(post_data)
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Returns a playlist track with track data
+        """
         try:
             playlist_track = PlaylistTrack.objects.get(id=kwargs['pk'])
             trackData = _build_track(playlist_track)
@@ -143,8 +154,10 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
         return Response(trackData)
 
-    # Removes playlist from db (Cascading)
     def destroy(self, request, *args, **kwargs):
+        """
+        Removes playlist track from db and resets the remaining tracks position
+        """
         try:
             playlist_track = PlaylistTrack.objects.get(id=kwargs['pk'])
             playlist_id = playlist_track.playlist.id
@@ -158,42 +171,8 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Track removed from playlist'})
 
-    # Set user id, for each record saved
     def pre_save(self, obj):
+        """
+        Set user id, for each record saved/updated
+        """
         obj.owner = self.request.user
-
-
-class PlaylistTrackUpdateOrder(generics.GenericAPIView):
-    """
-    Update the position of a track in a given playlist
-    """
-    def get(self, request, *args, **kwargs):
-        track_id = kwargs['pk']
-        direction = kwargs['direction']
-
-        try:
-            track = PlaylistTrack.objects.get(id=track_id)
-            new_position = int(track.position) + int(direction)
-        except:
-            response = {
-                'detail': 'Playlist track not found',
-            }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            over_riding_track = PlaylistTrack.objects.get(
-                playlist_id=track.playlist_id,
-                position=new_position
-            )
-            over_riding_track.position = track.position
-            over_riding_track.save()
-        except:
-            response = {
-                'message': 'Could not update track order, level breached',
-            }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        track.position = new_position
-        track.save()
-
-        return Response({'detail': 'track position updated'})

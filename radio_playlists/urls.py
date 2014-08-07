@@ -6,7 +6,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from .views import (
     PlaylistViewSet,
     PlaylistTrackViewSet,
-    PlaylistTrackUpdateOrder,
 )
 
 
@@ -44,11 +43,6 @@ urlpatterns = patterns(
             'delete': 'destroy',
         }),
         name='radio-playlists-tracks-detail'
-    ),
-    url(
-        r'^(?P<playlist_id>[0-9]+)/track/(?P<pk>[^/]+)/order/(?P<direction>[\-1]+)$',
-        PlaylistTrackUpdateOrder.as_view(),
-        name='radio-playlists-tracks-order'
     ),
 )
 
