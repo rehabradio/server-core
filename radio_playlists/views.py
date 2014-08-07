@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 # local imports
 from .models import Playlist, PlaylistTrack
+from radio_metadata.models import Track
 from .serializers import PlaylistSerializer, PlaylistTrackSerializer
 
 
@@ -112,6 +113,23 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         ])
 
         return Response(orderedPlaylist)
+
+    def create(self, request, *args, **kwargs):
+        # Use api to fetch track information
+        post_data = {
+            'track': request.POST['track'],
+            'playlist': kwargs['playlist_id'],
+            'position': int(self.queryset.count())+1
+        }
+
+        serializer = self.serializer_class(data=post_data)
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            response = serializer.errors
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(post_data)
 
     def retrieve(self, request, *args, **kwargs):
         try:

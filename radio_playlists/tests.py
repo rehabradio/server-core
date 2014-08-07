@@ -229,11 +229,8 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         # Count the number of records before the save
         existing_records_count = PlaylistTrack.objects.all().count()
         track = Track.objects.get(id=1)
-        playlist = Playlist.objects.get(id=1)
         post_data = {
             'track': track.id,
-            'playlist': playlist.id,
-            'position': int(existing_records_count)+1
         }
 
         resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
@@ -246,7 +243,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['playlist'], playlist.id)
+        self.assertEqual(data['playlist'], 1)
         self.assertEqual(data['track'], track.id)
         self.assertEqual(data['position'], int(new_records_count))
 
@@ -271,9 +268,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['playlist'], ['This field is required.'])
         self.assertEqual(data['track'], ['This field is required.'])
-        self.assertEqual(data['position'], ['Enter a whole number.'])
 
     """
     Look up a playlist track, and return all playlist track's attributes
