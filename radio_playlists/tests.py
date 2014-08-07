@@ -227,7 +227,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_create(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(playlist=2).count()
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=2
+        ).count()
         track = Track.objects.get(id=1)
         post_data = {
             'track': track.id,
@@ -252,7 +254,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_create_with_empty_values(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=1
+        ).count()
         post_data = {
             'track': None,
             'playlist': None,
@@ -304,7 +308,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_update(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=1
+        ).count()
         track = Track.objects.get(id=1)
         playlist = Playlist.objects.get(id=1)
         post_data = {
@@ -335,7 +341,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_partial_update(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=1
+        ).count()
         post_data = {
             'position': 33
         }
@@ -359,7 +367,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_destroy(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=1
+        ).count()
 
         resp = self.api_client.delete('/api/playlists/1/tracks/3/')
         data = json.loads(resp.content)
