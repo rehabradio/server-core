@@ -141,6 +141,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'message': 'Track removed from playlist'})
 
+    def pre_save(self, obj):
+        obj.owner = self.request.user
+
 
 class PlaylistTrackUpdateOrder(generics.GenericAPIView):
     """

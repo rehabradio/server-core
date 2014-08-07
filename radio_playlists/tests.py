@@ -6,6 +6,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 
 from .models import Playlist, PlaylistTrack
+from radio_metadata.models import Track
 
 
 class BaseTestCase(TestCase):
@@ -186,7 +187,6 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     Retrieve a list of all playlist tracks, with an excepted result set
     """
-    """
     def test_list(self):
         expected_attrs = (
             'count',
@@ -197,10 +197,19 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
 
         expected_results_attrs = (
             'id',
-            'playlist',
-            'track',
+            'track_id',
+            'source_type',
+            'source_id',
+            'name',
+            'artists',
+            'duration_ms',
+            'track_number',
+            'preview_url',
             'position',
-            'owner',
+            'album',
+            'image_small',
+            'image_medium',
+            'image_large',
         )
 
         resp = self.api_client.get('/api/playlists/1/tracks/')
@@ -212,18 +221,19 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertTrue(set(expected_attrs) <= set(data))
         self.assertTrue(set(expected_results_attrs) <= set(playlists))
-    """
 
     """
-    Create a playlist with all data
-    """
+    Create a playlist track with all data
     """
     def test_create(self):
         # Count the number of records before the save
         existing_records_count = PlaylistTrack.objects.all().count()
+        track = Track.objects.get(id=1)
+        playlist = Playlist.objects.get(id=1)
         post_data = {
-            'name': 'test playlist',
-            'description': 'a playlist for tdd',
+            'track': track.id,
+            'playlist': playlist.id,
+            'position': int(existing_records_count)+1
         }
 
         resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
@@ -236,9 +246,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['name'], post_data['name'])
-        self.assertEqual(data['description'], post_data['description'])
-    """
+        self.assertEqual(data['playlist'], playlist.id)
+        self.assertEqual(data['track'], track.id)
+        self.assertEqual(data['position'], int(new_records_count))
 
     """
     Create a playlist with no data

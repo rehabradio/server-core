@@ -38,7 +38,6 @@ class TrackSerializer(BaseSerializer):
 
     # track stats
     play_count = serializers.IntegerField()
-    vote_count = serializers.IntegerField()
     created = serializers.DateTimeField()
     updated = serializers.DateTimeField()
 
