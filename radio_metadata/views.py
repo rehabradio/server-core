@@ -21,7 +21,7 @@ from .sources import spotify
 from radio.custom_exceptions import InvalidBackend, MissingParameter
 
 
-def _getTrackData(source_type, source_id):
+def _get_track_data(source_type, source_id):
     """
     Does a track lookup using the API specified in "source_type"
     Returns a dictionary
@@ -30,7 +30,7 @@ def _getTrackData(source_type, source_id):
         # Query the spotify api for all the track data
         track_data = spotify.lookup_track(source_id)
         # Get or create relational album field
-        track_data['album'] = _getOrCreateAlbum(
+        track_data['album'] = _get_or_create_album(
             track_data['album'],
             'spotify'
         )
@@ -43,7 +43,7 @@ def _getTrackData(source_type, source_id):
     return track_data
 
 
-def _getOrCreateAlbum(album, source_type):
+def _get_or_create_album(album, source_type):
     """
     Get or create an album record from db,
     Returns an Album model reference
@@ -56,7 +56,7 @@ def _getOrCreateAlbum(album, source_type):
     return record
 
 
-def _getOrCreateArtists(artists, source_type):
+def _get_or_create_artists(artists, source_type):
     """
     Get or create artist records from db,
     Returns a list of Artist model references
@@ -73,7 +73,7 @@ def _getOrCreateArtists(artists, source_type):
     return artistModels
 
 
-def _getOrCreateTrack(track_data, owner):
+def _get_or_create_track(track_data, owner):
     """
     Saves a track to the db, unless one already exists
     Returns reference to Track model reference
@@ -294,7 +294,7 @@ class TrackViewSet(viewsets.ModelViewSet):
         # Use api to fetch track information
         post_data = request.POST
         try:
-            track_data = _getTrackData(
+            track_data = _get_track_data(
                 post_data['source_type'],
                 post_data['source_id']
             )
@@ -305,7 +305,7 @@ class TrackViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         # Save the track
         try:
-            trackObj = _getOrCreateTrack(track_data, self.request.user)
+            trackObj = _get_or_create_track(track_data, self.request.user)
             track = trackObj['track']
         except:
             response = {
@@ -315,7 +315,7 @@ class TrackViewSet(viewsets.ModelViewSet):
 
         # Save the track artists
         try:
-            _getOrCreateArtists(
+            _get_or_create_artists(
                 track_data['artists'],
                 post_data['source_type']
             )
