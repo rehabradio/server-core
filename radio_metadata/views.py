@@ -325,7 +325,9 @@ class TrackViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(track)
+        new_track = Track.objects.filter(id=track.id).values()[0]
+
+        return Response(new_track)
 
     # Set user id, for each record saved
     def pre_save(self, obj):
