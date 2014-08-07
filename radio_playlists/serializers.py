@@ -10,7 +10,7 @@ class PlaylistSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Playlist
         view_name = 'radio-playlists-api-detail'
-        fields = ('id', 'name', 'description', 'protected')
+        fields = ('id', 'name', 'description')
 
 
 class PlaylistTrackSerializer(serializers.ModelSerializer):

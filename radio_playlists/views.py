@@ -37,6 +37,8 @@ def _build_track(record, request):
         ('name', track.name),
         # Artists is a list of the artist names
         ('artists', [{'name': artist.name} for artist in track.artists.all()]),
+        ('duration_ms', track.duration_ms),
+        ('track_number', track.track_number),
         ('preview_url', track.preview_url),
         ('position', record.position),
         ('album', unicode(track.album)),
@@ -80,48 +82,18 @@ class PlaylistViewSet(viewsets.ModelViewSet):
             trackData = _build_track(record, request)
             tracks.append(trackData)
 
-        trackObj = collections.OrderedDict([
+        # Return data
+        orderedPlaylist = collections.OrderedDict([
+            ('id', playlist.id),
+            ('name', playlist.name),
+            ('description', playlist.description),
             ('count', len(tracks)),
             ('next', None),
             ('previous', None),
             ('results', tracks),
         ])
 
-        # Return data
-        orderedPlaylist = collections.OrderedDict([
-            ('id', playlist.id),
-            ('name', playlist.name),
-            ('description', playlist.description),
-            ('protected', playlist.protected),
-            ('tracks', trackObj),
-        ])
-
         return Response(orderedPlaylist)
-
-    # Removes playlist from db (Cascading)
-    def destroy(self, request, *args, **kwargs):
-        try:
-            playlist = Playlist.objects.get(id=kwargs['pk'])
-        except:
-            response = {'message': 'Playlist not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Prevent protected playlists from being removed
-        if playlist.protected:
-            response = {
-                'message': 'Action not authorised, playlist is protected'
-            }
-            return Response(response, status=status.HTTP_403_FORBIDDEN)
-        else:
-            try:
-                playlist.delete()
-            except:
-                response = {
-                    'message': 'Failed to remove playlist',
-                }
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        return Response({'message': 'playlist successfully removed'})
 
     # Set user id, for each record saved
     def pre_save(self, obj):
