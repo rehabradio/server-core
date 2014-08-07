@@ -124,20 +124,24 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         """
         Uses a track id to add a track to the playlist
         """
+        total_playlist_records = PlaylistTrack.objects.filter(
+            playlist=kwargs['playlist_id']
+        ).count()
         post_data = {
             'track': request.POST['track'],
             'playlist': kwargs['playlist_id'],
-            'position': int(self.queryset.count())+1
+            'position': int(total_playlist_records)+1,
         }
 
         serializer = self.serializer_class(data=post_data)
         if serializer.is_valid():
+            serializer.object.owner_id = self.request.user.id
             serializer.save()
         else:
             response = serializer.errors
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(post_data)
+        return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         """

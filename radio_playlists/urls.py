@@ -35,7 +35,7 @@ urlpatterns = patterns(
         name='radio-playlists-tracks-list'
     ),
     url(
-        r'^(?P<playlist_id>[0-9]+)/tracks/(?P<pk>[^/]+)$',
+        r'^(?P<playlist_id>[0-9]+)/tracks/(?P<pk>[^/]+)/$',
         PlaylistTrackViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',

@@ -227,23 +227,23 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_create(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.all().count()
+        existing_records_count = PlaylistTrack.objects.filter(playlist=2).count()
         track = Track.objects.get(id=1)
         post_data = {
             'track': track.id,
         }
 
-        resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
+        resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.all().count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=2).count()
 
         # Ensure request was successful
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['playlist'], 1)
+        self.assertEqual(data['playlist'], 2)
         self.assertEqual(data['track'], track.id)
         self.assertEqual(data['position'], int(new_records_count))
 
@@ -252,16 +252,16 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_create_with_empty_values(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.all().count()
+        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
         post_data = {
             'track': None,
             'playlist': None,
             'position': None,
         }
 
-        resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
+        resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.all().count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
         # Ensure request failed
         self.assertEqual(resp.status_code, 400)
@@ -291,7 +291,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
             'image_large',
         )
 
-        resp = self.api_client.get('/api/playlists/1/tracks/3')
+        resp = self.api_client.get('/api/playlists/1/tracks/3/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
@@ -304,7 +304,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_update(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.all().count()
+        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
         track = Track.objects.get(id=1)
         playlist = Playlist.objects.get(id=1)
         post_data = {
@@ -314,11 +314,11 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         }
 
         resp = self.api_client.put(
-            '/api/playlists/1/tracks/3',
+            '/api/playlists/1/tracks/3/',
             data=post_data
         )
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.all().count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
@@ -335,17 +335,17 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_partial_update(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.all().count()
+        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
         post_data = {
             'position': 33
         }
 
         resp = self.api_client.patch(
-            '/api/playlists/1/tracks/3',
+            '/api/playlists/1/tracks/3/',
             data=post_data
         )
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.all().count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
@@ -359,11 +359,11 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     """
     def test_destroy(self):
         # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.all().count()
+        existing_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
-        resp = self.api_client.delete('/api/playlists/1/tracks/3')
+        resp = self.api_client.delete('/api/playlists/1/tracks/3/')
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.all().count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
