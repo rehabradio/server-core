@@ -38,43 +38,36 @@ Requirements
 
 Before you can use this project, you'll need to install a few dependencies:
 
-- [Virtualbox >= 4.2](https://www.virtualbox.org)
-- [Vagrant >= 1.4](http://www.vagrantup.com)
-- [Vagrant Hostmanager Plugin](https://github.com/smdahlen/vagrant-hostmanager)
-- [Vagrant VBGuest Plugin](https://github.com/dotless-de/vagrant-vbguest)
+- [Foreman/Heroku-Toolbelt](https://toolbelt.heroku.com/)
+- [virtualenvWrapper](http://virtualenvwrapper.readthedocs.org/en/latest/install.html)
 
 
-Provisioning the Vagrant environment
-------------------------------------
+Foreman
+-----------------------------------------
+Foreman requires a `.env` file to work. Please ensure you create this file in the project root directory (same directory as manage.py), and ensure the following keys are listed
 
-Using the vagrant box is simple. Provided you have the prerequisites above installed, you can be up and running with a few short commands:
+SECRET_KEY=[django secret key]
 
-First, clone this repository to an appropriate location.
+GOOGLE_OAUTH2_CLIENT_ID=[google client id]
+GOOGLE_OAUTH2_CLIENT_SECRET=[google client secret key]
+GOOGLE_WHITE_LISTED_DOMAINS=[list of email domains that can access the api]
 
-    dev@box:~/.../projects$ git clone ssh://git@stash.rehabstudio.com:7999/~paddy/rehabradio.git
+SOUNDCLOUD_CLIENT_ID=[soundcloud secret key]
 
-Next, navigate inside the vagrant folder and provision the guest instance.
-
-    dev@box:~/.../projects$ cd rehabradio/vagrant
-    dev@box:~/.../vagrant$ vagrant up
-
-Once provisioned, you can ssh into the running box and complete preparation of your environment:
-
-    dev@box:~/.../vagrant$ vagrant ssh
-
-You'll be dropped at a Bash shell in a Byobu environment. The application data lives in the `~/app/` folder and most actions/commands should be carried out in this folder.
+TEST_USERNAME=[username for test login]
+TEST_PASSWORD=[password for test login]
 
 
 Preparing your Python virtual environment
 -----------------------------------------
 
-Whilst the Vagrant box itself provides most of what you'll need to run and develop a simple app, for our purposes (testing, i18n, third-party django apps etc.) we need a few extra dependencies and tools.  Standard Python procedure is to install all dependencies in a virtualenv (both virtualenv and virtualenvwrapper should already be installed inside the Vagrant virtual machine), and so we shall:
-
-    vagrant@rehabradio:~/app$ mkvirtualenv rehabradio
+Standard Python procedure is to install all dependencies in a virtualenv (both virtualenv and virtualenvwrapper should already be installed before this step), and so we shall:
+    vagrant@rehabradio:~/$ cd server-core
+    vagrant@rehabradio:~/server-core$ mkvirtualenv rehabradio
 
 virtualenvwrapper will create and activate your new virtualenv for you. You can now install the required dependencies; the simplest method is to use pip
 
-    (rehabradio)vagrant@rehabradio:~/app$ pip install -r requirements.txt
+    (rehabradio)vagrant@rehabradio:~/server-core$ pip install -r requirements.txt
 
 To deactivate the virtualenv simply type `deactivate`, and to reactivate use `workon rehabradio`.
 
@@ -86,12 +79,12 @@ Preparing your Django environment
 ---------------------------------
 
 Almost there... Before we can get started we need to complete a few final steps to set up our Django environment locally, such as creating database tables and a superuser.
-
-    (rehabradio)vagrant@rehabradio:~/app$ python manage.py migrate
+    (rehabradio)vagrant@rehabradio:~/server-core$ mkdir databases
+    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py migrate
 
 `migrate` will ask a few questions on the terminal, fill in the required details as appropriate. You should now be ready to start the application locally.
 
-    (rehabradio)vagrant@rehabradio:~/app$ python manage.py runserver 0.0.0.0:8000
+    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py runserver 0.0.0.0:8000
 
 You should now be able to access the running Django application in a browser at `http://rehabradio.vagrant.local:8000/api/`
 
