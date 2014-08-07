@@ -109,37 +109,15 @@ class PlaylistViewSetTestCase(BaseTestCase):
             'id',
             'name',
             'description',
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-
-        expected_results_attrs = (
-            'id',
-            'track_id',
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'album',
-            'duration_ms',
-            'preview_url',
-            'track_number',
-            'image_small',
-            'image_medium',
-            'image_large',
         )
 
         resp = self.api_client.get('/api/playlists/1/')
         data = json.loads(resp.content)
-        tracks = data['results'][0]
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(expected_attrs) <= set(data))
-        self.assertTrue(set(expected_results_attrs) <= set(tracks))
 
     """
     Update a playlist's data
@@ -158,7 +136,8 @@ class PlaylistViewSetTestCase(BaseTestCase):
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure a the record was updated and a new records was not added to the database
+        # Ensure a the record was updated
+        # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         self.assertEqual(new_record['name'], post_data['name'])
         self.assertEqual(new_record['description'], post_data['description'])
@@ -192,7 +171,6 @@ class PlaylistViewSetTestCase(BaseTestCase):
         existing_records_count = Playlist.objects.all().count()
 
         resp = self.api_client.delete('/api/playlists/2/')
-        print(resp)
         data = json.loads(resp.content)
         new_records_count = Playlist.objects.all().count()
 

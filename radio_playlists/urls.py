@@ -16,7 +16,7 @@ urlpatterns = patterns(
         r'^$', PlaylistViewSet.as_view({
             'get': 'list',
             'post': 'create',
-        }), name='radio-playlists-api-list'
+        }), name='radio-playlists-list'
     ),
     url(
         r'^(?P<pk>[0-9]+)/$',
@@ -25,20 +25,30 @@ urlpatterns = patterns(
             'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
-        }), name='radio-playlists-api-detail'
+        }), name='radio-playlists-detail'
     ),
     url(
-        r'^(?P<playlist>[0-9]+)/track/(?P<pk>[^/]+)$',
+        r'^(?P<playlist_id>[0-9]+)/tracks/$',
+        PlaylistTrackViewSet.as_view({
+            'get': 'list',
+            'post': 'create',
+        }),
+        name='radio-playlists-tracks-list'
+    ),
+    url(
+        r'^(?P<playlist_id>[0-9]+)/tracks/(?P<pk>[^/]+)$',
         PlaylistTrackViewSet.as_view({
             'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
             'delete': 'destroy',
         }),
-        name='radio-playlists-api-track'
+        name='radio-playlists-tracks-detail'
     ),
     url(
-        r'^(?P<playlist>[0-9]+)/track/(?P<pk>[^/]+)/order/(?P<direction>[\-1]+)$',
+        r'^(?P<playlist_id>[0-9]+)/track/(?P<pk>[^/]+)/order/(?P<direction>[\-1]+)$',
         PlaylistTrackUpdateOrder.as_view(),
-        name='radio-playlists-api-track-order'
+        name='radio-playlists-tracks-order'
     ),
 )
 
