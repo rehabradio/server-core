@@ -95,6 +95,24 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         return Response(orderedPlaylist)
 
+    # Removes playlist from db (Cascading)
+    def destroy(self, request, *args, **kwargs):
+        try:
+            playlist = Playlist.objects.get(id=kwargs['pk'])
+        except:
+            response = {'detail': 'Playlist not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            playlist.delete()
+        except:
+            response = {
+                'detail': 'Failed to remove playlist',
+            }
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'detail': 'playlist successfully removed'})
+
     # Set user id, for each record saved
     def pre_save(self, obj):
         obj.owner = self.request.user

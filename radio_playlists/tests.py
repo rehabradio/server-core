@@ -190,12 +190,9 @@ class PlaylistViewSetTestCase(BaseTestCase):
     def test_destroy(self):
         # Count the number of records before the save
         existing_records_count = Playlist.objects.all().count()
-        post_data = {
-            'name': 'updated playlist',
-            'description': 'playlist is now updated',
-        }
 
-        resp = self.api_client.delete('/api/playlists/2/', data=post_data)
+        resp = self.api_client.delete('/api/playlists/2/')
+        print(resp)
         data = json.loads(resp.content)
         new_records_count = Playlist.objects.all().count()
 
