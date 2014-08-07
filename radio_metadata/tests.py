@@ -29,10 +29,11 @@ class MetadataAPIRootViewTestCase(BaseTestCase):
         self.assertTrue(data['endpoints']['search'])
         self.assertTrue(data['endpoints']['lookup'])
 
+
 class LookupRootViewTestCase(BaseTestCase):
     """
     Root index for all metadata/lookup routes
-    List of endpoint links for track lookups, example urls provided under "tracks"
+    List of endpoint links for track lookups
     """
     def test_get(self):
         resp = self.api_client.get('/api/metadata/lookup/')
@@ -67,7 +68,9 @@ class LookupViewTestCase(BaseTestCase):
             'image_large',
         )
 
-        resp1 = self.api_client.get('/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/')
+        resp1 = self.api_client.get(
+            '/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/'
+        )
         data1 = json.loads(resp1.content)
 
         # Ensure request was successful
@@ -75,7 +78,9 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertTrue(set(track_attrs) <= set(data1))
 
-        resp2 = self.api_client.get('/api/metadata/lookup/soundcloud/153868082/')
+        resp2 = self.api_client.get(
+            '/api/metadata/lookup/soundcloud/153868082/'
+        )
         data2 = json.loads(resp2.content)
 
         # Ensure request was successful
@@ -93,14 +98,16 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], 'Invalid backend, provider not recognised.')
-
+        self.assertEqual(
+            data['detail'],
+            'Invalid backend, provider not recognised.'
+        )
 
 
 class SearchRootViewTestCase(BaseTestCase):
     """
     Root index for all metadata/search routes
-    List of endpoint links for search lookups, example urls provided under "tracks"
+    List of endpoint links for search lookups
     """
     def test_get(self):
         resp = self.api_client.get('/api/metadata/search/')
@@ -151,7 +158,9 @@ class SearchViewTestCase(BaseTestCase):
         self.assertTrue(set(result_attrs) <= set(data1))
         self.assertTrue(set(track_attrs) <= set(tracks1))
 
-        resp2 = self.api_client.get('/api/metadata/search/soundcloud/?q=narsti/')
+        resp2 = self.api_client.get(
+            '/api/metadata/search/soundcloud/?q=narsti/'
+        )
         data2 = json.loads(resp2.content)
         tracks2 = data2['results'][0]
 
@@ -171,7 +180,10 @@ class SearchViewTestCase(BaseTestCase):
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], 'Invalid backend, provider not recognised.')
+        self.assertEqual(
+            data['detail'],
+            'Invalid backend, provider not recognised.'
+        )
 
     """
     Test 400 error and detail message returns, if no "q" parameter is set
