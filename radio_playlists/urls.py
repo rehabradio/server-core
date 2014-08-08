@@ -39,7 +39,6 @@ urlpatterns = patterns(
         r'^(?P<playlist_id>[0-9]+)/tracks/(?P<pk>[^/]+)/$',
         PlaylistTrackViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
         }),
