@@ -347,7 +347,6 @@ class TrackViewSet(viewsets.ModelViewSet):
         new_playlist = Track.objects.filter(id=track.id).values()[0]
         return Response(new_playlist)
 
-    # Removes playlist from db (Cascading)
     def destroy(self, request, *args, **kwargs):
         """
         Removes track from database, and returns a detail reponse

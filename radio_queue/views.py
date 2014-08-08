@@ -16,6 +16,26 @@ class QueueViewSet(viewsets.ModelViewSet):
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Removes queue from database, and returns a detail reponse
+        """
+        try:
+            queue = Queue.objects.get(id=kwargs['pk'])
+        except:
+            response = {'detail': 'Queue not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            queue.delete()
+        except:
+            response = {
+                'detail': 'Failed to remove queue',
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'detail': 'Queue successfully removed'})
+
     def pre_save(self, obj):
         """
         Set user id, for each record saved/updated
@@ -32,12 +52,13 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Uses a track id to add a track to the queue
+        Uses a track id to add a track to the end of a queue
         """
+        position = QueueTrack.objects.filter(queue=kwargs['queue_id'])+1
         try:
             queue_track = QueueTrack.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
-                position=request.DATA['position'],
+                position=position,
                 owner=self.request.user
             )
         except:
