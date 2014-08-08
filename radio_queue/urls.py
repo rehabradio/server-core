@@ -3,35 +3,58 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 # local imports
-from .views import (
-    QueueList,
-    QueueAddTrack,
-    QueueNextTrack,
-    QueueTrackVote,
-)
+from .views import QueueViewSet, QueueTrackViewSet, QueueTrackHistoryViewSet
 
 
 urlpatterns = patterns(
     '',
     url(
         r'^$',
-        QueueList.as_view(),
-        name='radio-queue-api'
+        QueueViewSet.as_view({
+            'get': 'list',
+            'post': 'create',
+        }), name='radio-queue-list'
     ),
     url(
-        r'^active/$',
-        QueueNextTrack.as_view(),
-        name='radio-queue-api-active'
+        r'^(?P<pk>[0-9]+)/$',
+        QueueViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }), name='radio-queue-detail'
     ),
     url(
-        r'^add/(?P<track_id>[^/]+)$',
-        QueueAddTrack.as_view(),
-        name='radio-queue-api-add'
+        r'^(?P<queue_id>[0-9]+)/tracks/$',
+        QueueTrackViewSet.as_view({
+            'get': 'list',
+            'post': 'create',
+        }), name='radio-queue-track-list'
     ),
     url(
-        r'^vote/(?P<track_id>[0-9]+)/(?P<vote>[\-1]+)$',
-        QueueTrackVote.as_view(),
-        name='radio-data-tracks-vote'
+        r'^(?P<queue_id>[0-9]+)/tracks/(?P<pk>[0-9]+)/$',
+        QueueTrackViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }), name='radio-queue-track-detail'
+    ),
+    url(
+        r'^(?P<queue_id>[0-9]+)/history/$',
+        QueueTrackHistoryViewSet.as_view({
+            'get': 'list',
+            'post': 'create',
+        }), name='radio-queue-track-history-list'
+    ),
+    url(
+        r'^(?P<queue_id>[0-9]+)/history/(?P<pk>[0-9]+)/$',
+        QueueTrackHistoryViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }), name='radio-queue-track-history-detail'
     ),
 )
 

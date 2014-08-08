@@ -10,9 +10,8 @@ def update_owner(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     Track = apps.get_model("radio_metadata", "Track")
-    user = User.objects.get(id=1)
-    for track in Track.objects.all():
-        track.owner_id = user.id
+    for track in Track.objects.filter():
+        track.owner_id = 1
         track.save()
 
 

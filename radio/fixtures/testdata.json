@@ -154,6 +154,33 @@
 },
 {
     "fields": {
+        "model": "queue",
+        "name": "queue",
+        "app_label": "radio_queue"
+    },
+    "model": "contenttypes.contenttype",
+    "pk": 18
+},
+{
+    "fields": {
+        "model": "queuetrack",
+        "name": "queue track",
+        "app_label": "radio_queue"
+    },
+    "model": "contenttypes.contenttype",
+    "pk": 19
+},
+{
+    "fields": {
+        "model": "queuetrackhistory",
+        "name": "queue track history",
+        "app_label": "radio_queue"
+    },
+    "model": "contenttypes.contenttype",
+    "pk": 20
+},
+{
+    "fields": {
         "source_id": "4Ui2kfOqGujY81UcPrb5KE",
         "source_type": "spotify",
         "name": "Haim"
@@ -802,13 +829,94 @@
 },
 {
     "fields": {
+        "codename": "add_queue",
+        "name": "Can add queue",
+        "content_type": 18
+    },
+    "model": "auth.permission",
+    "pk": 52
+},
+{
+    "fields": {
+        "codename": "change_queue",
+        "name": "Can change queue",
+        "content_type": 18
+    },
+    "model": "auth.permission",
+    "pk": 53
+},
+{
+    "fields": {
+        "codename": "delete_queue",
+        "name": "Can delete queue",
+        "content_type": 18
+    },
+    "model": "auth.permission",
+    "pk": 54
+},
+{
+    "fields": {
+        "codename": "add_queuetrack",
+        "name": "Can add queue track",
+        "content_type": 19
+    },
+    "model": "auth.permission",
+    "pk": 55
+},
+{
+    "fields": {
+        "codename": "change_queuetrack",
+        "name": "Can change queue track",
+        "content_type": 19
+    },
+    "model": "auth.permission",
+    "pk": 56
+},
+{
+    "fields": {
+        "codename": "delete_queuetrack",
+        "name": "Can delete queue track",
+        "content_type": 19
+    },
+    "model": "auth.permission",
+    "pk": 57
+},
+{
+    "fields": {
+        "codename": "add_queuetrackhistory",
+        "name": "Can add queue track history",
+        "content_type": 20
+    },
+    "model": "auth.permission",
+    "pk": 58
+},
+{
+    "fields": {
+        "codename": "change_queuetrackhistory",
+        "name": "Can change queue track history",
+        "content_type": 20
+    },
+    "model": "auth.permission",
+    "pk": 59
+},
+{
+    "fields": {
+        "codename": "delete_queuetrackhistory",
+        "name": "Can delete queue track history",
+        "content_type": 20
+    },
+    "model": "auth.permission",
+    "pk": 60
+},
+{
+    "fields": {
         "username": "admin",
         "first_name": "",
         "last_name": "",
         "is_active": true,
         "is_superuser": true,
         "is_staff": true,
-        "last_login": "2014-08-07T16:12:07.213Z",
+        "last_login": "2014-08-08T13:55:31.742Z",
         "groups": [],
         "user_permissions": [],
         "password": "pbkdf2_sha256$12000$TWUqKdNPVW8C$7THmkljV8fVP+EP4KJMjbpVZ3hBYunTyiMIe16hE8l4=",
@@ -822,7 +930,7 @@
     "fields": {
         "album": 1,
         "image_large": null,
-        "updated": "2014-08-01T11:38:05.261Z",
+        "updated": "2014-08-08T13:20:27.681Z",
         "image_medium": null,
         "duration_ms": 245800,
         "name": "The Wire",
@@ -845,7 +953,7 @@
     "fields": {
         "album": null,
         "image_large": null,
-        "updated": "2014-08-01T11:38:20.240Z",
+        "updated": "2014-08-08T13:20:27.684Z",
         "image_medium": null,
         "duration_ms": 190083,
         "name": "Dale Hooks & Frederick Fringe pres. Ubblahkan - Supa Crack (UlyBug Records)",
@@ -868,7 +976,7 @@
     "fields": {
         "album": 1,
         "image_large": null,
-        "updated": "2014-08-01T11:39:31.802Z",
+        "updated": "2014-08-08T13:20:27.685Z",
         "image_medium": null,
         "duration_ms": 245800,
         "name": "Forever",
@@ -891,7 +999,7 @@
     "fields": {
         "album": null,
         "image_large": null,
-        "updated": "2014-08-01T11:39:56.332Z",
+        "updated": "2014-08-08T13:20:27.686Z",
         "image_medium": null,
         "duration_ms": 115131,
         "name": "Dale Hooks & Frederick Fringe pres. Ubblahkan - Supa Crack (Web Preview)",
@@ -914,7 +1022,7 @@
     "fields": {
         "album": 1,
         "image_large": null,
-        "updated": "2014-08-01T11:40:31.353Z",
+        "updated": "2014-08-08T13:20:27.687Z",
         "image_medium": null,
         "duration_ms": 230453,
         "name": "If I Could Change Your Mind",
@@ -937,7 +1045,7 @@
     "fields": {
         "album": null,
         "image_large": null,
-        "updated": "2014-08-04T14:11:51.141Z",
+        "updated": "2014-08-08T13:20:27.688Z",
         "image_medium": null,
         "duration_ms": 95511,
         "name": "Dale Hooks & Frederick Fringe Pres. Ubblahkan - Supa Crack Original - Snippet 96kbps",
@@ -960,7 +1068,7 @@
     "fields": {
         "album": 2,
         "image_large": null,
-        "updated": "2014-08-01T11:49:03.730Z",
+        "updated": "2014-08-08T13:20:27.689Z",
         "image_medium": null,
         "duration_ms": 202120,
         "name": "I'll Make A Man Out Of You",
@@ -984,7 +1092,7 @@
     "fields": {
         "album": null,
         "image_large": null,
-        "updated": "2014-08-01T11:48:34.806Z",
+        "updated": "2014-08-08T13:20:27.691Z",
         "image_medium": null,
         "duration_ms": 163540,
         "name": "Everything Is AWESOME!!! - Tegan And Sara feat. The Lonely Island [The Lego Movie]",
@@ -1007,7 +1115,7 @@
     "fields": {
         "album": 3,
         "image_large": "https://i.scdn.co/image/4477db752224fe31cc8ef966491fb49951a0d511",
-        "updated": "2014-08-01T15:33:11.336Z",
+        "updated": "2014-08-08T13:20:27.692Z",
         "image_medium": "https://i.scdn.co/image/000d93fccbe70d3d675e5f83c323c29c85f8b36a",
         "duration_ms": 212586,
         "name": "Hakuna Matata",
@@ -1028,7 +1136,7 @@
     "fields": {
         "album": null,
         "image_large": "https://i1.sndcdn.com/artworks-000084004587-ai42y6-t67x67.jpg?e76cf77",
-        "updated": "2014-08-01T15:39:11.792Z",
+        "updated": "2014-08-08T13:20:27.693Z",
         "image_medium": "https://i1.sndcdn.com/artworks-000084004587-ai42y6-t300x300.jpg?e76cf77",
         "duration_ms": 308116,
         "name": "Everything Is Awesome - R&B Edition Feat. Lee Jamison",
@@ -1049,7 +1157,7 @@
     "fields": {
         "album": 2,
         "image_large": "https://i.scdn.co/image/ddff86654bb7b5dd379495bf82984dafdad62237",
-        "updated": "2014-08-01T16:10:43.163Z",
+        "updated": "2014-08-08T13:20:27.694Z",
         "image_medium": "https://i.scdn.co/image/b68d2ec512b8fc3329d05c0425dea0df4188d6a7",
         "duration_ms": 146413,
         "name": "A Girl Worth Fighting For",
@@ -1076,7 +1184,7 @@
     "fields": {
         "album": 4,
         "image_large": null,
-        "updated": "2014-08-08T08:24:48.139Z",
+        "updated": "2014-08-08T13:20:27.695Z",
         "image_medium": null,
         "duration_ms": 195493,
         "name": "You And Me",
@@ -1273,198 +1381,22 @@
 },
 {
     "fields": {
-        "track": 7,
-        "started": "2014-08-05T09:30:45.895Z",
         "owner": 1,
-        "position": 1
+        "updated": "2014-08-08T13:34:53.367Z",
+        "created": "2014-08-08T13:34:53.367Z",
+        "name": "rehab",
+        "description": "Global rehab queue"
     },
-    "model": "radio_queue.queuedtrack",
-    "pk": 8
-},
-{
-    "fields": {
-        "track": 8,
-        "started": null,
-        "owner": 1,
-        "position": 2
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 9
-},
-{
-    "fields": {
-        "track": 8,
-        "started": null,
-        "owner": 1,
-        "position": 3
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 10
-},
-{
-    "fields": {
-        "track": 7,
-        "started": null,
-        "owner": 1,
-        "position": 4
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 11
-},
-{
-    "fields": {
-        "track": 9,
-        "started": null,
-        "owner": 1,
-        "position": 5
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 12
-},
-{
-    "fields": {
-        "track": 13,
-        "started": null,
-        "owner": 1,
-        "position": 6
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 13
-},
-{
-    "fields": {
-        "track": 13,
-        "started": null,
-        "owner": 1,
-        "position": 7
-    },
-    "model": "radio_queue.queuedtrack",
-    "pk": 14
-},
-{
-    "fields": {
-        "track": 1,
-        "owner": 1,
-        "created": "2014-08-01T11:38:05.295Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
+    "model": "radio_queue.queue",
     "pk": 1
 },
 {
     "fields": {
-        "track": 2,
-        "owner": 1,
-        "created": "2014-08-01T11:38:20.353Z"
+        "track": 1,
+        "position": 1,
+        "owner": 1
     },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 2
-},
-{
-    "fields": {
-        "track": 3,
-        "owner": 1,
-        "created": "2014-08-01T11:39:31.833Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 3
-},
-{
-    "fields": {
-        "track": 4,
-        "owner": 1,
-        "created": "2014-08-01T11:39:56.370Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 4
-},
-{
-    "fields": {
-        "track": 5,
-        "owner": 1,
-        "created": "2014-08-01T11:40:31.476Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 5
-},
-{
-    "fields": {
-        "track": 6,
-        "owner": 1,
-        "created": "2014-08-01T11:40:44.174Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 6
-},
-{
-    "fields": {
-        "track": 6,
-        "owner": 1,
-        "created": "2014-08-01T11:46:14.453Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 7
-},
-{
-    "fields": {
-        "track": 7,
-        "owner": 1,
-        "created": "2014-08-01T11:46:37.201Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 8
-},
-{
-    "fields": {
-        "track": 8,
-        "owner": 1,
-        "created": "2014-08-01T11:47:25.455Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 9
-},
-{
-    "fields": {
-        "track": 8,
-        "owner": 1,
-        "created": "2014-08-01T11:48:34.846Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 10
-},
-{
-    "fields": {
-        "track": 7,
-        "owner": 1,
-        "created": "2014-08-01T11:49:03.844Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 11
-},
-{
-    "fields": {
-        "track": 9,
-        "owner": 1,
-        "created": "2014-08-01T15:33:11.381Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 12
-},
-{
-    "fields": {
-        "track": 13,
-        "owner": 1,
-        "created": "2014-08-01T15:36:48.983Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 13
-},
-{
-    "fields": {
-        "track": 13,
-        "owner": 1,
-        "created": "2014-08-01T15:39:11.829Z"
-    },
-    "model": "radio_queue.queuedtrackhistory",
-    "pk": 14
+    "model": "radio_queue.queuetrack",
+    "pk": 1
 }
 ]

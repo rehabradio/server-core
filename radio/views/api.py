@@ -33,7 +33,7 @@ class APIRootView(APIView):
             ('endpoints', collections.OrderedDict([
                 ('metadata', reverse('radio-data-api-root', request=request)),
                 ('playlists', reverse('radio-playlists-list', request=request)),
-                ('queue', reverse('radio-queue-api', request=request)),
+                ('queue', reverse('radio-queue-list', request=request)),
                 ('users', reverse('radio-users-api-list', request=request)),
             ])),
         ])

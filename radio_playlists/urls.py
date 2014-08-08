@@ -12,7 +12,8 @@ from .views import (
 urlpatterns = patterns(
     '',
     url(
-        r'^$', PlaylistViewSet.as_view({
+        r'^$',
+        PlaylistViewSet.as_view({
             'get': 'list',
             'post': 'create',
         }), name='radio-playlists-list'
