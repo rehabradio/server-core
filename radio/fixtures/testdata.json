@@ -996,7 +996,7 @@
         "created": "2014-08-01T15:29:21.505Z",
         "image_small": "https://i.scdn.co/image/9637e762cccdb85aa7a5bd37a22aa270c0763c45",
         "preview_url": "https://p.scdn.co/mp3-preview/7e71aa5895b252d34b5c2c9ca853f6c9bb953e31",
-        "owner": null,
+        "owner": 1,
         "track_number": 3,
         "play_count": 2,
         "source_type": "spotify",
