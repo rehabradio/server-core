@@ -197,19 +197,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
 
         expected_results_attrs = (
             'id',
-            'track_id',
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'duration_ms',
-            'track_number',
-            'preview_url',
+            'track',
             'position',
-            'album',
-            'image_small',
-            'image_medium',
-            'image_large',
+            'owner',
         )
 
         resp = self.api_client.get('/api/playlists/1/tracks/')
@@ -245,8 +235,8 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['playlist'], 2)
-        self.assertEqual(data['track'], track.id)
+        self.assertEqual(data['playlist_id'], 2)
+        self.assertEqual(data['track_id'], track.id)
         self.assertEqual(data['position'], int(new_records_count))
 
     """
@@ -259,8 +249,6 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         ).count()
         post_data = {
             'track': None,
-            'playlist': None,
-            'position': None,
         }
 
         resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
@@ -272,7 +260,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['track'], ['This field is required.'])
+        self.assertEqual(data['detail'], 'Track could not be saved to playlist')
 
     """
     Look up a playlist track, and return all playlist track's attributes
@@ -280,19 +268,9 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
     def test_retrieve(self):
         expected_attrs = (
             'id',
-            'track_id',
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'duration_ms',
-            'track_number',
-            'preview_url',
+            'track',
             'position',
-            'album',
-            'image_small',
-            'image_medium',
-            'image_large',
+            'owner',
         )
 
         resp = self.api_client.get('/api/playlists/1/tracks/3/')
@@ -302,39 +280,6 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(expected_attrs) <= set(data))
-
-    """
-    Update a playlist track's data
-    """
-    def test_update(self):
-        # Count the number of records before the save
-        existing_records_count = PlaylistTrack.objects.filter(
-            playlist=1
-        ).count()
-        track = Track.objects.get(id=1)
-        playlist = Playlist.objects.get(id=1)
-        post_data = {
-            'track': track.id,
-            'playlist': playlist.id,
-            'position': 24
-        }
-
-        resp = self.api_client.put(
-            '/api/playlists/1/tracks/3/',
-            data=post_data
-        )
-        data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
-
-        # Ensure request was successful
-        self.assertEqual(resp.status_code, 200)
-        # Ensure a new record was created in the database
-        self.assertEqual(existing_records_count, new_records_count)
-        # Ensure the returned json keys match the expected
-        self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['playlist'], playlist.id)
-        self.assertEqual(data['track'], track.id)
-        self.assertEqual(data['position'], post_data['position'])
 
     """
     Update a single piece of playlist's data

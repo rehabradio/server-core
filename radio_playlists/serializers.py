@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 # local imports
 from .models import Playlist, PlaylistTrack
+from radio_metadata.serializers import TrackSerializer
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
@@ -17,10 +18,11 @@ class PlaylistSerializer(serializers.ModelSerializer):
 
 
 class PlaylistTrackSerializer(serializers.ModelSerializer):
-    # playlist to which this track has been added
-    #position = serializers.IntegerField()
+    track = TrackSerializer()
+    position = serializers.IntegerField()
+    playlist = PlaylistSerializer(write_only=True)
     owner = serializers.Field(source='owner.username')
 
     class Meta:
         model = PlaylistTrack
-        fields = ('id', 'track', 'playlist', 'position')
+        fields = ('id', 'position', 'owner', 'track')

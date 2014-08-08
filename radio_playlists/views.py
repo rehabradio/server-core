@@ -1,12 +1,10 @@
-# stdlib imports
-import collections
-
 # third-party imports
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 # local imports
 from .models import Playlist, PlaylistTrack
+from radio_metadata.models import Track
 from .serializers import PlaylistSerializer, PlaylistTrackSerializer
 
 
@@ -19,32 +17,6 @@ def _reset_track_positions(playlist_id):
     for (i, track) in enumerate(records):
         track.position = i+1
         track.save()
-
-
-def _build_track(record):
-    """
-    Builds a ordered object to be returned to the client
-    """
-    # Fetch all track data
-    track = record.track
-    # Put all the track data into a nice singular dictionary
-    track = collections.OrderedDict([
-        ('id', record.id),
-        ('track_id', track.id),
-        ('source_id', track.source_id),
-        ('source_type', track.source_type),
-        ('name', track.name),
-        ('artists', track.artists.all().values()),
-        ('duration_ms', track.duration_ms),
-        ('track_number', track.track_number),
-        ('preview_url', track.preview_url),
-        ('position', record.position),
-        ('album', unicode(track.album)),
-        ('image_small', track.image_small),
-        ('image_medium', track.image_medium),
-        ('image_large', track.image_large),
-    ])
-    return track
 
 
 class PlaylistViewSet(viewsets.ModelViewSet):
@@ -89,74 +61,29 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
     queryset = PlaylistTrack.objects.all()
     serializer_class = PlaylistTrackSerializer
 
-    def list(self, request, *args, **kwargs):
-        """
-        Returns a list of all the playlist tracks with track data
-        """
-        try:
-            playlist = Playlist.objects.get(id=kwargs['playlist_id'])
-        except:
-            response = {
-                'detail': 'Playlist not found',
-            }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        # Grab all the associated tracks
-        db_tracks = PlaylistTrack.objects.filter(playlist_id=playlist)
-        # Loop through each track, to restructure and populate associate data
-        tracks = []
-        for (counter, record) in enumerate(db_tracks):
-            # Build out the track data
-            trackData = _build_track(record)
-            tracks.append(trackData)
-
-        # Return data
-        orderedPlaylist = collections.OrderedDict([
-            ('count', len(tracks)),
-            ('next', None),
-            ('previous', None),
-            ('results', tracks),
-        ])
-
-        return Response(orderedPlaylist)
-
     def create(self, request, *args, **kwargs):
         """
         Uses a track id to add a track to the playlist
         """
+        track_id = request.POST['track']
+        playlist_id = kwargs['playlist_id']
         total_playlist_records = PlaylistTrack.objects.filter(
             playlist=kwargs['playlist_id']
         ).count()
-        post_data = {
-            'track': request.POST['track'],
-            'playlist': kwargs['playlist_id'],
-            'position': int(total_playlist_records)+1,
-        }
 
-        serializer = self.serializer_class(data=post_data)
-        if serializer.is_valid():
-            serializer.object.owner_id = self.request.user.id
-            serializer.save()
-        else:
-            response = serializer.errors
+        try:
+            playlist = PlaylistTrack.objects.create(
+                track=Track.objects.get(id=track_id),
+                playlist=Playlist.objects.get(id=playlist_id),
+                position=total_playlist_records+1,
+                owner=self.request.user
+            )
+        except:
+            response = {'detail': 'Track could not be saved to playlist'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        """
-        Returns a playlist track with track data
-        """
-        try:
-            playlist_track = PlaylistTrack.objects.get(id=kwargs['pk'])
-            trackData = _build_track(playlist_track)
-        except:
-            response = {
-                'detail': 'Playlist track not found',
-            }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-        return Response(trackData)
+        new_playlist = PlaylistTrack.objects.filter(id=playlist.id).values()[0]
+        return Response(new_playlist)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -168,9 +95,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             playlist_track.delete()
             _reset_track_positions(playlist_id)
         except:
-            response = {
-                'detail': 'Playlist track not found',
-            }
+            response = {'detail': 'Playlist track not found'}
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'detail': 'Track removed from playlist'})
