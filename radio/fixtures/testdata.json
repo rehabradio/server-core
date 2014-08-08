@@ -298,6 +298,15 @@
 },
 {
     "fields": {
+        "source_id": "5PokPZn11xzZXyXSfnvIM3",
+        "source_type": "spotify",
+        "name": "Lifehouse"
+    },
+    "model": "radio_metadata.artist",
+    "pk": 17
+},
+{
+    "fields": {
         "source_id": "7CzrzGbCwqT8Y43tvIUPBX",
         "source_type": "spotify",
         "name": "Days Are Gone (Deluxe Edition)"
@@ -322,6 +331,15 @@
     },
     "model": "radio_metadata.album",
     "pk": 3
+},
+{
+    "fields": {
+        "source_id": "4mmUYaBXYsLKsuCoAE9UvX",
+        "source_type": "spotify",
+        "name": "Lifehouse"
+    },
+    "model": "radio_metadata.album",
+    "pk": 4
 },
 {
     "fields": {
@@ -790,7 +808,7 @@
         "is_active": true,
         "is_superuser": true,
         "is_staff": true,
-        "last_login": "2014-08-04T13:33:11.984Z",
+        "last_login": "2014-08-07T16:12:07.213Z",
         "groups": [],
         "user_permissions": [],
         "password": "pbkdf2_sha256$12000$TWUqKdNPVW8C$7THmkljV8fVP+EP4KJMjbpVZ3hBYunTyiMIe16hE8l4=",
@@ -1056,9 +1074,32 @@
 },
 {
     "fields": {
+        "album": 4,
+        "image_large": null,
+        "updated": "2014-08-08T08:24:48.139Z",
+        "image_medium": null,
+        "duration_ms": 195493,
+        "name": "You And Me",
+        "created": "2014-08-08T08:24:48.139Z",
+        "image_small": null,
+        "preview_url": "https://p.scdn.co/mp3-preview/9b55361ebe94215872f4fc2fdf789eb2038f4bda",
         "owner": 1,
-        "name": "Starred",
-        "description": "Admin's starred playlist"
+        "track_number": 2,
+        "play_count": 0,
+        "source_type": "spotify",
+        "artists": [],
+        "source_id": "4T2SmVJPtDdugk5j5xV1d5"
+    },
+    "model": "radio_metadata.track",
+    "pk": 15
+},
+{
+    "fields": {
+        "owner": 1,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "created": "2014-08-01T11:37:47.203Z",
+        "name": "Test Starred",
+        "description": "Test Admin's starred playlist"
     },
     "model": "radio_playlists.playlist",
     "pk": 1
@@ -1066,6 +1107,8 @@
 {
     "fields": {
         "owner": 1,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "created": "2014-08-01T11:37:47.203Z",
         "name": "Second",
         "description": "Admins second playlist"
     },
@@ -1074,93 +1117,159 @@
 },
 {
     "fields": {
-        "track": 2,
-        "position": 3,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 2,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 3
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 2
 },
 {
     "fields": {
-        "track": 3,
-        "position": 2,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 3,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 2
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 3
 },
 {
     "fields": {
-        "track": 4,
-        "position": 4,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 4,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 4
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 4
 },
 {
     "fields": {
-        "track": 5,
-        "position": 5,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 5,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 5
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 5
 },
 {
     "fields": {
-        "track": 6,
-        "position": 6,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 6,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 6
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 6
 },
 {
     "fields": {
-        "track": 8,
-        "position": 1,
         "playlist": 2,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 8,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 1
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 7
 },
 {
     "fields": {
-        "track": 7,
-        "position": 2,
         "playlist": 2,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 7,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 2
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 8
 },
 {
     "fields": {
-        "track": 14,
-        "position": 7,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 14,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 7
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 9
 },
 {
     "fields": {
-        "track": 8,
-        "position": 7,
         "playlist": 1,
-        "owner": 1
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 8,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 7
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 10
+},
+{
+    "fields": {
+        "playlist": 1,
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 1,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 8
+    },
+    "model": "radio_playlists.playlisttrack",
+    "pk": 11
+},
+{
+    "fields": {
+        "playlist": 2,
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 1,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 11
+    },
+    "model": "radio_playlists.playlisttrack",
+    "pk": 12
+},
+{
+    "fields": {
+        "playlist": 2,
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 2,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 12
+    },
+    "model": "radio_playlists.playlisttrack",
+    "pk": 13
+},
+{
+    "fields": {
+        "playlist": 2,
+        "created": "2014-08-01T11:37:47.203Z",
+        "track": 4,
+        "updated": "2014-08-01T11:37:47.203Z",
+        "owner": 1,
+        "position": 13
+    },
+    "model": "radio_playlists.playlisttrack",
+    "pk": 14
 },
 {
     "fields": {

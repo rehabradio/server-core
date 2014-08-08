@@ -9,6 +9,8 @@ class Playlist(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=500)
     owner = models.ForeignKey('auth.User')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (('name', 'owner'),)
@@ -22,6 +24,8 @@ class PlaylistTrack(models.Model):
     # Ordering of the tracks
     position = models.PositiveIntegerField(null=True)
     owner = models.ForeignKey('auth.User')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ('position',)

@@ -220,7 +220,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         existing_records_count = PlaylistTrack.objects.filter(
             playlist=2
         ).count()
-        track = Track.objects.get(id=1)
+        track = Track.objects.get(id=3)
         post_data = {
             'track': track.id,
         }

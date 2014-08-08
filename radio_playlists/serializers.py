@@ -10,6 +10,8 @@ class PlaylistSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     description = serializers.CharField()
     owner = serializers.Field(source='owner.username')
+    created = serializers.DateTimeField()
+    updated = serializers.DateTimeField()
 
     class Meta:
         model = Playlist
@@ -22,7 +24,9 @@ class PlaylistTrackSerializer(serializers.ModelSerializer):
     position = serializers.IntegerField()
     playlist = PlaylistSerializer(write_only=True)
     owner = serializers.Field(source='owner.username')
+    created = serializers.DateTimeField()
+    updated = serializers.DateTimeField()
 
     class Meta:
         model = PlaylistTrack
-        fields = ('id', 'position', 'owner', 'track')
+        fields = ('id', 'position', 'owner', 'track', 'created', 'updated')

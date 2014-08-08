@@ -76,23 +76,27 @@ def _get_or_create_track(track_data, owner):
     Saves a track to the db, unless one already exists
     Returns reference to Track model reference
     """
-    track, created = Track.objects.get_or_create(
-        source_id=track_data['source_id'],
-        source_type=track_data['source_type'],
-        name=track_data['name'],
-        duration_ms=track_data['duration_ms'],
-        preview_url=track_data['preview_url'],
-        track_number=track_data['track_number'],
-        album=track_data['album'],
-    )
-    if created:
-        track.image_small = track_data['image_small'],
-        track.image_medium = track_data['image_medium'],
-        track.image_large = track_data['image_large'],
-        track.owner = owner
-        track.save()
+    try:
+        track = Track.objects.get(
+            source_id=track_data['source_id'],
+            source_type=track_data['source_type'],
+        )
+    except:
+        track = Track.objects.create(
+            source_id=track_data['source_id'],
+            source_type=track_data['source_type'],
+            name=track_data['name'],
+            duration_ms=track_data['duration_ms'],
+            preview_url=track_data['preview_url'],
+            track_number=track_data['track_number'],
+            album=track_data['album'],
+            image_small=track_data['image_small'],
+            image_medium=track_data['image_medium'],
+            image_large=track_data['image_large'],
+            owner=owner
+        )
 
-    return {'created': created, 'track': track}
+    return track
 
 
 class MetadataAPIRootView(APIView):
@@ -305,8 +309,7 @@ class TrackViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         # Save the track
         try:
-            trackObj = _get_or_create_track(track_data, self.request.user)
-            track = trackObj['track']
+            track = _get_or_create_track(track_data, self.request.user)
         except:
             response = {
                 'detail': 'Track could not be saved',
