@@ -46,6 +46,24 @@ class TrackSerializer(BaseSerializer):
 
     class Meta:
         model = Track
+        fields = (
+            'id',
+            'source_type',
+            'source_id',
+            'name',
+            'artists',
+            'album',
+            'duration_ms',
+            'preview_url',
+            'track_number',
+            'image_small',
+            'image_medium',
+            'image_large',
+            'play_count',
+            'owner',
+            'created',
+            'updated',
+        )
 
 
 class PaginatedTrackSerializer(pagination.PaginationSerializer):
