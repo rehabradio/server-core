@@ -23,7 +23,7 @@ urlpatterns = patterns(
     url(r'^api/_auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/metadata/', include('radio_metadata.urls')),
     url(r'^api/playlists/', include('radio_playlists.urls')),
-    url(r'^api/queue/', include('radio_queue.urls')),
+    url(r'^api/queues/', include('radio_queue.urls')),
     url(r'^api/users/', include('radio_users.urls')),
 )
 
