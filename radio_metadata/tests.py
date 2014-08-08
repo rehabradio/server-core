@@ -1,7 +1,11 @@
 import json
+import os
+
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
+
+from .models import Track
 
 
 class BaseTestCase(TestCase):
@@ -54,7 +58,7 @@ class LookupViewTestCase(BaseTestCase):
     Test looking up a track using the spotify and soundcloud backends
     """
     def test_get(self):
-        track_attrs = (
+        expected_attrs = (
             'source_type',
             'source_id',
             'name',
@@ -66,6 +70,10 @@ class LookupViewTestCase(BaseTestCase):
             'image_small',
             'image_medium',
             'image_large',
+            'play_count',
+            'owner',
+            'created',
+            'updated',
         )
 
         resp1 = self.api_client.get(
@@ -76,7 +84,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp1.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(track_attrs) <= set(data1))
+        self.assertTrue(set(expected_attrs) <= set(data1))
 
         resp2 = self.api_client.get(
             '/api/metadata/lookup/soundcloud/153868082/'
@@ -86,7 +94,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp2.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(track_attrs) <= set(data2))
+        self.assertTrue(set(expected_attrs) <= set(data2))
 
     """
     Test 404 error and detail message returns, using a bad backend
@@ -134,7 +142,7 @@ class SearchViewTestCase(BaseTestCase):
             'previous',
             'results',
         )
-        track_attrs = (
+        expected_results_attrs = (
             'source_type',
             'source_id',
             'name',
@@ -146,6 +154,10 @@ class SearchViewTestCase(BaseTestCase):
             'image_small',
             'image_medium',
             'image_large',
+            'play_count',
+            'owner',
+            'created',
+            'updated',
         )
 
         resp1 = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
@@ -156,7 +168,7 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(resp1.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(result_attrs) <= set(data1))
-        self.assertTrue(set(track_attrs) <= set(tracks1))
+        self.assertTrue(set(expected_results_attrs) <= set(tracks1))
 
         resp2 = self.api_client.get(
             '/api/metadata/search/soundcloud/?q=narsti/'
@@ -168,7 +180,7 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(resp2.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(result_attrs) <= set(data2))
-        self.assertTrue(set(track_attrs) <= set(tracks2))
+        self.assertTrue(set(expected_results_attrs) <= set(tracks2))
 
     """
     Test 404 error and detail message returns, using a bad backend
@@ -196,3 +208,196 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(resp.status_code, 400)
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(data['detail'], 'Required parameters are missing')
+
+
+class TrackViewSetTestCase(TestCase):
+    """
+    Load in default data for tests
+    """
+    fixtures = ['radio/fixtures/testdata.json']
+    factory = APIRequestFactory()
+    api_client = APIClient()
+
+    """
+    Log in a user
+    """
+    def setUp(self):
+        username = os.environ.get('TEST_USERNAME', None)
+        password = os.environ.get('TEST_PASSWORD', None)
+        login = self.api_client.login(username=username, password=password)
+        self.assertEqual(login, True)
+
+    """
+    Retrieve a list of all Tracks, with an excepted result set
+    """
+    def test_list(self):
+        expected_attrs = (
+            'count',
+            'next',
+            'previous',
+            'results',
+        )
+
+        expected_results_attrs = (
+            'id',
+            'source_type',
+            'source_id',
+            'name',
+            'artists',
+            'album',
+            'duration_ms',
+            'preview_url',
+            'track_number',
+            'image_small',
+            'image_medium',
+            'image_large',
+            'play_count',
+            'owner',
+            'created',
+            'updated',
+        )
+
+        resp = self.api_client.get('/api/metadata/tracks/')
+        data = json.loads(resp.content)
+        Tracks = data['results'][0]
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(expected_results_attrs) <= set(Tracks))
+
+    """
+    Create a Track with all data
+    """
+    def test_create(self):
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'source_type': 'spotify',
+            'source_id': '4bCOAuhvjsxbVBM5MM8oik',
+        }
+
+        resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+        new_records_count = Track.objects.all().count()
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count+1, new_records_count)
+
+    """
+    Create a track with no source id
+    """
+    def test_create_with_no_source_id(self):
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'source_type': 'spotify',
+        }
+
+        resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+        data = json.loads(resp.content)
+        new_records_count = Track.objects.all().count()
+
+        # Ensure request failed
+        self.assertEqual(resp.status_code, 400)
+        # Ensure a new record was not added to the database
+        self.assertEqual(existing_records_count, new_records_count)
+        # Ensure validation flags where raised for each field
+        self.assertEqual(data['detail'], 'Track could not be found')
+
+    """
+    Create a track with bad backend
+    """
+    def test_create_with_bad_backend(self):
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'source_type': 'test',
+            'source_id': '4bCOAuhvjsxbVBM5MM8oik',
+        }
+
+        resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+        data = json.loads(resp.content)
+        new_records_count = Track.objects.all().count()
+
+        # Ensure request failed
+        self.assertEqual(resp.status_code, 400)
+        # Ensure a new record was not added to the database
+        self.assertEqual(existing_records_count, new_records_count)
+        # Ensure validation flags where raised for each field
+        self.assertEqual(data['detail'], 'Track could not be found')
+
+    """
+    Retrieve a track
+    """
+    def test_retrieve(self):
+        expected_attrs = (
+            'id',
+            'source_type',
+            'source_id',
+            'name',
+            'artists',
+            'album',
+            'duration_ms',
+            'preview_url',
+            'track_number',
+            'image_small',
+            'image_medium',
+            'image_large',
+            'play_count',
+            'owner',
+            'created',
+            'updated',
+        )
+
+        resp = self.api_client.get('/api/metadata/tracks/1/')
+        data = json.loads(resp.content)
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(expected_attrs) <= set(data))
+
+    """
+    Update a single piece of track's data
+    """
+    def test_partial_update(self):
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'play_count': '22',
+        }
+
+        resp = self.api_client.patch('/api/metadata/tracks/1/', data=post_data)
+        new_record = Track.objects.filter(id=1).values()[0]
+        new_records_count = Track.objects.all().count()
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a the record was updated
+        # and a new records was not added to the database
+        self.assertEqual(existing_records_count, new_records_count)
+        self.assertEqual(
+            new_record['play_count'],
+            int(post_data['play_count'])
+        )
+
+    """
+    Cascade remove a track from the database
+    """
+    def test_destroy(self):
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+
+        resp = self.api_client.delete('/api/metadata/tracks/2/')
+        data = json.loads(resp.content)
+        new_records_count = Track.objects.all().count()
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the record was removed from the database
+        self.assertEqual(existing_records_count-1, new_records_count)
+        # Ensure "detail" message is set, and the message matches expected
+        self.assertEqual(data['detail'], 'Track successfully removed')

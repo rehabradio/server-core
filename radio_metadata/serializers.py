@@ -29,18 +29,18 @@ class TrackSerializer(BaseSerializer):
     # relationships to other models
     artists = ArtistSerializer(many=True)
     album = AlbumSerializer(required=False)
-    owner = serializers.Field(source='owner.username')
 
     # track metadata
     duration_ms = serializers.IntegerField()
     preview_url = serializers.URLField()
     track_number = serializers.IntegerField()
-    image_small = serializers.URLField()
-    image_medium = serializers.URLField()
-    image_large = serializers.URLField()
+    image_small = serializers.URLField(required=False)
+    image_medium = serializers.URLField(required=False)
+    image_large = serializers.URLField(required=False)
 
     # track stats
     play_count = serializers.IntegerField()
+    owner = serializers.Field(source='owner.username')
     created = serializers.DateTimeField()
     updated = serializers.DateTimeField()
 

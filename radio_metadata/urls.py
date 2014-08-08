@@ -37,7 +37,7 @@ urlpatterns = patterns(
         name='radio-data-tracks-list'
     ),
     url(
-        r'^tracks/(?P<pk>[^/]+)$',
+        r'^tracks/(?P<pk>[^/]+)/$',
         TrackViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',

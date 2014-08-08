@@ -37,8 +37,6 @@ def _get_track_data(source_type, source_id):
     elif source_type == 'soundcloud':
         # Query the soundcloud api for all the track data
         track_data = soundcloud.lookup_track(source_id)
-    else:
-        raise InvalidBackend
 
     return track_data
 
@@ -291,43 +289,81 @@ class TrackViewSet(viewsets.ModelViewSet):
     serializer_class = TrackSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Adds a track to the database, using a tracks source_type and source_id
+        """
         # Use api to fetch track information
-        post_data = request.POST
         try:
             track_data = _get_track_data(
-                post_data['source_type'],
-                post_data['source_id']
+                request.POST['source_type'],
+                request.POST['source_id']
             )
         except:
             response = {
-                'message': 'Track could not be found',
+                'detail': 'Track could not be found',
             }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         # Save the track
         try:
             trackObj = _get_or_create_track(track_data, self.request.user)
             track = trackObj['track']
         except:
             response = {
-                'message': 'Track could not be saved',
+                'detail': 'Track could not be saved',
             }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         # Save the track artists
         try:
             _get_or_create_artists(
                 track_data['artists'],
-                post_data['source_type']
+                track_data['source_type']
             )
         except:
             response = {
-                'message': 'Artists could not be saved',
+                'detail': 'Artists could not be saved',
             }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         new_track = Track.objects.filter(id=track.id).values()[0]
 
         return Response(new_track)
+
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Update a tracks play count value
+        """
+        try:
+            track = Track.objects.get(id=kwargs['pk'])
+            track.play_count = request.DATA['play_count']
+            track.save()
+        except:
+            response = {'detail': 'Track could not be updated'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        new_playlist = Track.objects.filter(id=track.id).values()[0]
+        return Response(new_playlist)
+
+    # Removes playlist from db (Cascading)
+    def destroy(self, request, *args, **kwargs):
+        """
+        Removes track from database, and returns a detail reponse
+        """
+        try:
+            track = Track.objects.get(id=kwargs['pk'])
+        except:
+            response = {'detail': 'Track not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            track.delete()
+        except:
+            response = {
+                'detail': 'Failed to remove track',
+            }
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'detail': 'Track successfully removed'})
 
     # Set user id, for each record saved
     def pre_save(self, obj):
