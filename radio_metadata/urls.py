@@ -40,7 +40,6 @@ urlpatterns = patterns(
         r'^tracks/(?P<pk>[^/]+)/$',
         TrackViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
         }),

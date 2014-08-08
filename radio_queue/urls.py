@@ -35,7 +35,6 @@ urlpatterns = patterns(
         r'^(?P<queue_id>[0-9]+)/tracks/(?P<pk>[0-9]+)/$',
         QueueTrackViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
         }), name='radio-queue-track-detail'
@@ -45,16 +44,14 @@ urlpatterns = patterns(
         QueueTrackHistoryViewSet.as_view({
             'get': 'list',
             'post': 'create',
-        }), name='radio-queue-track-history-list'
+        }), name='radio-queue-history-list'
     ),
     url(
         r'^(?P<queue_id>[0-9]+)/history/(?P<pk>[0-9]+)/$',
         QueueTrackHistoryViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
-            'patch': 'partial_update',
             'delete': 'destroy',
-        }), name='radio-queue-track-history-detail'
+        }), name='radio-queue-history-detail'
     ),
 )
 
