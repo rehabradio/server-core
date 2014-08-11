@@ -59,6 +59,9 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     serializer_class = QueueTrackSerializer
 
     def list(self, request, queue_id=None):
+        """
+        Returns a paginated set of tracks in a given queue
+        """
         queryset = self.queryset.filter(queue_id=queue_id)
         paginator = Paginator(queryset, 20)
 
@@ -152,6 +155,9 @@ class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = QueueTrackHistorySerializer
 
     def list(self, request, queue_id=None):
+        """
+        Returns a paginated set of track history records for a given queue
+        """
         queryset = self.queryset.filter(queue_id=queue_id)
         paginator = Paginator(queryset, 20)
 
