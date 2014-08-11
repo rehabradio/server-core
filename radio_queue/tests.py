@@ -218,6 +218,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
     def test_create(self):
         # Count the number of records before the save
         existing_records_count = QueueTrack.objects.all().count()
+        existing_history_records_count = QueueTrackHistory.objects.all().count()
         post_data = {
             'track': 1,
         }
@@ -225,11 +226,14 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         resp = self.api_client.post('/api/queues/1/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = QueueTrack.objects.all().count()
+        new_history_records_count = QueueTrackHistory.objects.all().count()
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
+        # Ensure the track has been saved in the history
+        self.assertEqual(existing_history_records_count+1, new_history_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
         self.assertEqual(data['position'], new_records_count)
@@ -313,3 +317,54 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(data['detail'], 'Queued track successfully removed')
+
+
+class QueueTrackHistoryViewSetTestCase(BaseTestCase):
+    """
+    Retrieve a list of all queues in database
+    """
+    def test_list(self):
+        expected_attrs = (
+            'count',
+            'next',
+            'previous',
+            'results',
+        )
+
+        expected_results_attrs = (
+            'id',
+            'track',
+            'queue',
+            'owner',
+            'created',
+        )
+
+        resp = self.api_client.get('/api/queues/1/history/')
+        data = json.loads(resp.content)
+        queues = data['results'][0]
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(expected_results_attrs) <= set(queues))
+
+    """
+    Retrieve a queued track's attribrutes
+    """
+    def test_retrieve(self):
+        expected_attrs = (
+            'id',
+            'track',
+            'queue',
+            'owner',
+            'created',
+        )
+
+        resp = self.api_client.get('/api/queues/1/history/1/')
+        data = json.loads(resp.content)
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(expected_attrs) <= set(data))
