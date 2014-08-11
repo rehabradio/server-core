@@ -92,7 +92,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
                 track=Track.objects.get(id=request.DATA['track']),
                 queue=Queue.objects.get(id=kwargs['queue_id']),
                 position=position,
-                owner_id=1
+                owner_id=self.request.user.id
             )
         except:
             response = {'detail': 'Track could not be saved to queue'}
@@ -102,7 +102,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             QueueTrackHistory.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
                 queue=Queue.objects.get(id=kwargs['queue_id']),
-                owner_id=1
+                owner_id=self.request.user.id
             )
         except:
             response = {'detail': 'Track could not be saved to queue history'}
