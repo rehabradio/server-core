@@ -13,7 +13,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^api/docs/', include('rest_framework_swagger.urls')),
     # Django admin URLs
     url(r'^admin/', include(admin.site.urls)),
     # monitoring/admin URL for Django-RQ
