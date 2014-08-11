@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django_rq',
     'social_auth',
     'corsheaders',
+    'rest_framework_swagger',
 
     # local apps
     'radio_metadata',
