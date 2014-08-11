@@ -50,6 +50,16 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
 
+    def list(self, request, queue_id=None):
+        queryset = self.queryset.filter(queue_id=queue_id)
+        serializer = QueueTrackSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, queue_id=None):
+        queryset = self.queryset.get(pk=pk, queue_id=queue_id)
+        serializer = QueueTrackSerializer(queryset)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         """
         Uses a track id to add a track to the end of a queue

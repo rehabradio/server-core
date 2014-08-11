@@ -61,6 +61,16 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
     queryset = PlaylistTrack.objects.all()
     serializer_class = PlaylistTrackSerializer
 
+    def list(self, request, playlist_id=None):
+        queryset = self.queryset.filter(playlist_id=playlist_id)
+        serializer = PlaylistTrackSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, playlist_id=None):
+        queryset = self.queryset.get(pk=pk, playlist_id=playlist_id)
+        serializer = PlaylistTrackSerializer(queryset)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         """
         Uses a track id to add a track to the playlist
