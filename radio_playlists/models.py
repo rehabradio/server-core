@@ -22,7 +22,7 @@ class PlaylistTrack(models.Model):
     # track which has been added to this playlist
     track = models.ForeignKey(Track)
     # Ordering of the tracks
-    position = models.PositiveIntegerField(null=True)
+    position = models.PositiveIntegerField()
     owner = models.ForeignKey('auth.User')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

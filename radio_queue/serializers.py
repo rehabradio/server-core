@@ -19,7 +19,8 @@ class QueueSerializer(serializers.ModelSerializer):
 
 class QueueTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
-    position = serializers.IntegerField()
+    queue = QueueSerializer(read_only=True)
+    position = serializers.IntegerField(read_only=True)
     owner = serializers.Field(source='owner.username')
 
     class Meta:

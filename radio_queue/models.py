@@ -14,16 +14,19 @@ class Queue(models.Model):
 
 class QueueTrack(models.Model):
     track = models.ForeignKey(Track)
-    position = models.PositiveIntegerField(null=True)
-    owner = models.ForeignKey('auth.User', null=True)
+    queue = models.ForeignKey(Queue)
+    position = models.PositiveIntegerField()
+    owner = models.ForeignKey('auth.User')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ('position',)
 
 
 class QueueTrackHistory(models.Model):
-    queue = models.ForeignKey(Queue)
     track = models.ForeignKey(Track)
+    queue = models.ForeignKey(Queue)
     owner = models.ForeignKey('auth.User')
     created = models.DateTimeField(auto_now_add=True)
 
