@@ -332,21 +332,6 @@ class TrackViewSet(viewsets.ModelViewSet):
 
         return Response(new_track)
 
-    def partial_update(self, request, *args, **kwargs):
-        """
-        Update a tracks play count value
-        """
-        try:
-            track = Track.objects.get(id=kwargs['pk'])
-            track.play_count = request.DATA['play_count']
-            track.save()
-        except:
-            response = {'detail': 'Track could not be updated'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        new_playlist = Track.objects.filter(id=track.id).values()[0]
-        return Response(new_playlist)
-
     def destroy(self, request, *args, **kwargs):
         """
         Removes track from database, and returns a detail reponse

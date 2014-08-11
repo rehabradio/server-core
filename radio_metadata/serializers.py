@@ -27,22 +27,23 @@ class AlbumSerializer(BaseSerializer):
 
 class TrackSerializer(BaseSerializer):
     # relationships to other models
-    artists = ArtistSerializer(many=True)
-    album = AlbumSerializer(required=False)
+    artists = ArtistSerializer(many=True, read_only=True)
+    album = AlbumSerializer(required=False, read_only=True)
 
     # track metadata
-    duration_ms = serializers.IntegerField()
-    preview_url = serializers.URLField()
-    track_number = serializers.IntegerField()
-    image_small = serializers.URLField(required=False)
-    image_medium = serializers.URLField(required=False)
-    image_large = serializers.URLField(required=False)
+    name = serializers.CharField(read_only=True)
+    duration_ms = serializers.IntegerField(read_only=True)
+    preview_url = serializers.URLField(read_only=True)
+    track_number = serializers.IntegerField(read_only=True)
+    image_small = serializers.URLField(required=False, read_only=True)
+    image_medium = serializers.URLField(required=False, read_only=True)
+    image_large = serializers.URLField(required=False, read_only=True)
 
     # track stats
-    play_count = serializers.IntegerField()
+    play_count = serializers.IntegerField(read_only=True)
     owner = serializers.Field(source='owner.username')
-    created = serializers.DateTimeField()
-    updated = serializers.DateTimeField()
+    created = serializers.DateTimeField(read_only=True)
+    updated = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Track
