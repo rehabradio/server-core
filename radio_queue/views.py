@@ -12,7 +12,8 @@ from .serializers import (
     QueueSerializer,
     QueueTrackSerializer,
     PaginatedQueueTrackSerializer,
-    QueueTrackHistorySerializer
+    QueueTrackHistorySerializer,
+    PaginatedQueueTrackHistorySerializer
 )
 
 
@@ -149,3 +150,24 @@ class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     """
     queryset = QueueTrackHistory.objects.all()
     serializer_class = QueueTrackHistorySerializer
+
+    def list(self, request, queue_id=None):
+        queryset = self.queryset.filter(queue_id=queue_id)
+        paginator = Paginator(queryset, 20)
+
+        page = request.QUERY_PARAMS.get('page')
+        try:
+            queued_tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            queued_tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            queued_tracks = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedQueueTrackHistorySerializer(
+            queued_tracks, context=serializer_context
+        )
+        return Response(serializer.data)

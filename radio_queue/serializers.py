@@ -43,3 +43,11 @@ class QueueTrackHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QueueTrackHistory
+
+
+class PaginatedQueueTrackHistorySerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of queue track history querysets.
+    """
+    class Meta:
+        object_serializer_class = QueueTrackHistorySerializer
