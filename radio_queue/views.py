@@ -114,12 +114,6 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Queued track successfully removed'})
 
-    def pre_save(self, obj):
-        """
-        Set user id, for each record saved/updated
-        """
-        obj.owner = self.request.user
-
 
 class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     """
@@ -127,9 +121,3 @@ class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     """
     queryset = QueueTrackHistory.objects.all()
     serializer_class = QueueTrackHistorySerializer
-
-    def pre_save(self, obj):
-        """
-        Set user id, for each record saved/updated
-        """
-        obj.owner = self.request.user

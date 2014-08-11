@@ -361,30 +361,6 @@ class TrackViewSetTestCase(TestCase):
         self.assertTrue(set(expected_attrs) <= set(data))
 
     """
-    Update a single piece of track's data
-    """
-    def test_partial_update(self):
-        # Count the number of records before the save
-        existing_records_count = Track.objects.all().count()
-        post_data = {
-            'play_count': '22',
-        }
-
-        resp = self.api_client.patch('/api/metadata/tracks/1/', data=post_data)
-        new_record = Track.objects.filter(id=1).values()[0]
-        new_records_count = Track.objects.all().count()
-
-        # Ensure request was successful
-        self.assertEqual(resp.status_code, 200)
-        # Ensure a the record was updated
-        # and a new records was not added to the database
-        self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(
-            new_record['play_count'],
-            int(post_data['play_count'])
-        )
-
-    """
     Cascade remove a track from the database
     """
     def test_destroy(self):

@@ -85,6 +85,24 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         new_playlist = PlaylistTrack.objects.filter(id=playlist.id).values()[0]
         return Response(new_playlist)
 
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Update a playlist track's position
+        """
+        try:
+            playlist_track = PlaylistTrack.objects.get(id=kwargs['pk'])
+            playlist_track.position = request.DATA['position']
+            playlist_track.save()
+        except:
+            response = {'detail': 'Playlist track could not be updated'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        new_playlist = PlaylistTrack.objects.filter(
+            id=playlist_track.id
+        ).values()[0]
+
+        return Response(new_playlist)
+
     def destroy(self, request, *args, **kwargs):
         """
         Removes playlist track from db and resets the remaining tracks position

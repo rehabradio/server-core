@@ -21,5 +21,3 @@ Thumbs.db
 *.env
 
 /databases/*
-
-manage.py
