@@ -1,11 +1,13 @@
 # third-party imports
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 # local imports
 from .models import Playlist, PlaylistTrack
 from radio_metadata.models import Track
-from .serializers import PlaylistSerializer, PlaylistTrackSerializer
+from .serializers import PlaylistSerializer, PlaylistTrackSerializer, PaginatedPlaylistTrackSerializer
 
 
 def _reset_track_positions(playlist_id):
@@ -63,12 +65,23 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
     def list(self, request, playlist_id=None):
         queryset = self.queryset.filter(playlist_id=playlist_id)
-        serializer = PlaylistTrackSerializer(queryset, many=True)
-        return Response(serializer.data)
+        paginator = Paginator(queryset, 20)
 
-    def retrieve(self, request, pk=None, playlist_id=None):
-        queryset = self.queryset.get(pk=pk, playlist_id=playlist_id)
-        serializer = PlaylistTrackSerializer(queryset)
+        page = request.QUERY_PARAMS.get('page')
+        try:
+            users = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            users = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            users = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedPlaylistTrackSerializer(
+            users, context=serializer_context
+        )
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):

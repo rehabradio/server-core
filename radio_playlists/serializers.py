@@ -1,4 +1,5 @@
 # third-party imports
+from rest_framework import pagination
 from rest_framework import serializers
 
 # local imports
@@ -30,3 +31,11 @@ class PlaylistTrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaylistTrack
         fields = ('id', 'position', 'owner', 'track', 'created', 'updated')
+
+
+class PaginatedPlaylistTrackSerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of playlist track querysets.
+    """
+    class Meta:
+        object_serializer_class = PlaylistTrackSerializer

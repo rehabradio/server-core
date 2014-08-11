@@ -1,4 +1,6 @@
 # third-party imports
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
@@ -6,7 +8,12 @@ from rest_framework.response import Response
 from .models import Queue, QueueTrack, QueueTrackHistory
 from radio_metadata.models import Track
 
-from .serializers import QueueSerializer, QueueTrackSerializer, QueueTrackHistorySerializer
+from .serializers import (
+    QueueSerializer,
+    QueueTrackSerializer,
+    PaginatedQueueTrackSerializer,
+    QueueTrackHistorySerializer
+)
 
 
 class QueueViewSet(viewsets.ModelViewSet):
@@ -52,12 +59,23 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
     def list(self, request, queue_id=None):
         queryset = self.queryset.filter(queue_id=queue_id)
-        serializer = QueueTrackSerializer(queryset, many=True)
-        return Response(serializer.data)
+        paginator = Paginator(queryset, 20)
 
-    def retrieve(self, request, pk=None, queue_id=None):
-        queryset = self.queryset.get(pk=pk, queue_id=queue_id)
-        serializer = QueueTrackSerializer(queryset)
+        page = request.QUERY_PARAMS.get('page')
+        try:
+            queued_tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            queued_tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            queued_tracks = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedQueueTrackSerializer(
+            queued_tracks, context=serializer_context
+        )
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):

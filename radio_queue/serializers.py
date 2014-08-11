@@ -1,5 +1,5 @@
 # third-party imports
-from rest_framework import serializers
+from rest_framework import pagination, serializers
 
 # local imports
 from .models import Queue, QueueTrack, QueueTrackHistory
@@ -25,6 +25,14 @@ class QueueTrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QueueTrack
+
+
+class PaginatedQueueTrackSerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of queue track querysets.
+    """
+    class Meta:
+        object_serializer_class = QueueTrackSerializer
 
 
 class QueueTrackHistorySerializer(serializers.ModelSerializer):
