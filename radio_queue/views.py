@@ -1,7 +1,7 @@
 # third-party imports
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from rest_framework import status, viewsets
+from rest_framework import generics, mixins, status, viewsets
 from rest_framework.response import Response
 
 # local imports
@@ -61,6 +61,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     """
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
+    permission_classes = (IsStaffOrOwnerToDelete, )
 
     def list(self, request, queue_id=None):
         """
@@ -140,6 +141,50 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         """
         try:
             queued_track = QueueTrack.objects.get(id=kwargs['pk'])
+        except:
+            response = {'detail': 'Queued track not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            queued_track.delete()
+        except:
+            response = {
+                'detail': 'Failed to remove track from queue',
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'detail': 'Queued track successfully removed'})
+
+
+class QueueTrackHead(generics.GenericAPIView):
+    """
+    Fetch the top track in a given queue
+    """
+
+    serializer_class = QueueTrackSerializer
+
+    def get(self, request, *args, **kwargs):
+        queued_track = QueueTrack.objects.get(
+            queue_id=kwargs['queue_id'],
+            position=1
+        )
+        seralizer = QueueTrackSerializer(queued_track)
+        return Response(seralizer.data)
+
+
+class QueueTrackPop(mixins.DestroyModelMixin, generics.GenericAPIView):
+    """
+    Remove a track from the top of a given queue
+    """
+
+    serializer_class = QueueTrackSerializer
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            queued_track = QueueTrack.objects.get(
+                queue_id=kwargs['queue_id'],
+                position=1
+            )
         except:
             response = {'detail': 'Queued track not found'}
             return Response(response, status=status.HTTP_404_NOT_FOUND)

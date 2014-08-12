@@ -3,7 +3,13 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
 # local imports
-from .views import QueueViewSet, QueueTrackViewSet, QueueTrackHistoryViewSet
+from .views import (
+    QueueViewSet,
+    QueueTrackViewSet,
+    QueueTrackPop,
+    QueueTrackHead,
+    QueueTrackHistoryViewSet
+)
 
 
 urlpatterns = patterns(
@@ -38,6 +44,14 @@ urlpatterns = patterns(
             'patch': 'partial_update',
             'delete': 'destroy',
         }), name='radio-queue-track-detail'
+    ),
+    url(
+        r'^(?P<queue_id>[0-9]+)/tracks/head/$',
+        QueueTrackHead.as_view(), name='radio-queue-track-head'
+    ),
+    url(
+        r'^(?P<queue_id>[0-9]+)/tracks/pop/$',
+        QueueTrackPop.as_view(), name='radio-queue-track-pop'
     ),
     url(
         r'^(?P<queue_id>[0-9]+)/history/$',
