@@ -1,5 +1,7 @@
+import random
 # third-party imports
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import F
 
 from rest_framework import generics, mixins, status, viewsets
 from rest_framework.response import Response
@@ -16,6 +18,28 @@ from .serializers import (
     PaginatedQueueTrackHistorySerializer
 )
 from radio.permissions import IsStaffOrOwnerToDelete
+
+
+def _add_random_track_to_queue(queue_id):
+    """
+    Selects a track for the "tracks" database table
+    and add its to the top of the queue
+    """
+    # Grab the first 50 tracks with the highest number of votes
+    track_ids = QueueTrackHistory.objects.filter(
+        queue_id=queue_id
+        ).values_list('track_id', flat=True)[:50]
+    # Select a track ID at random
+    track_id = random.choice(track_ids)
+    # Add the track to the top of the queue
+    queue_track = QueueTrack.objects.create(
+        track=Track.objects.get(id=track_id),
+        queue=Queue.objects.get(id=queue_id),
+        position=1,
+        owner_id=1
+    )
+    # Return the track instance
+    return queue_track
 
 
 class QueueViewSet(viewsets.ModelViewSet):
@@ -164,10 +188,13 @@ class QueueTrackHead(generics.GenericAPIView):
     serializer_class = QueueTrackSerializer
 
     def get(self, request, *args, **kwargs):
-        queued_track = QueueTrack.objects.get(
-            queue_id=kwargs['queue_id'],
-            position=1
-        )
+        try:
+            queued_track = QueueTrack.objects.get(
+                queue_id=kwargs['queue_id'],
+                position=1
+            )
+        except:
+            queued_track = _add_random_track_to_queue(kwargs['queue_id'])
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
@@ -190,6 +217,10 @@ class QueueTrackPop(mixins.DestroyModelMixin, generics.GenericAPIView):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         try:
+            track = queued_track.track
+            track.play_count = F('play_count') + 1
+            track.save()
+
             queued_track.delete()
         except:
             response = {
