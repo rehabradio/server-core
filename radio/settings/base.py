@@ -43,6 +43,7 @@ INSTALLED_APPS = (
 
     # local apps
     'radio_metadata',
+    'radio_players',
     'radio_playlists',
     'radio_queue',
     'radio_users',
