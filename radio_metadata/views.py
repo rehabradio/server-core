@@ -101,12 +101,13 @@ def _get_or_create_track(track_data, owner):
 
 class MetadataAPIRootView(APIView):
     """
-    The metadata API allows for both search and lookup from supported source_types.
+    The metadata API allows for both search and lookup
+    from supported source_types.
 
     Clients should use the metadata API to retrieve data about available songs.
-    The metadata API coerces data from the available source_types into a unified
-    format that allows for easy interoperability and addition of new source_types
-    in future.
+    The metadata API coerces data from the available source_types into a
+    unified format that allows for easy interoperability and addition of
+    new source_types in future.
     """
 
     def get(self, request, format=None):
@@ -168,7 +169,9 @@ class LookupView(APIView):
         """Build key used for caching the lookup data
         """
         return 'mtdt-lkp-{0}-{1}-{2}'.format(
-            source_type, source_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
+            source_type,
+            source_id,
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
     def get(self, request, source_type, source_id, format=None):
