@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Core radio API views.
+'''Core radio API views.
 
 The views in this module exist primarily to tie together the browsable APIs of
 our seperate apps, there probably shouldn't be any substantial logic in here.
-"""
+'''
 # stdlib imports
 import collections
 
@@ -49,15 +49,13 @@ class SwaggerView(APIView):
 
     def get(self, request, format=None):
         settings = {
-            "basePath": "http://localhost:8000/api/docs/api-docs",
-            "swaggerVersion": "1.2",
-            "apiVersion": "0.1",
-            "apis": [
-                {
-                    "path": "/api/metadata"
-                },
-                {"path": "/api/playlists"},
-                {"path": "/api/queues"}
+            'basePath': 'http://localhost:8000/api/docs/api-docs',
+            'swaggerVersion': '1.2',
+            'apiVersion': '0.1',
+            'apis': [
+                {'path': '/api/metadata'},
+                {'path': '/api/playlists'},
+                {'path': '/api/queues'}
             ]
         }
         return Response(settings)
