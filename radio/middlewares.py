@@ -1,5 +1,5 @@
-from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.http import HttpResponse
 
 
 class LoginRequiredMiddleware:
@@ -12,11 +12,10 @@ class LoginRequiredMiddleware:
     def process_request(self, request):
         whilte_list = [
             settings.LOGIN_URL,
-            '/login/google-oauth2/',
             '/complete/google-oauth2/'
         ]
-        """
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
-                return HttpResponseRedirect(settings.LOGIN_URL)
-        """
+                response = '<h2>Please login to google with your rehabstudio account</h2>\
+                            <a href="/login/google-oauth2/?next=/api/">Login</a>'
+                return HttpResponse(response)

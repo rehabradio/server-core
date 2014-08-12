@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import re
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -126,7 +127,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/login/google-oauth2/'
 LOGIN_ERROR_URL = '/login-error/'
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
@@ -213,10 +214,13 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get(
     'GOOGLE_OAUTH2_CLIENT_SECRET',
     None
 )
-GOOGLE_WHITE_LISTED_DOMAINS = os.environ.get(
+domains = os.environ.get(
     'GOOGLE_WHITE_LISTED_DOMAINS',
-    None
+    ''
 )
+domains = re.findall('([a-z\.]+)', domains)
+
+GOOGLE_WHITE_LISTED_DOMAINS = domains
 
 SWAGGER_SETTINGS = {
     "api_url": 'http://localhost:8000/api/',

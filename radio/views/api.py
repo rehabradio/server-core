@@ -60,7 +60,8 @@ class SwaggerView(APIView):
             'apis': [
                 {
                     'path': '/api/metadata',
-                    'description': 'Search and store track data from a list of sources'
+                    'description': 'Search and store track data from \
+                                        a list of sources'
                 },
                 {
                     'path': '/api/playlists',
@@ -73,21 +74,25 @@ class SwaggerView(APIView):
             ],
             'info': {
                 'title': 'rehabradio API',
-                'description': '<hr>The rehabradio API allows full control of all functionality. All clients, \
-                                including the web frontends rely on this API for control of the system. \
-                                Clients should use the metadata API to retrieve data about available songs. \
-                                The metadata API coerces data from the available backends into a unified \
-                                format that allows for easy interoperability and addition of new backends \
-                                in future.<br /><br /> \
-                                Clients should use the playlist API to manage playlists. \
-                                Owners of playlists can set various permissions, \
-                                allowing certain users to perform certain actions on a playlist \
-                                such as adding or removing tracks.<hr>',
+                'description': '<hr> \
+                    The rehabradio API allows full control of all \
+                    functionality. All clients, including the web \
+                    frontends rely on this API for control of the \
+                    system. Clients should use the metadata API to \
+                    retrieve data about available songs. The \
+                    metadata API coerces data from the available \
+                    backends into a unified format that allows for \
+                    easy interoperability and addition of new backends \
+                    in future.<br /><br />\
+                    Clients should use the playlist API to manage playlists. \
+                    Owners of playlists can set various permissions, \
+                    allowing certain users to perform certain actions on \
+                    a playlist such as adding or removing tracks.\
+                    <hr>',
                 'termsOfServiceUrl': '',
                 'contact': '',
                 'license': '',
                 'licenseUrl': ''
-
             }
         }
         return Response(settings)
