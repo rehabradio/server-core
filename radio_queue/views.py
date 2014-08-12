@@ -15,18 +15,21 @@ from .serializers import (
     QueueTrackHistorySerializer,
     PaginatedQueueTrackHistorySerializer
 )
+from radio.permissions import IsStaffOrOwnerToDelete
 
 
 class QueueViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlists.
     """
+    permission_classes = (IsStaffOrOwnerToDelete, )
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
 
     def destroy(self, request, *args, **kwargs):
         """
         Removes queue from database, and returns a detail reponse
+        Must be owner or staff
         """
         try:
             queue = Queue.objects.get(id=kwargs['pk'])
@@ -54,6 +57,7 @@ class QueueViewSet(viewsets.ModelViewSet):
 class QueueTrackViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlists.
+    position -- Patch request param (int) - form
     """
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
@@ -86,7 +90,9 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         """
         Uses a track id to add a track to the end of a queue
         """
-        position = QueueTrack.objects.filter(queue=kwargs['queue_id']).count()+1
+        position = QueueTrack.objects.filter(
+            queue=kwargs['queue_id']
+        ).count()+1
         try:
             queue_track = QueueTrack.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
@@ -123,7 +129,9 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             response = {'detail': 'Queued track could not be updated'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        new_playlist = QueueTrack.objects.filter(id=queued_track.id).values()[0]
+        new_playlist = QueueTrack.objects.filter(
+            id=queued_track.id
+        ).values()[0]
         return Response(new_playlist)
 
     def destroy(self, request, *args, **kwargs):
