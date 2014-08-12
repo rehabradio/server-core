@@ -17,7 +17,7 @@ from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
 from .sources import soundcloud
 from .sources import spotify
-
+from radio.permissions import IsStaffToDelete
 from radio.custom_exceptions import InvalidBackend, MissingParameter
 
 
@@ -160,7 +160,8 @@ class LookupRootView(APIView):
 
 
 class LookupView(APIView):
-    """Lookup tracks/artists/albums using any configured backend
+    """
+    Lookup tracks/artists/albums using any configured backend
     """
 
     def _get_cache_key(self, backend, pk):
@@ -242,7 +243,9 @@ class SearchRootView(APIView):
 
 
 class SearchView(APIView):
-    """Search tracks using any configured backend
+    """
+    Search tracks using any configured backend
+    q -- lookup query (string)
     """
 
     def get(self, request, backend, format=None):
@@ -288,9 +291,11 @@ class SearchView(APIView):
 class TrackViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlists.
+    User must be staff to remove track from database
     """
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
+    permission_classes = (IsStaffToDelete,)
 
     def create(self, request, *args, **kwargs):
         """
