@@ -14,8 +14,10 @@ class LoginRequiredMiddleware:
             settings.LOGIN_URL,
             '/complete/google-oauth2/'
         ]
+        """
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
                 response = '<h2>Please login to google with your rehabstudio account</h2>\
                             <a href="/login/google-oauth2/?next=/api/">Login</a>'
                 return HttpResponse(response)
+        """
