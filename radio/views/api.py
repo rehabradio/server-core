@@ -11,6 +11,7 @@ import collections
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework.renderers import JSONRenderer
 
 
 class APIRootView(APIView):
@@ -38,3 +39,25 @@ class APIRootView(APIView):
             ])),
         ])
         return Response(response)
+
+
+class SwaggerView(APIView):
+    """
+    Swagger config
+    """
+    renderer_classes = (JSONRenderer,)
+
+    def get(self, request, format=None):
+        settings = {
+            "basePath": "http://localhost:8000/api/docs/api-docs",
+            "swaggerVersion": "1.2",
+            "apiVersion": "0.1",
+            "apis": [
+                {
+                    "path": "/api/metadata"
+                },
+                {"path": "/api/playlists"},
+                {"path": "/api/queues"}
+            ]
+        }
+        return Response(settings)

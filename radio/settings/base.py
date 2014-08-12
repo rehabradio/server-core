@@ -219,15 +219,9 @@ GOOGLE_WHITE_LISTED_DOMAINS = os.environ.get(
 )
 
 SWAGGER_SETTINGS = {
+    "api_url": 'http://localhost:8000/api/',
     "exclude_namespaces": [], # List URL namespaces to ignore
     "api_version": '0.1',  # Specify your API's version
-    "api_path": "/api/",  # Specify the path to your API not a root level
-    "apis": [
-        {
-            "path": "http://localhost:8000/api/",
-            "description": "Operations about pets"
-        },
-    ],
     "is_authenticated": False,  # Set to True to enforce user authentication,
     "is_superuser": False,  # Set to True to enforce admin only access
 }

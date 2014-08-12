@@ -4,8 +4,9 @@ from django.conf.urls import *
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+
 # local imports
-from .views.api import APIRootView
+from .views.api import APIRootView, SwaggerView
 
 # autodiscover all admin urls
 admin.autodiscover()
@@ -13,6 +14,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
+    url(r'^api/docs/api-docs/$', SwaggerView.as_view(), name='rest_framework_swagger_config'),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
     # Django admin URLs
     url(r'^admin/', include(admin.site.urls)),
