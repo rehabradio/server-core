@@ -18,7 +18,7 @@ from .serializers import PaginatedTrackSerializer, TrackSerializer
 from .sources import soundcloud
 from .sources import spotify
 from radio.permissions import IsStaffToDelete
-from radio.custom_exceptions import Invalidsource_type, MissingParameter
+from radio.custom_exceptions import InvalidBackend, MissingParameter
 
 
 def _get_track_data(source_type, source_id):
@@ -184,7 +184,7 @@ class LookupView(APIView):
             'spotify': spotify.lookup_track,
         }.get(source_type.lower())
         if lookup_func is None:
-            raise Invalidsource_type
+            raise InvalidBackend
 
         # search using requested source_type and serialize
         results = lookup_func(source_id)
@@ -272,7 +272,7 @@ class SearchView(APIView):
             'spotify': spotify.search_tracks,
         }.get(source_type.lower())
         if search_func is None:
-            raise Invalidsource_type
+            raise InvalidBackend
 
         # search using requested source_type
         results = search_func(query, page, page_size)
