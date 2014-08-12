@@ -6,8 +6,16 @@ from rest_framework.response import Response
 
 # local imports
 from .models import Playlist, PlaylistTrack
+from .serializers import (
+    PlaylistSerializer,
+    PlaylistTrackSerializer,
+    PaginatedPlaylistTrackSerializer
+)
+from radio.permissions import (
+    IsOwnerOrReadOnly,
+    IsOwnerOrPlaylistOwnerElseReadOnly
+)
 from radio_metadata.models import Track
-from .serializers import PlaylistSerializer, PlaylistTrackSerializer, PaginatedPlaylistTrackSerializer
 
 
 def _reset_track_positions(playlist_id):
@@ -24,14 +32,16 @@ def _reset_track_positions(playlist_id):
 class PlaylistViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlists.
+    For update and delete functions, user must be owner
     """
+    permission_classes = (IsOwnerOrReadOnly,)
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
 
-    # Removes playlist from db (Cascading)
     def destroy(self, request, *args, **kwargs):
         """
-        Removes playlist from database, and returns a detail reponse
+        Remove a playlist and its associated tracks from the database
+        Returns a detail reponse
         """
         try:
             playlist = Playlist.objects.get(id=kwargs['pk'])
@@ -59,7 +69,9 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 class PlaylistTrackViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlist tracks.
+    position -- Patch request param (int) - form
     """
+    permission_classes = (IsOwnerOrPlaylistOwnerElseReadOnly,)
     queryset = PlaylistTrack.objects.all()
     serializer_class = PlaylistTrackSerializer
 
