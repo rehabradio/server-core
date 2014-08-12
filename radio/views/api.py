@@ -58,9 +58,18 @@ class SwaggerView(APIView):
             'swaggerVersion': '1.2',
             'apiVersion': '0.1',
             'apis': [
-                {'path': '/api/metadata'},
-                {'path': '/api/playlists'},
-                {'path': '/api/queues'}
+                {
+                    'path': '/api/metadata',
+                    'description': 'Search and store track data from a list of sources'
+                },
+                {
+                    'path': '/api/playlists',
+                    'description': 'Manage playlists'
+                },
+                {
+                    'path': '/api/queues',
+                    'description': 'Manage queues'
+                }
             ],
             'info': {
                 'title': 'rehabradio API',
