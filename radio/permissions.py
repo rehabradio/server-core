@@ -49,3 +49,21 @@ class IsStaffToDelete(permissions.BasePermission):
             return request.user.is_staff
 
         return True
+
+
+class IsStaffOrOwnerToDelete(permissions.BasePermission):
+    """
+    Object-level permission to only allow admins
+    premission to delete a record
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method == 'DELETE':
+            if obj.owner == request.user or request.user.is_staff:
+                return True
+            else:
+                return False
+
+        return True
