@@ -18,13 +18,13 @@ urlpatterns = patterns(
 
     url(r'^lookup/$', LookupRootView.as_view(), name='radio-data-lookup-root'),
     url(
-        r'^lookup/(?P<backend>[^/]+)/(?P<pk>[^/]+)/$',
+        r'^lookup/(?P<source_type>[^/]+)/(?P<source_id>[^/]+)/$',
         LookupView.as_view(), name='radio-data-lookup'
     ),
 
     url(r'^search/$', SearchRootView.as_view(), name='radio-data-search-root'),
     url(
-        r'^search/(?P<backend>[^/]+)/$',
+        r'^search/(?P<source_type>[^/]+)/$',
         SearchView.as_view(), name='radio-data-search'
     ),
 

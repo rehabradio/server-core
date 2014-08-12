@@ -18,7 +18,7 @@ from .serializers import PaginatedTrackSerializer, TrackSerializer
 from .sources import soundcloud
 from .sources import spotify
 from radio.permissions import IsStaffToDelete
-from radio.custom_exceptions import InvalidBackend, MissingParameter
+from radio.custom_exceptions import Invalidsource_type, MissingParameter
 
 
 def _get_track_data(source_type, source_id):
@@ -101,11 +101,11 @@ def _get_or_create_track(track_data, owner):
 
 class MetadataAPIRootView(APIView):
     """
-    The metadata API allows for both search and lookup from supported backends.
+    The metadata API allows for both search and lookup from supported source_types.
 
     Clients should use the metadata API to retrieve data about available songs.
-    The metadata API coerces data from the available backends into a unified
-    format that allows for easy interoperability and addition of new backends
+    The metadata API coerces data from the available source_types into a unified
+    format that allows for easy interoperability and addition of new source_types
     in future.
     """
 
@@ -122,7 +122,7 @@ class MetadataAPIRootView(APIView):
 
 class LookupRootView(APIView):
     """
-    The lookup API allows retrieval of metadata from supported backends.
+    The lookup API allows retrieval of metadata from supported source_types.
 
     Data is cached after initial lookup but is keyed by calendar date to
     ensure that fresh data is fetched at least once per day.
@@ -161,20 +161,20 @@ class LookupRootView(APIView):
 
 class LookupView(APIView):
     """
-    Lookup tracks/artists/albums using any configured backend
+    Lookup tracks/artists/albums using any configured source_type
     """
 
-    def _get_cache_key(self, backend, pk):
+    def _get_cache_key(self, source_type, source_id):
         """Build key used for caching the lookup data
         """
         return 'mtdt-lkp-{0}-{1}-{2}'.format(
-            backend, pk, datetime.datetime.utcnow().strftime('%Y%m%d'),
+            source_type, source_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
-    def get(self, request, backend, pk, format=None):
+    def get(self, request, source_type, source_id, format=None):
         """perform metadata lookup
         """
-        cache_key = self._get_cache_key(backend, pk)
+        cache_key = self._get_cache_key(source_type, source_id)
         response = cache.get(cache_key)
         if response is not None:
             return Response(response)
@@ -182,12 +182,12 @@ class LookupView(APIView):
         lookup_func = {
             'soundcloud': soundcloud.lookup_track,
             'spotify': spotify.lookup_track,
-        }.get(backend.lower())
+        }.get(source_type.lower())
         if lookup_func is None:
-            raise InvalidBackend
+            raise Invalidsource_type
 
-        # search using requested backend and serialize
-        results = lookup_func(pk)
+        # search using requested source_type and serialize
+        results = lookup_func(source_id)
         response = TrackSerializer(results).data
 
         # return response to the client
@@ -197,7 +197,7 @@ class LookupView(APIView):
 
 class SearchRootView(APIView):
     """
-    The search API allows searching for tracks on supported backends.
+    The search API allows searching for tracks on supported source_types.
 
     Data is cached after initial lookup but is keyed by calendar date to
     ensure that fresh data is fetched at least once per day.
@@ -244,11 +244,11 @@ class SearchRootView(APIView):
 
 class SearchView(APIView):
     """
-    Search tracks using any configured backend
+    Search tracks using any configured source_type
     q -- lookup query (string)
     """
 
-    def get(self, request, backend, format=None):
+    def get(self, request, source_type, format=None):
         """perform track search and return the results in a consistent format
         """
         # parse search data from query params
@@ -259,7 +259,7 @@ class SearchView(APIView):
         page_size = int(request.QUERY_PARAMS.get('page_size', 20))
 
         cache_key = u'mtdttrcksrch-{0}-{1}-{2}-{3}-{4}'.format(
-            backend, query, page, page_size,
+            source_type, query, page, page_size,
             datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
         response = cache.get(cache_key)
@@ -270,11 +270,11 @@ class SearchView(APIView):
         search_func = {
             'soundcloud': soundcloud.search_tracks,
             'spotify': spotify.search_tracks,
-        }.get(backend.lower())
+        }.get(source_type.lower())
         if search_func is None:
-            raise InvalidBackend
+            raise Invalidsource_type
 
-        # search using requested backend
+        # search using requested source_type
         results = search_func(query, page, page_size)
 
         serializer_context = {'request': request}
