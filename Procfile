@@ -1,1 +1,1 @@
-web: gunicorn radio.wsgi --log-file -
+web: python manage.py runserver
