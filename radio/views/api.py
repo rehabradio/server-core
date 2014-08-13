@@ -65,6 +65,10 @@ class SwaggerView(APIView):
                                         a list of sources'
                 },
                 {
+                    'path': '/api/players',
+                    'description': 'Devices connected or listening to the api server'
+                },
+                {
                     'path': '/api/playlists',
                     'description': 'Manage playlists'
                 },
