@@ -22,8 +22,8 @@ from radio.permissions import IsStaffOrOwnerToDelete
 
 def _add_random_track_to_queue(queue_id):
     """
-    Selects a track for the "tracks" database table
-    and add its to the top of the queue
+    Grabs a random track from the queues history,
+    and adds it back into the queue
     """
     # Grab the first 50 tracks with the highest number of votes
     track_ids = QueueTrackHistory.objects.filter(
