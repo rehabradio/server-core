@@ -57,6 +57,8 @@ SOUNDCLOUD_CLIENT_ID=[soundcloud secret key]
 TEST_USERNAME=[username for test login]
 TEST_PASSWORD=[password for test login]
 
+DATABASE_URL=[url to database server]
+
 
 Preparing your Python virtual environment
 -----------------------------------------
