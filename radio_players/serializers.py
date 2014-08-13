@@ -10,7 +10,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     location = serializers.CharField()
     auth_token = serializers.CharField()
-    queue = QueueSerializer()
+    queue = serializers.PrimaryKeyRelatedField(required=False)
     active = serializers.BooleanField()
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)

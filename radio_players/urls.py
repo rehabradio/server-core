@@ -13,7 +13,7 @@ urlpatterns = patterns(
         PlayerViewSet.as_view({
             'get': 'list',
             'post': 'create',
-        }), name='radio-player-list'
+        }), name='radio-players-list'
     ),
     url(
         r'^(?P<pk>[0-9]+)/$',
@@ -22,15 +22,7 @@ urlpatterns = patterns(
             'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
-        }), name='radio-player-detail'
-    ),
-    url(
-        r'^(?P<pk>[0-9]+)/hook/(?P<queue_id>[0-9]+)$',
-        PlayerViewSet.as_view(), name='radio-player-hook'
-    ),
-    url(
-        r'^(?P<pk>[0-9]+)/listen/(?P<queue_id>[0-9]+)$',
-        PlayerViewSet.as_view(), name='radio-player-listen'
+        }), name='radio-players-detail'
     ),
 )
 
