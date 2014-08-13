@@ -29,4 +29,3 @@ class PlaylistTrack(models.Model):
 
     class Meta:
         ordering = ('position',)
-        unique_together = (('playlist', 'track'),)
