@@ -12,12 +12,16 @@ class LoginRequiredMiddleware:
     def process_request(self, request):
         whilte_list = [
             settings.LOGIN_URL,
-            '/complete/google-oauth2/'
+            '/complete/google-oauth2/',
+            '/api/_auth/login/'
         ]
         """
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
-                response = '<h2>Please login to google with your rehabstudio account</h2>\
-                            <a href="/login/google-oauth2/?next=/api/">Login</a>'
+                response = '<h2>Please login</h2>\
+                            <a href="/login/google-oauth2/?next=/api/">\
+                            Google Login</a> / \
+                            <a href="/api/_auth/login/?next=/api/">\
+                            Admin Login</a>'
                 return HttpResponse(response)
         """

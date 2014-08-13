@@ -7,7 +7,7 @@ from .models import Player
 from .serializers import PlayerSerializer
 
 
-class PlaylistViewSet(viewsets.ModelViewSet):
+class PlayerViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing connected players.
     User must be admin
