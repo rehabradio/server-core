@@ -15,7 +15,6 @@ class LoginRequiredMiddleware:
             '/complete/google-oauth2/',
             '/api/_auth/login/'
         ]
-        """
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
                 response = '<h2>Please login</h2>\
@@ -24,4 +23,3 @@ class LoginRequiredMiddleware:
                             <a href="/api/_auth/login/?next=/api/">\
                             Admin Login</a>'
                 return HttpResponse(response)
-        """
