@@ -1,1 +1,1 @@
-web: foreman run python manage.py runserver
+web: python manage.py runserver
