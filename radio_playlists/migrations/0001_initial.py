@@ -44,8 +44,4 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
-        migrations.AlterUniqueTogether(
-            name='playlisttrack',
-            unique_together=set([(b'playlist', b'track')]),
-        ),
     ]
