@@ -40,7 +40,6 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'rest_framework',
     'django_rq',
-    'social_auth',
     'corsheaders',
     'rest_framework_swagger',
 
@@ -63,8 +62,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'radio.middlewares.DisableCSRF',
-    #'radio.middlewares.LoginRequiredMiddleware',
 )
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -104,34 +101,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
-"""
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-"""
+
 # Django Rest Framework settings
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'radio.auth.MyCustomBackend',
+    ),
 }
 
 
 # Django Social Auth Config
-
-AUTHENTICATION_BACKENDS = (
-    'social_auth.backends.google.GoogleOAuth2Backend',
-    'django.contrib.auth.backends.ModelBackend',
-)
-
 LOGIN_URL = '/login/google-oauth2/'
 LOGIN_ERROR_URL = '/login-error/'
-
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
-SOCIAL_AUTH_PROCESS_EXCEPTIONS = 'social_auth.utils.log_exceptions_to_messages'
-
-SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
-SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
 
 
 # Django Caching settings
