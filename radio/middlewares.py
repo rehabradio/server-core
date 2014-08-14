@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.shortcuts import redirect
 
 
 class LoginRequiredMiddleware:
@@ -15,13 +15,6 @@ class LoginRequiredMiddleware:
             '/complete/google-oauth2/',
             '/api/_auth/login/'
         ]
-        """
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
-                response = '<h2>Please login</h2>\
-                            <a href="/login/google-oauth2/?next=/api/">\
-                            Google Login</a> / \
-                            <a href="/api/_auth/login/?next=/api/">\
-                            Admin Login</a>'
-                return HttpResponse(response)
-        """
+                return redirect('/login/google-oauth2/?next=/test/')
