@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.conf.urls import *
 from django.contrib import admin
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
 
 
 # local imports
@@ -43,7 +43,8 @@ urlpatterns = patterns(
     url(r'^api/users/', include('radio_users.urls')),
 )
 
-urlpatterns += staticfiles_urlpatterns()
+#urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # add some routes that are only active when DEBUG is turned on
 if settings.DEBUG:
