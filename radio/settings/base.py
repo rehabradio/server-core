@@ -110,9 +110,13 @@ STATICFILES_DIRS = (
 """
 # Django Rest Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'PAGINATE_BY': 10,
-    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
 }
 
 
@@ -219,9 +223,8 @@ domains = re.findall('([a-z\.]+)', domains)
 GOOGLE_WHITE_LISTED_DOMAINS = domains
 
 SWAGGER_SETTINGS = {
-    "api_url": 'http://localhost:8000/api/',
-    "exclude_namespaces": [], # List URL namespaces to ignore
-    "api_version": '0.1',  # Specify your API's version
-    "is_authenticated": False,  # Set to True to enforce user authentication,
-    "is_superuser": False,  # Set to True to enforce admin only access
+    "exclude_namespaces": [],
+    "api_version": '0.1',
+    "is_authenticated": True,
+    "is_superuser": False,
 }
