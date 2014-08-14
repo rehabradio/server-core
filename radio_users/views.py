@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAdminUser
 
 from django.contrib.auth.models import User
 # Local imports
+from .models import Profile
 from .serializers import UserSerializer
 
 
@@ -21,6 +22,13 @@ class UserList(
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+    def post_save(self, user, created=False):
+        """
+        On creation, create a profile
+        """
+        if created:
+            Profile.objects.create(user=user)
 
 
 class UserDetail(
