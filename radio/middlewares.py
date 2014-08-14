@@ -17,4 +17,4 @@ class LoginRequiredMiddleware:
         ]
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
-                return redirect('/login/google-oauth2/?next=/test/')
+                return redirect('/login/google-oauth2/?next=/api/')
