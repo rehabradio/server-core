@@ -18,3 +18,8 @@ class LoginRequiredMiddleware:
         if not request.user.is_authenticated():
             if request.path_info not in whilte_list:
                 return redirect('/login/google-oauth2/?next=/api/')
+
+
+class DisableCSRF(object):
+    def process_request(self, request):
+        setattr(request, '_dont_enforce_csrf_checks', True)
