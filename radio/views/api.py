@@ -55,7 +55,8 @@ class SwaggerView(APIView):
 
     def get(self, request, format=None):
         settings = {
-            'basePath': 'http://localhost:8000/api/docs/api-docs',
+            #'basePath': 'http://localhost:8000/api/docs/api-docs',
+            'basePath': 'http://server-core.herokuapp.com/api/docs/api-docs',
             'swaggerVersion': '1.2',
             'apiVersion': '0.1',
             'apis': [
