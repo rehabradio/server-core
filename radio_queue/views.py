@@ -91,7 +91,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         """
         Returns a paginated set of tracks in a given queue
         """
-        queryset = self.queryset.filter(queue_id=queue_id)
+        queryset = QueueTrack.objects.select_related().filter(queue_id=queue_id)
         paginator = Paginator(queryset, 20)
 
         page = request.QUERY_PARAMS.get('page')

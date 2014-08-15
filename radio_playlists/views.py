@@ -79,7 +79,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         """
         Returns a paginated set of tracks in a given playlist
         """
-        queryset = self.queryset.filter(playlist_id=playlist_id)
+        queryset = PlaylistTrack.objects.select_related().filter(playlist_id=playlist_id)
         paginator = Paginator(queryset, 20)
 
         page = request.QUERY_PARAMS.get('page')
