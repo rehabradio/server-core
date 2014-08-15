@@ -22,7 +22,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
 class PlaylistTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
     position = serializers.IntegerField(read_only=True)
-    playlist = PlaylistSerializer(write_only=True)
+    playlist = serializers.PrimaryKeyRelatedField(read_only=True)
     owner = serializers.Field(source='owner.username')
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)

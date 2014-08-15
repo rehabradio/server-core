@@ -7,6 +7,8 @@ import datetime
 
 # third-party imports
 from django.core.cache import cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -299,6 +301,34 @@ class TrackViewSet(viewsets.ModelViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     permission_classes = (IsStaffToDelete,)
+
+    def list(self, request, pk=None):
+        """
+        Returns a paginated set of tracks in a given queue
+        """
+        queryset = Track.objects.prefetch_related(
+            'artists',
+            'album',
+            'owner',
+        ).all()
+        paginator = Paginator(queryset, 20)
+
+        page = request.QUERY_PARAMS.get('page')
+        try:
+            tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            tracks = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedTrackSerializer(
+            tracks, context=serializer_context
+        )
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         """

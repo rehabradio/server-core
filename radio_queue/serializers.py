@@ -19,7 +19,7 @@ class QueueSerializer(serializers.ModelSerializer):
 
 class QueueTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
-    queue = QueueSerializer(read_only=True)
+    queue = serializers.PrimaryKeyRelatedField(read_only=True)
     position = serializers.IntegerField(read_only=True)
     owner = serializers.Field(source='owner.username')
 
@@ -37,7 +37,7 @@ class PaginatedQueueTrackSerializer(pagination.PaginationSerializer):
 
 class QueueTrackHistorySerializer(serializers.ModelSerializer):
     track = TrackSerializer()
-    queue = QueueSerializer()
+    queue = serializers.PrimaryKeyRelatedField(read_only=True)
     owner = serializers.Field(source='owner.username')
     created = serializers.DateTimeField()
 

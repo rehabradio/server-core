@@ -33,7 +33,7 @@ class Album(MetadataBase):
 
 class Track(MetadataBase):
     # relationships to other models
-    artists = models.ManyToManyField(Artist)
+    artists = models.ManyToManyField(Artist, related_name='track')
     album = models.ForeignKey(Album, null=True)
 
     # track metadata
