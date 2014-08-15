@@ -12,7 +12,7 @@ from rest_framework import exceptions
 from radio_users.models import Profile
 
 
-class MyCustomBackend(authentication.BaseAuthentication):
+class GoogleOauthBackend(authentication.BaseAuthentication):
     """
     Uses a Google Oauth2 token passed in the request header.
     Retreives or creates a user object, based on their email domain

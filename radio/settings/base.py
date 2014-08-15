@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*']
@@ -41,7 +41,6 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'django_rq',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_swagger',
 
     # local apps
@@ -72,7 +71,7 @@ CORS_ALLOW_HEADERS = (
     'content-type',
     'origin',
     'x-csrftoken',
-    'x_google_auth_token'
+    'x_google_auth_token',
     'x-requested-with',
 )
 
@@ -125,7 +124,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'radio.auth.MyCustomBackend',
+        'radio.auth.GoogleOauthBackend',
     ),
 }
 
