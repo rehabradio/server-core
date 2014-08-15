@@ -1,7 +1,7 @@
+import uuid
 # third-party imports
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
 
 # local imports
 from .models import Player
@@ -16,3 +16,11 @@ class PlayerViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
+
+    def post_save(self, player, created=False):
+        """
+        On creation, create a token
+        """
+        if created:
+            player.token = uuid.uuid4()
+            player.save()
