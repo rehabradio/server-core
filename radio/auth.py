@@ -20,7 +20,6 @@ class MyCustomBackend(authentication.BaseAuthentication):
     def authenticate(self, request):
         # Retrieve the access token from the request header
         access_token = request.META.get('HTTP_X_GOOGLE_AUTH_TOKEN')
-        print(request.META)
 
         # Validated the token and pull down the user details
         params = {'alt': 'json', 'access_token': access_token}

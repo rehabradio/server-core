@@ -33,14 +33,15 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.messages',
 
     # third-party apps
-    'debug_toolbar',
-    'rest_framework',
-    'django_rq',
     'corsheaders',
+    'debug_toolbar',
+    'django_rq',
+    'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_swagger',
 
     # local apps
@@ -53,27 +54,26 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 )
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = (
-    'x-requested-with',
-    'content-type',
     'accept',
-    'origin',
     'authorization',
+    'content-type',
+    'origin',
     'x-csrftoken',
     'x_google_auth_token'
+    'x-requested-with',
 )
 
 ROOT_URLCONF = 'radio.urls'
@@ -109,9 +109,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
-#STATIC_ROOT = 'staticfiles'
-#STATIC_URL = '/static/'
-#PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_PATH = BASE_DIR
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
@@ -132,12 +129,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-
-# Django Social Auth Config
-LOGIN_URL = '/login/google-oauth2/'
-LOGIN_ERROR_URL = '/login-error/'
-
-
 # Django Caching settings
 """
 CACHES = {
@@ -154,7 +145,7 @@ SESSION_CACHE_ALIAS = 'default'
 
 # django-debug-toolbar settings
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = ('127.0.0.1', '192.168.33.10', '0.0.0.0')
+INTERNAL_IPS = ('127.0.0.1', '0.0.0.0')
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': 'radio.utils.debug_toolbar.show_debug_toolbar',
 }
@@ -215,17 +206,13 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get(
     'GOOGLE_OAUTH2_CLIENT_SECRET',
     None
 )
-domains = os.environ.get(
-    'GOOGLE_WHITE_LISTED_DOMAINS',
-    ''
-)
+domains = os.environ.get('GOOGLE_WHITE_LISTED_DOMAINS', '')
 domains = re.findall('([a-z\.]+)', domains)
-
 GOOGLE_WHITE_LISTED_DOMAINS = domains
 
 SWAGGER_SETTINGS = {
-    "exclude_namespaces": [],
     "api_version": '0.1',
+    "exclude_namespaces": [],
     "is_authenticated": True,
     "is_superuser": False,
 }
