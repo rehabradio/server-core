@@ -55,9 +55,14 @@ def _search_tracks(query):
 def _transform_track(track):
     """Transform result into a format that more closely matches our unified API.
     """
-    small_artwork = str(track['artwork_url']).replace('large', 't500x500')
-    medium_artwork = str(track['artwork_url']).replace('large', 't300x300')
-    large_artwork = str(track['artwork_url']).replace('large', 't67x67')
+    large_artwork = None
+    medium_artwork = None
+    small_artwork = None
+
+    if track['artwork_url']:
+        large_artwork = (track['artwork_url']).replace('large', 't500x500')
+        medium_artwork = (track['artwork_url']).replace('large', 't300x300')
+        small_artwork = (track['artwork_url']).replace('large', 't67x67')
 
     transformed_track = dict([
         ('source_type', 'soundcloud'),
