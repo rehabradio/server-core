@@ -16,6 +16,15 @@ class BaseTestCase(TestCase):
     factory = APIRequestFactory()
     api_client = APIClient()
 
+    """
+    Log in a user
+    """
+    def setUp(self):
+        username = os.environ.get('TEST_USERNAME', None)
+        password = os.environ.get('TEST_PASSWORD', None)
+        login = self.api_client.login(username=username, password=password)
+        self.assertEqual(login, True)
+
 
 class MetadataAPIRootViewTestCase(BaseTestCase):
     """
