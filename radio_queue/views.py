@@ -173,7 +173,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        serializer = PaginatedQueueTrackSerializer(queued_track)
+        serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
@@ -190,7 +190,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        serializer = PaginatedQueueTrackSerializer(queued_track)
+        serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
