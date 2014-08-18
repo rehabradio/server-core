@@ -48,22 +48,26 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
 
             password = make_password(person['id'])
             try:
-                user = User.objects.create(
-                    username=person['name'],
-                    password=password,
-                    first_name=person['given_name'],
-                    last_name=person['family_name'],
-                    email=person['email']
-                )
-                Profile.objects.create(
-                    user=user,
-                    avatar=person['picture']
-                )
+                user = User.objects.get(email=person['email'])
             except:
-                print 'User could not be created'
-                raise exceptions.AuthenticationFailed(
-                    'User could not be created'
-                )
+                print 'user not found'
+                try:
+                    user = User.objects.create(
+                        username=person['name'],
+                        password=password,
+                        first_name=person['given_name'],
+                        last_name=person['family_name'],
+                        email=person['email']
+                    )
+                    Profile.objects.create(
+                        user=user,
+                        avatar=person['picture']
+                    )
+                except:
+                    print 'User could not be created'
+                    raise exceptions.AuthenticationFailed(
+                        'User could not be created'
+                    )
 
             return (user, None)
         print 'no access_token provided'
