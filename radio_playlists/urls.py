@@ -23,6 +23,7 @@ urlpatterns = patterns(
         PlaylistViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',
+            'patch': 'partial_update',
             'delete': 'destroy',
         }), name='radio-playlists-detail'
     ),
