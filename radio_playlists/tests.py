@@ -235,8 +235,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['playlist_id'], 2)
-        self.assertEqual(data['track_id'], track.id)
+        self.assertEqual(data['track']['id'], track.id)
         self.assertEqual(data['position'], int(new_records_count))
 
     """
@@ -305,7 +304,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure the returned json keys match the expected
-        self.assertEqual(data['position'], post_data['position'])
+        self.assertEqual(int(data['position']), post_data['position'])
 
     """
     Remove a playlist track from the database
