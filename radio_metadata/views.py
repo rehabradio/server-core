@@ -380,6 +380,8 @@ class TrackViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+        cache.delete(self._get_cache_key())
+
         serializer = TrackSerializer(track)
 
         return Response(serializer.data)
@@ -402,16 +404,11 @@ class TrackViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'detail': 'Track successfully removed'})
-
-    # Set user id, for each record saved
-    def pre_save(self, obj):
-        obj.owner = self.request.user
-
-    def post_save(self, user, created=False):
-        # Destory the existing track list cache, to force an update
         cache.delete(self._get_cache_key())
 
-    def post_delete(self):
-        # Destory the existing track list cache, to force an update
+        return Response({'detail': 'Track successfully removed'})
+
+    def pre_save(self, obj):
+        # Set user id, for each record saved
+        obj.owner = self.request.user
         cache.delete(self._get_cache_key())
