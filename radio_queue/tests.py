@@ -237,8 +237,8 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
         self.assertEqual(data['position'], new_records_count)
-        self.assertEqual(data['track_id'], post_data['track'])
-        self.assertEqual(data['queue_id'], 1)
+        self.assertEqual(data['track']['id'], post_data['track'])
+        self.assertEqual(data['queue'], 1)
 
     """
     Try to add a track to the queue, without specifying the track ID
@@ -298,7 +298,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         # Ensure a the record was updated
         # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(data['position'], post_data['position'])
+        self.assertEqual(int(data['position']), post_data['position'])
 
     """
     Remove a track from a queue
