@@ -6,8 +6,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from .views import (
     QueueViewSet,
     QueueTrackViewSet,
-    QueueTrackPop,
-    QueueTrackHead,
     QueueTrackHistoryViewSet
 )
 
@@ -46,12 +44,16 @@ urlpatterns = patterns(
         }), name='radio-queue-track-detail'
     ),
     url(
-        r'^(?P<queue_id>[0-9]+)/tracks/head/$',
-        QueueTrackHead.as_view(), name='radio-queue-track-head'
+        r'^(?P<queue_id>[0-9]+)/head/$',
+        QueueTrackViewSet.as_view({
+            'get': 'head',
+        }), name='radio-queue-track-head'
     ),
     url(
-        r'^(?P<queue_id>[0-9]+)/tracks/pop/$',
-        QueueTrackPop.as_view(), name='radio-queue-track-pop'
+        r'^(?P<queue_id>[0-9]+)/pop/$',
+        QueueTrackViewSet.as_view({
+            'delete': 'pop',
+        }), name='radio-queue-track-pop'
     ),
     url(
         r'^(?P<queue_id>[0-9]+)/history/$',

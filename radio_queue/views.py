@@ -1,9 +1,12 @@
+import datetime
 import random
 # third-party imports
+from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
 
-from rest_framework import generics, mixins, status, viewsets
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import link
 from rest_framework.response import Response
 
 # local imports
@@ -42,11 +45,22 @@ def _add_random_track_to_queue(queue_id):
     return queue_track
 
 
+def _reset_track_positions(queue_id):
+    """
+    Once a record has been removed, reset the postions
+    """
+    records = QueueTrack.objects.filter(queue_id=queue_id)
+
+    for (i, track) in enumerate(records):
+        track.position = i+1
+        track.save()
+
+
 class QueueViewSet(viewsets.ModelViewSet):
     """
     CRUD API endpoints that allow managing playlists.
     """
-    permission_classes = (IsStaffOrOwnerToDelete, )
+    permission_classes = (IsStaffOrOwnerToDelete, permissions.IsAuthenticated)
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
 
@@ -85,19 +99,31 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     """
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
-    permission_classes = (IsStaffOrOwnerToDelete, )
+    permission_classes = (IsStaffOrOwnerToDelete, permissions.IsAuthenticated)
+
+    def _get_cache_key(self, queue_id):
+        """Build key used for caching the playlist data
+        """
+        return 'queue-{0}-{1}'.format(
+            queue_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
 
     def list(self, request, queue_id=None):
         """
         Returns a paginated set of tracks in a given queue
         """
-        queryset = QueueTrack.objects.prefetch_related(
-            'track',
-            'track__artists',
-            'track__album',
-            'track__owner',
-            'owner'
-        ).filter(queue_id=queue_id)
+        cache_key = self._get_cache_key(queue_id)
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            queryset = QueueTrack.objects.prefetch_related(
+                'track',
+                'track__artists',
+                'track__album',
+                'track__owner',
+                'owner'
+            ).filter(queue_id=queue_id)
+            cache.set(cache_key, queryset, 86400)
         paginator = Paginator(queryset, 20)
 
         page = request.QUERY_PARAMS.get('page')
@@ -125,7 +151,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             queue=kwargs['queue_id']
         ).count()+1
         try:
-            queue_track = QueueTrack.objects.create(
+            queued_track = QueueTrack.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
                 queue=Queue.objects.get(id=kwargs['queue_id']),
                 position=position,
@@ -145,8 +171,10 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             response = {'detail': 'Track could not be saved to queue history'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        new_playlist = QueueTrack.objects.filter(id=queue_track.id).values()[0]
-        return Response(new_playlist)
+        cache.delete(self._get_cache_key(kwargs['queue_id']))
+
+        serializer = PaginatedQueueTrackSerializer(queued_track)
+        return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
         """
@@ -160,10 +188,10 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             response = {'detail': 'Queued track could not be updated'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        new_playlist = QueueTrack.objects.filter(
-            id=queued_track.id
-        ).values()[0]
-        return Response(new_playlist)
+        cache.delete(self._get_cache_key(kwargs['queue_id']))
+
+        serializer = PaginatedQueueTrackSerializer(queued_track)
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -183,19 +211,22 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+        cache.delete(self._get_cache_key(kwargs['queue_id']))
+
         return Response({'detail': 'Queued track successfully removed'})
 
-
-class QueueTrackHead(generics.GenericAPIView):
-    """
-    Fetch the top track in a given queue
-    """
-
-    serializer_class = QueueTrackSerializer
-
-    def get(self, request, *args, **kwargs):
+    @link()
+    def head(self, request, *args, **kwargs):
+        """
+        Fetch the top track in a given queue
+        """
         try:
-            queued_track = QueueTrack.objects.get(
+            queued_track = QueueTrack.objects.select_related(
+                'track',
+                'track__album',
+                'track__owner',
+                'owner'
+            ).get(
                 queue_id=kwargs['queue_id'],
                 position=1
             )
@@ -204,15 +235,11 @@ class QueueTrackHead(generics.GenericAPIView):
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
-
-class QueueTrackPop(mixins.DestroyModelMixin, generics.GenericAPIView):
-    """
-    Remove a track from the top of a given queue
-    """
-
-    serializer_class = QueueTrackSerializer
-
-    def delete(self, request, *args, **kwargs):
+    @link()
+    def pop(self, request, *args, **kwargs):
+        """
+        Remove a track from the top of a given queue
+        """
         try:
             queued_track = QueueTrack.objects.get(
                 queue_id=kwargs['queue_id'],
@@ -228,11 +255,15 @@ class QueueTrackPop(mixins.DestroyModelMixin, generics.GenericAPIView):
             track.save()
 
             queued_track.delete()
+            # reset the remaining tracks into their new positions
+            _reset_track_positions(kwargs['queue_id'])
         except:
             response = {
                 'detail': 'Failed to remove track from queue',
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        cache.delete(self._get_cache_key(kwargs['queue_id']))
 
         return Response({'detail': 'Queued track successfully removed'})
 
