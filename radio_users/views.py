@@ -22,14 +22,19 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser,)
 
+    def _get_cache_key(self):
+        """Build key used for caching the lookup data
+        """
+        return 'userlist-{0}'.format(
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
     def list(self, request):
         """
         CRUD API endpoints that allow managing users.
         Admin permissions required
         """
-        cache_key = u'userlist-{0}'.format(
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
         if queryset is None:
             users = User.objects.select_related('profile').all()
@@ -77,14 +82,13 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         On creation, create a profile
         """
+        # Destory the existing track list cache, to force an update
+        cache.delete(self._get_cache_key())
+
         if created:
             # Create an empty profile
             Profile.objects.create(user=user)
-            # Update the cache
-            cache_key = u'userlist-{0}'.format(
-                datetime.datetime.utcnow().strftime('%Y%m%d'),
-            )
-            users = User.objects.select_related('profile').all()
-            serializer = UserSerializer(users)
-            queryset = serializer.data
-            cache.set(cache_key, queryset, 86400)
+
+    def post_delete(self):
+        # Destory the existing track list cache, to force an update
+        cache.delete(self._get_cache_key())
