@@ -316,14 +316,13 @@ class TrackViewSet(viewsets.ModelViewSet):
         """
         cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
+
         if queryset is None:
             queryset = Track.objects.prefetch_related(
                 'artists',
                 'album',
                 'owner',
             ).all()
-            serializer = TrackSerializer(queryset)
-            queryset = serializer.data
             cache.set(cache_key, queryset, 86400)
 
         paginator = Paginator(queryset, 20)
