@@ -20,7 +20,6 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
     def authenticate(self, request):
         # Retrieve the access token from the request header
         access_token = request.META.get('HTTP_X_GOOGLE_AUTH_TOKEN')
-        #access_token = 'ya29.YgDpbXf7kqJiOxwAAADmidIHzuVIDax_gnQO5NLNDr3XYNhZiC7S2KsBBB4dWg'
         if access_token:
             print access_token
             # Validated the token and pull down the user details
@@ -34,7 +33,9 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
             # Ensure a valid json object is returned
             if person.get('error') or person['verified_email'] is False:
                 print person.get('error')
-                raise exceptions.AuthenticationFailed(person['error']['message'])
+                raise exceptions.AuthenticationFailed(
+                    person['error']['message']
+                )
 
             # Retrieve the whitelisted domains set in the .env file
             domains = os.environ.get('GOOGLE_WHITE_LISTED_DOMAINS', '')
@@ -42,21 +43,28 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
 
             # Ensure the users domain exists within the whilelist
             if person['hd'] not in white_listed_domains:
+                print 'Invalid domain' + person['hd']
                 raise exceptions.AuthenticationFailed('Invalid domain')
 
             password = make_password(person['id'])
-            user = User.objects.create(
-                username=person['name'],
-                password=password,
-                first_name=person['given_name'],
-                last_name=person['family_name'],
-                email=person['email']
-            )
-
-            Profile.objects.create(
-                user=user,
-                avatar=person['picture']
-            )
+            try:
+                user = User.objects.create(
+                    username=person['name'],
+                    password=password,
+                    first_name=person['given_name'],
+                    last_name=person['family_name'],
+                    email=person['email']
+                )
+                Profile.objects.create(
+                    user=user,
+                    avatar=person['picture']
+                )
+            except:
+                print 'User could not be created'
+                raise exceptions.AuthenticationFailed(
+                    'User could not be created'
+                )
 
             return (user, None)
+        print 'no access_token provided'
         return None
