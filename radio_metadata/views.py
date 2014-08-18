@@ -13,6 +13,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework import permissions
 
 # local imports
 from .models import Album, Artist, Track
@@ -300,17 +301,31 @@ class TrackViewSet(viewsets.ModelViewSet):
     """
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
-    permission_classes = (IsStaffToDelete,)
+    permission_classes = (IsStaffToDelete, permissions.IsAuthenticated)
+
+    def _get_cache_key(self):
+        """Build key used for caching the lookup data
+        """
+        return 'tracklist-{0}'.format(
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
 
     def list(self, request, pk=None):
         """
         Returns a paginated set of tracks in a given queue
         """
-        queryset = Track.objects.prefetch_related(
-            'artists',
-            'album',
-            'owner',
-        ).all()
+        cache_key = self._get_cache_key()
+        queryset = cache.get(cache_key)
+        if queryset is None:
+            queryset = Track.objects.prefetch_related(
+                'artists',
+                'album',
+                'owner',
+            ).all()
+            serializer = TrackSerializer(queryset)
+            queryset = serializer.data
+            cache.set(cache_key, queryset, 86400)
+
         paginator = Paginator(queryset, 20)
 
         page = request.QUERY_PARAMS.get('page')
@@ -366,9 +381,9 @@ class TrackViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        new_track = Track.objects.filter(id=track.id).values()[0]
+        serializer = TrackSerializer(track)
 
-        return Response(new_track)
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -393,3 +408,11 @@ class TrackViewSet(viewsets.ModelViewSet):
     # Set user id, for each record saved
     def pre_save(self, obj):
         obj.owner = self.request.user
+
+    def post_save(self, user, created=False):
+        # Destory the existing track list cache, to force an update
+        cache.delete(self._get_cache_key())
+
+    def post_delete(self):
+        # Destory the existing track list cache, to force an update
+        cache.delete(self._get_cache_key())
