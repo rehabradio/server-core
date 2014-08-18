@@ -1,5 +1,6 @@
 # Third party imports
 from django.contrib.auth.models import User
+from rest_framework import pagination
 from rest_framework import serializers
 
 from .models import Profile
@@ -46,3 +47,11 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(attrs['password'])
 
         return user
+
+
+class PaginatedUserSerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of tracks.
+    """
+    class Meta:
+        object_serializer_class = UserSerializer

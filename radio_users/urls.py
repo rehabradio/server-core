@@ -1,9 +1,25 @@
 from django.conf.urls import patterns, url
 
-from . import views
+from .views import UserViewSet
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.UserList.as_view(), name='radio-users-api-list'),
-    url(r'^(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(
+        r'^$',
+        UserViewSet.as_view({
+            'get': 'list',
+            'post': 'create',
+        }),
+        name='radio-users-api-list'
+    ),
+    url(
+        r'^(?P<pk>[^/]+)/$',
+        UserViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }),
+        name='radio-users-api-detail'
+    ),
 )
