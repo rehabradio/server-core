@@ -112,10 +112,6 @@ PROJECT_PATH = BASE_DIR
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'static'),
-)
-
 # Django Rest Framework settings
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10,

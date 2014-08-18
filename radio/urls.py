@@ -43,7 +43,6 @@ urlpatterns = patterns(
     url(r'^api/users/', include('radio_users.urls')),
 )
 
-#urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # add some routes that are only active when DEBUG is turned on
