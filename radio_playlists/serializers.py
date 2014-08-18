@@ -19,6 +19,14 @@ class PlaylistSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description')
 
 
+class PaginatedPlaylistSerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of playlist track querysets.
+    """
+    class Meta:
+        object_serializer_class = PlaylistSerializer
+
+
 class PlaylistTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
     position = serializers.IntegerField(read_only=True)
