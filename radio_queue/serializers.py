@@ -17,6 +17,14 @@ class QueueSerializer(serializers.ModelSerializer):
         model = Queue
 
 
+class PaginatedQueueSerializer(pagination.PaginationSerializer):
+    """
+    Serializes page objects of queue querysets.
+    """
+    class Meta:
+        object_serializer_class = QueueSerializer
+
+
 class QueueTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
     queue = serializers.PrimaryKeyRelatedField(read_only=True)

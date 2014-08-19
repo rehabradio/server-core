@@ -15,6 +15,7 @@ from radio_metadata.models import Track
 
 from .serializers import (
     QueueSerializer,
+    PaginatedQueueSerializer,
     QueueTrackSerializer,
     PaginatedQueueTrackSerializer,
     QueueTrackHistorySerializer,
@@ -64,6 +65,44 @@ class QueueViewSet(viewsets.ModelViewSet):
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
 
+    def _get_cache_key(self):
+        """Build key used for caching the queue list
+        """
+        return 'queuelist-{0}'.format(
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
+    def list(self, request, queue_id=None):
+        """
+        Returns a paginated set of tracks in a given queue
+        """
+        cache_key = self._get_cache_key()
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            queryset = Queue.objects.select_related(
+                'owner'
+            ).all()
+            cache.set(cache_key, queryset, 86400)
+        paginator = Paginator(queryset, 20)
+
+        page = request.QUERY_PARAMS.get('page')
+        try:
+            queues = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            queues = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            queues = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedQueueSerializer(
+            queues, context=serializer_context
+        )
+        return Response(serializer.data)
+
     def destroy(self, request, *args, **kwargs):
         """
         Removes queue from database, and returns a detail reponse
@@ -83,6 +122,8 @@ class QueueViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+        cache.delete(self._get_cache_key())
+
         return Response({'detail': 'Queue successfully removed'})
 
     def pre_save(self, obj):
@@ -90,6 +131,7 @@ class QueueViewSet(viewsets.ModelViewSet):
         Set user id, for each record saved/updated
         """
         obj.owner = self.request.user
+        cache.delete(self._get_cache_key())
 
 
 class QueueTrackViewSet(viewsets.ModelViewSet):
@@ -102,7 +144,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrOwnerToDelete, permissions.IsAuthenticated)
 
     def _get_cache_key(self, queue_id):
-        """Build key used for caching the playlist data
+        """Build key used for caching the queue data
         """
         return 'queue-{0}-{1}'.format(
             queue_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
