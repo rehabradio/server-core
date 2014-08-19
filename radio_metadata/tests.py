@@ -19,6 +19,31 @@ class BaseTestCase(TestCase):
     """
     Log in a user
     """
+    paginated_attrs = (
+        'count',
+        'next',
+        'previous',
+        'results',
+    )
+
+    track_attrs = (
+        'source_type',
+        'source_id',
+        'name',
+        'artists',
+        'album',
+        'duration_ms',
+        'preview_url',
+        'track_number',
+        'image_small',
+        'image_medium',
+        'image_large',
+        'play_count',
+        'owner',
+        'created',
+        'updated',
+    )
+
     def setUp(self):
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
@@ -33,14 +58,8 @@ class MetadataAPIRootViewTestCase(BaseTestCase):
     """
     def test_get(self):
         resp = self.api_client.get('/api/metadata/')
-        data = json.loads(resp.content)
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure the returned json keys match the expected
-        self.assertTrue(data['endpoints'])
-        self.assertTrue(data['endpoints']['search'])
-        self.assertTrue(data['endpoints']['lookup'])
 
 
 class LookupRootViewTestCase(BaseTestCase):
@@ -50,16 +69,8 @@ class LookupRootViewTestCase(BaseTestCase):
     """
     def test_get(self):
         resp = self.api_client.get('/api/metadata/lookup/')
-        data = json.loads(resp.content)
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure the returned json keys match the expected
-        self.assertTrue(data['endpoints'])
-        self.assertTrue(data['endpoints']['soundcloud'])
-        self.assertTrue(data['endpoints']['soundcloud']['tracks'])
-        self.assertTrue(data['endpoints']['spotify'])
-        self.assertTrue(data['endpoints']['spotify']['tracks'])
 
 
 class LookupViewTestCase(BaseTestCase):
@@ -67,23 +78,6 @@ class LookupViewTestCase(BaseTestCase):
     Test looking up a track using the spotify and soundcloud backends
     """
     def test_get(self):
-        expected_attrs = (
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'album',
-            'duration_ms',
-            'preview_url',
-            'track_number',
-            'image_small',
-            'image_medium',
-            'image_large',
-            'play_count',
-            'owner',
-            'created',
-            'updated',
-        )
 
         resp1 = self.api_client.get(
             '/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/'
@@ -93,7 +87,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp1.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data1))
+        self.assertTrue(set(self.track_attrs) <= set(data1))
 
         resp2 = self.api_client.get(
             '/api/metadata/lookup/soundcloud/153868082/'
@@ -103,7 +97,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp2.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data2))
+        self.assertTrue(set(self.track_attrs) <= set(data2))
 
     """
     Test 404 error and detail message returns, using a bad backend
@@ -117,7 +111,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(
             data['detail'],
-            'Invalid backend, provider not recognised.'
+            u'Invalid lookup_type, type not supported by backend.'
         )
 
 
@@ -145,30 +139,6 @@ class SearchViewTestCase(BaseTestCase):
     Test searching for tracks using the spotify and soundcloud backends
     """
     def test_get(self):
-        result_attrs = (
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-        expected_results_attrs = (
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'album',
-            'duration_ms',
-            'preview_url',
-            'track_number',
-            'image_small',
-            'image_medium',
-            'image_large',
-            'play_count',
-            'owner',
-            'created',
-            'updated',
-        )
-
         resp1 = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
         data1 = json.loads(resp1.content)
         tracks1 = data1['results'][0]
@@ -176,8 +146,8 @@ class SearchViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp1.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(result_attrs) <= set(data1))
-        self.assertTrue(set(expected_results_attrs) <= set(tracks1))
+        self.assertTrue(set(self.paginated_attrs) <= set(data1))
+        self.assertTrue(set(self.track_attrs) <= set(tracks1))
 
         resp2 = self.api_client.get(
             '/api/metadata/search/soundcloud/?q=narsti/'
@@ -188,8 +158,8 @@ class SearchViewTestCase(BaseTestCase):
         # Ensure request was successful
         self.assertEqual(resp2.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(result_attrs) <= set(data2))
-        self.assertTrue(set(expected_results_attrs) <= set(tracks2))
+        self.assertTrue(set(self.paginated_attrs) <= set(data2))
+        self.assertTrue(set(self.track_attrs) <= set(tracks2))
 
     """
     Test 404 error and detail message returns, using a bad backend
@@ -203,7 +173,7 @@ class SearchViewTestCase(BaseTestCase):
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(
             data['detail'],
-            'Invalid backend, provider not recognised.'
+            u'Invalid backend, provider not recognised.'
         )
 
     """
@@ -216,56 +186,15 @@ class SearchViewTestCase(BaseTestCase):
         # Ensure request failed
         self.assertEqual(resp.status_code, 400)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], 'Required parameters are missing')
+        self.assertEqual(data['detail'], u'Required parameters are missing.')
 
 
-class TrackViewSetTestCase(TestCase):
-    """
-    Load in default data for tests
-    """
-    fixtures = ['radio/fixtures/testdata.json']
-    factory = APIRequestFactory()
-    api_client = APIClient()
-
-    """
-    Log in a user
-    """
-    def setUp(self):
-        username = os.environ.get('TEST_USERNAME', None)
-        password = os.environ.get('TEST_PASSWORD', None)
-        login = self.api_client.login(username=username, password=password)
-        self.assertEqual(login, True)
-
+class TrackViewSetTestCase(BaseTestCase):
     """
     Retrieve a list of all Tracks, with an excepted result set
     """
     def test_list(self):
-        expected_attrs = (
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-
-        expected_results_attrs = (
-            'id',
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'album',
-            'duration_ms',
-            'preview_url',
-            'track_number',
-            'image_small',
-            'image_medium',
-            'image_large',
-            'play_count',
-            'owner',
-            'created',
-            'updated',
-        )
-
+        track_attrs = self.track_attrs + ('id',)
         resp = self.api_client.get('/api/metadata/tracks/')
         data = json.loads(resp.content)
         Tracks = data['results'][0]
@@ -273,8 +202,8 @@ class TrackViewSetTestCase(TestCase):
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
-        self.assertTrue(set(expected_results_attrs) <= set(Tracks))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(track_attrs) <= set(Tracks))
 
     """
     Create a Track with all data
@@ -310,11 +239,11 @@ class TrackViewSetTestCase(TestCase):
         new_records_count = Track.objects.all().count()
 
         # Ensure request failed
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 404)
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['detail'], 'Track could not be found')
+        self.assertEqual(data['detail'], u'The record could not be found.')
 
     """
     Create a track with bad backend
@@ -336,38 +265,20 @@ class TrackViewSetTestCase(TestCase):
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['detail'], 'Track could not be found')
+        self.assertEqual(data['detail'], u'The record could not be found.')
 
     """
     Retrieve a track
     """
     def test_retrieve(self):
-        expected_attrs = (
-            'id',
-            'source_type',
-            'source_id',
-            'name',
-            'artists',
-            'album',
-            'duration_ms',
-            'preview_url',
-            'track_number',
-            'image_small',
-            'image_medium',
-            'image_large',
-            'play_count',
-            'owner',
-            'created',
-            'updated',
-        )
-
+        track_attrs = self.track_attrs + ('id',)
         resp = self.api_client.get('/api/metadata/tracks/1/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(track_attrs) <= set(data))
 
     """
     Cascade remove a track from the database
