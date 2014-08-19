@@ -46,6 +46,8 @@ Foreman
 -----------------------------------------
 Foreman requires a `.env` file to work. Please ensure you create this file in the project root directory (same directory as manage.py), and ensure the following keys are listed
 
+ENVIRONMENT=["LOCAL"/"LIVE"]
+
 SECRET_KEY=[django secret key]
 
 GOOGLE_OAUTH2_CLIENT_ID=[google client id]
@@ -57,7 +59,8 @@ SOUNDCLOUD_CLIENT_ID=[soundcloud secret key]
 TEST_USERNAME=[username for test login]
 TEST_PASSWORD=[password for test login]
 
-DATABASE_URL=[url to database server]
+DATABASE_URL=[url to live database server]
+LOCAL_DATABASE_URL=[url to local database server]
 
 REDIS_LOCATION=[url to redis server]
 
