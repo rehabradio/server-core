@@ -59,6 +59,8 @@ TEST_PASSWORD=[password for test login]
 
 DATABASE_URL=[url to database server]
 
+REDIS_LOCATION=[url to redis server]
+
 
 Preparing your Python virtual environment
 -----------------------------------------
