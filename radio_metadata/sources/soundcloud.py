@@ -34,16 +34,9 @@ def _search_tracks(query):
     # create a client object with your app credentials
     _client = soundcloud.Client(client_id=settings.SOUNDCLOUD_CLIENT_ID)
 
-    # keep fetching results until there aren't any more, this does add some
-    # overhead to initial searches, but with some caching i think it'll be
-    # worth doing it this way.
-    while True:
-        logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
-        results = _client.get('/tracks', q=query, limit=limit, offset=offset)
-        tracks.append([x.obj for x in results])
-        if len(results) < limit:
-            break
-        offset += limit
+    logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
+    results = _client.get('/tracks', q=query, limit=limit, offset=offset)
+    tracks.append([x.obj for x in results])
 
     tracks = list(itertools.chain.from_iterable(tracks))
     tracks = [_transform_track(x) for x in tracks]
