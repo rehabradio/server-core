@@ -20,7 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminUser,)
+    #permission_classes = (IsAdminUser,)
 
     def _get_cache_key(self):
         """Build key used for caching the lookup data

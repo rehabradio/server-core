@@ -41,7 +41,6 @@ INSTALLED_APPS = (
 
     # third-party apps
     'corsheaders',
-    'debug_toolbar',
     'django_rq',
     'rest_framework',
     'rest_framework_swagger',
@@ -56,7 +55,6 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
@@ -82,12 +80,11 @@ ROOT_URLCONF = 'radio.urls'
 
 WSGI_APPLICATION = 'radio.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 import dj_database_url
 
-database_url = os.environ.get('DATABASE_URL', None)
+database_url = os.environ.get('LOCAL_DATABASE_URL', None)
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -120,7 +117,8 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -129,28 +127,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-# Django Caching settings
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.cache.RedisCache',
-        'LOCATION': os.environ.get('REDIS_LOCATION', '127.0.0.1:6379:1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
-            'SOCKET_TIMEOUT': 5,
-        },
-    }
-}
 # Django session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
-
-# django-debug-toolbar settings
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = ('127.0.0.1', '0.0.0.0')
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'radio.utils.debug_toolbar.show_debug_toolbar',
-}
-
 
 # Logging settings
 LOGGING = {
@@ -186,17 +165,17 @@ LOGGING = {
     }
 }
 
+# Django template settings
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
+
 # Django RQ configuration
 RQ_QUEUES = {
     'default': {
         'USE_REDIS_CACHE': 'default',
     },
 }
-
-# Django template settings
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
 
 SECRET_KEY = os.environ.get('SECRET_KEY', None)
 
