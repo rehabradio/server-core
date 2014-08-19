@@ -4,14 +4,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 # stdlib imports
-import datetime
 import itertools
 import logging
 
 # third-party imports
 import soundcloud
 from django.conf import settings
-from django.core.cache import cache
 from django.core.paginator import Paginator
 
 
@@ -19,14 +17,6 @@ logger = logging.getLogger('rehabradio')
 
 
 def _search_tracks(query):
-
-    key_params = {'q': query, 'd': datetime.datetime.utcnow().strftime('%Y%m%d')}
-    cache_key = 'sndcldsrch-{q}-{d}'.format(**key_params)
-
-    tracks = cache.get(cache_key)
-    if tracks is not None:
-        return tracks
-
     limit = 200
     offset = 0
     tracks = []
@@ -41,7 +31,6 @@ def _search_tracks(query):
     tracks = list(itertools.chain.from_iterable(tracks))
     tracks = [_transform_track(x) for x in tracks]
 
-    cache.set(cache_key, tracks)
     return tracks
 
 
