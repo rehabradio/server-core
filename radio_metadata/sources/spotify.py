@@ -80,8 +80,15 @@ def _transform_track(track):
     ])
     if track['album']['images']:
         transformed_track['image_small'] = track['album']['images'][0]['url']
-        transformed_track['image_medium'] = track['album']['images'][1]['url']
-        transformed_track['image_large'] = track['album']['images'][2]['url']
+        try:
+            transformed_track['image_medium'] = track['album']['images'][1]['url']
+        except:
+            transformed_track['image_medium'] = transformed_track['image_small']
+
+        try:
+            transformed_track['image_large'] = track['album']['images'][2]['url']
+        except:
+            transformed_track['image_large'] = transformed_track['image_medium']
     else:
         transformed_track['image_small'] = None
         transformed_track['image_medium'] = None
