@@ -9,19 +9,25 @@ import datetime
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from rest_framework import status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework import permissions
 
 # local imports
 from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
 from .sources import soundcloud
 from .sources import spotify
+from radio.exceptions import (
+    InvalidBackend,
+    InvalidLookupType,
+    MissingParameter,
+    RecordDeleteFailed,
+    RecordNotFound,
+    RecordNotSaved,
+)
 from radio.permissions import IsStaffToDelete
-from radio.custom_exceptions import InvalidBackend, MissingParameter
 
 
 def _get_track_data(source_type, source_id):
@@ -29,49 +35,77 @@ def _get_track_data(source_type, source_id):
     Does a track lookup using the API specified in "source_type"
     Returns a dictionary
     """
-    if source_type == 'spotify':
-        # Query the spotify api for all the track data
-        track_data = spotify.lookup_track(source_id)
-        # Get or create relational album field
-        track_data['album'] = _get_or_create_album(
-            track_data['album'],
-            'spotify'
-        )
-    elif source_type == 'soundcloud':
-        # Query the soundcloud api for all the track data
-        track_data = soundcloud.lookup_track(source_id)
+    cache_key = 'search-{0}-{1}-{2}'.format(
+        source_type,
+        source_id,
+        datetime.datetime.utcnow().strftime('%Y%m%d'),
+    )
+
+    track_data = cache.get(cache_key)
+    if track_data is None:
+        if source_type == 'spotify':
+            # Query the spotify api for all the track data
+            track_data = spotify.lookup_track(source_id)
+            # Get or create relational album field
+            track_data['album'] = _get_or_create_album(
+                track_data['album']
+            )
+        elif source_type == 'soundcloud':
+            # Query the soundcloud api for all the track data
+            track_data = soundcloud.lookup_track(source_id)
+        else:
+            return None
+        cache.set(cache_key, track_data)
 
     return track_data
 
 
-def _get_or_create_album(album, source_type):
+def _get_or_create_album(album):
     """
     Get or create an album record from db,
     Returns an Album model reference
     """
-    record, created = Album.objects.get_or_create(
-        source_id=album['source_id'],
-        source_type=source_type,
-        name=album['name'],
+    cache_key = 'album-{0}-{1}-{2}'.format(
+        album['source_type'],
+        album['source_id'],
+        datetime.datetime.utcnow().strftime('%Y%m%d'),
     )
+
+    record = cache.get(cache_key)
+    if record is None:
+        record, created = Album.objects.get_or_create(
+            source_id=album['source_id'],
+            source_type=album['source_type'],
+            name=album['name'],
+        )
+        cache.set(cache_key, record)
     return record
 
 
-def _get_or_create_artists(artists, source_type):
+def _get_or_create_artists(artists):
     """
     Get or create artist records from db,
     Returns a list of Artist model references
     """
-    artistModels = []
+    records = []
     for (i, artist) in enumerate(artists):
-        record, created = Artist.objects.get_or_create(
-            source_id=artist['source_id'],
-            source_type=source_type,
-            name=artist['name'],
+        cache_key = 'artist-{0}-{1}-{2}'.format(
+            artist['source_type'],
+            artist['source_id'],
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
-        artistModels.append(record)
 
-    return artistModels
+        record = cache.get(cache_key)
+        if record is None:
+            record, created = Artist.objects.get_or_create(
+                source_id=artist['source_id'],
+                source_type=artist['source_type'],
+                name=artist['name'],
+            )
+            cache.set(cache_key, record)
+        records.append(record)
+
+    return records
 
 
 def _get_or_create_track(track_data, owner):
@@ -79,27 +113,36 @@ def _get_or_create_track(track_data, owner):
     Saves a track to the db, unless one already exists
     Returns reference to Track model reference
     """
-    try:
-        track = Track.objects.get(
-            source_id=track_data['source_id'],
-            source_type=track_data['source_type'],
-        )
-    except:
-        track = Track.objects.create(
-            source_id=track_data['source_id'],
-            source_type=track_data['source_type'],
-            name=track_data['name'],
-            duration_ms=track_data['duration_ms'],
-            preview_url=track_data['preview_url'],
-            track_number=track_data['track_number'],
-            album=track_data['album'],
-            image_small=track_data['image_small'],
-            image_medium=track_data['image_medium'],
-            image_large=track_data['image_large'],
-            owner=owner
-        )
+    cache_key = 'track-{0}-{1}-{2}'.format(
+        track_data['source_type'],
+        track_data['source_id'],
+        datetime.datetime.utcnow().strftime('%Y%m%d'),
+    )
 
-    return track
+    record = cache.get(cache_key)
+    if record is None:
+        try:
+            record = Track.objects.get(
+                source_id=track_data['source_id'],
+                source_type=track_data['source_type'],
+            )
+        except:
+            record = Track.objects.create(
+                source_id=track_data['source_id'],
+                source_type=track_data['source_type'],
+                name=track_data['name'],
+                duration_ms=track_data['duration_ms'],
+                preview_url=track_data['preview_url'],
+                track_number=track_data['track_number'],
+                album=track_data['album'],
+                image_small=track_data['image_small'],
+                image_medium=track_data['image_medium'],
+                image_large=track_data['image_large'],
+                owner=owner
+            )
+        cache.set(cache_key, record)
+
+    return record
 
 
 class MetadataAPIRootView(APIView):
@@ -190,7 +233,7 @@ class LookupView(APIView):
             'spotify': spotify.lookup_track,
         }.get(source_type.lower())
         if lookup_func is None:
-            raise InvalidBackend
+            raise InvalidLookupType
 
         # search using requested source_type and serialize
         results = lookup_func(source_id)
@@ -304,7 +347,7 @@ class TrackViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffToDelete, permissions.IsAuthenticated)
 
     def _get_cache_key(self):
-        """Build key used for caching the lookup data
+        """Build key used for caching the track data
         """
         return 'tracklist-{0}'.format(
             datetime.datetime.utcnow().strftime('%Y%m%d'),
@@ -312,7 +355,7 @@ class TrackViewSet(viewsets.ModelViewSet):
 
     def list(self, request, pk=None):
         """
-        Returns a paginated set of tracks in a given queue
+        Returns a paginated set of all database tracks
         """
         cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
@@ -348,37 +391,21 @@ class TrackViewSet(viewsets.ModelViewSet):
         """
         Adds a track to the database, using a tracks source_type and source_id
         """
-        # Use api to fetch track information
+        # Fetch track data
         try:
             track_data = _get_track_data(
                 request.POST['source_type'],
                 request.POST['source_id']
             )
         except:
-            response = {
-                'detail': 'Track could not be found',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        # Save the track
+            raise RecordNotFound
+
+        # Save/Retrieve track to/from database
         try:
             track = _get_or_create_track(track_data, self.request.user)
+            _get_or_create_artists(track_data['artists'])
         except:
-            response = {
-                'detail': 'Track could not be saved',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        # Save the track artists
-        try:
-            _get_or_create_artists(
-                track_data['artists'],
-                track_data['source_type']
-            )
-        except:
-            response = {
-                'detail': 'Artists could not be saved',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordNotSaved
 
         cache.delete(self._get_cache_key())
 
@@ -393,22 +420,19 @@ class TrackViewSet(viewsets.ModelViewSet):
         try:
             track = Track.objects.get(id=kwargs['pk'])
         except:
-            response = {'detail': 'Track not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            raise RecordNotFound
 
         try:
             track.delete()
         except:
-            response = {
-                'detail': 'Failed to remove track',
-            }
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            raise RecordDeleteFailed
 
         cache.delete(self._get_cache_key())
 
         return Response({'detail': 'Track successfully removed'})
 
     def pre_save(self, obj):
-        # Set user id, for each record saved
-        obj.owner = self.request.user
+        """
+        Remove the cached track list after database is updated
+        """
         cache.delete(self._get_cache_key())
