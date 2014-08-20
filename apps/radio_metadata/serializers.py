@@ -1,7 +1,7 @@
 # third-party imports
 from rest_framework import pagination
 from rest_framework import serializers
-
+# local imports
 from .models import Album, Artist, Track
 
 
@@ -9,7 +9,6 @@ class BaseSerializer(serializers.ModelSerializer):
 
     source_type = serializers.CharField()
     source_id = serializers.CharField()
-
     name = serializers.CharField()
 
 
@@ -39,7 +38,7 @@ class TrackSerializer(BaseSerializer):
     image_medium = serializers.URLField(required=False, read_only=True)
     image_large = serializers.URLField(required=False, read_only=True)
 
-    # track stats
+    # Additional information
     play_count = serializers.IntegerField(read_only=True)
     owner = serializers.Field(source='owner.username')
     created = serializers.DateTimeField(read_only=True)

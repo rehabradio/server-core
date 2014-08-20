@@ -44,7 +44,7 @@ class Track(MetadataBase):
     image_medium = models.URLField(null=True)
     image_large = models.URLField(null=True)
 
-    # track stats
+    # Additional information
     play_count = models.IntegerField(default=0)
     owner = models.ForeignKey('auth.User')
     created = models.DateTimeField(auto_now_add=True)

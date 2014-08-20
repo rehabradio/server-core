@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Search/Lookup related views
+"""Search/Lookup/Track related views
 """
 # stdlib imports
 import collections
 import datetime
-
 # third-party imports
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-
 # local imports
 from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
@@ -31,9 +28,8 @@ from radio.permissions import IsStaffToDelete
 
 
 def _get_track_data(source_type, source_id):
-    """
-    Does a track lookup using the API specified in "source_type"
-    Returns a dictionary
+    """Does a track lookup using the API specified in "source_type".
+    Returns a dictionary.
     """
     cache_key = 'search-{0}-{1}-{2}'.format(
         source_type,
@@ -61,9 +57,8 @@ def _get_track_data(source_type, source_id):
 
 
 def _get_or_create_album(album):
-    """
-    Get or create an album record from db,
-    Returns an Album model reference
+    """Get or create an album record from db,
+    Returns an Album model reference.
     """
     cache_key = 'album-{0}-{1}-{2}'.format(
         album['source_type'],
@@ -83,9 +78,8 @@ def _get_or_create_album(album):
 
 
 def _get_or_create_artists(artists):
-    """
-    Get or create artist records from db,
-    Returns a list of Artist model references
+    """Get or create artist records from db.
+    Returns a list of artist json objects
     """
     records = []
     for (i, artist) in enumerate(artists):
@@ -109,9 +103,8 @@ def _get_or_create_artists(artists):
 
 
 def _get_or_create_track(track_data, owner):
-    """
-    Saves a track to the db, unless one already exists
-    Returns reference to Track model reference
+    """Saves a track to the db, unless one already exists.
+    Returns a track json object
     """
     cache_key = 'track-{0}-{1}-{2}'.format(
         track_data['source_type'],
@@ -146,8 +139,7 @@ def _get_or_create_track(track_data, owner):
 
 
 class MetadataAPIRootView(APIView):
-    """
-    The metadata API allows for both search and lookup
+    """The metadata API allows for both search and lookup
     from supported source_types.
 
     Clients should use the metadata API to retrieve data about available songs.
@@ -168,8 +160,7 @@ class MetadataAPIRootView(APIView):
 
 
 class LookupRootView(APIView):
-    """
-    The lookup API allows retrieval of metadata from supported source_types.
+    """The lookup API allows retrieval of metadata from supported source_types.
 
     Data is cached after initial lookup but is keyed by calendar date to
     ensure that fresh data is fetched at least once per day.
@@ -207,9 +198,7 @@ class LookupRootView(APIView):
 
 
 class LookupView(APIView):
-    """
-    Lookup tracks/artists/albums using any configured source_type
-    """
+    """Lookup tracks using any configured source_type."""
 
     def _get_cache_key(self, source_type, source_id):
         """Build key used for caching the lookup data
@@ -236,7 +225,10 @@ class LookupView(APIView):
             raise InvalidLookupType
 
         # search using requested source_type and serialize
-        results = lookup_func(source_id)
+        try:
+            results = lookup_func(source_id)
+        except:
+            raise RecordNotFound
         response = TrackSerializer(results).data
 
         # return response to the client
@@ -245,8 +237,7 @@ class LookupView(APIView):
 
 
 class SearchRootView(APIView):
-    """
-    The search API allows searching for tracks on supported source_types.
+    """The search API allows searching for tracks on supported source_types.
 
     Data is cached after initial lookup but is keyed by calendar date to
     ensure that fresh data is fetched at least once per day.
@@ -292,13 +283,12 @@ class SearchRootView(APIView):
 
 
 class SearchView(APIView):
-    """
-    Search tracks using any configured source_type
+    """Search tracks using any configured source_type and a query parameter.
     q -- lookup query (string)
     """
 
     def get(self, request, source_type, format=None):
-        """perform track search and return the results in a consistent format
+        """perform track search and return the results in a consistent format.
         """
         # parse search data from query params
         query = request.QUERY_PARAMS.get('q', '')
@@ -338,25 +328,21 @@ class SearchView(APIView):
 
 
 class TrackViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API endpoints that allow managing playlists.
-    User must be staff to remove track from database
+    """CRUD API endpoints that allow managing playlists.
+    User must be staff to remove track from database.
     """
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     permission_classes = (IsStaffToDelete, permissions.IsAuthenticated)
 
     def _get_cache_key(self):
-        """Build key used for caching the track data
-        """
+        """Build key used for caching the track data."""
         return 'tracklist-{0}'.format(
             datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
     def list(self, request, pk=None):
-        """
-        Returns a paginated set of all database tracks
-        """
+        """Return a paginated list of track json objects."""
         cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
 
@@ -388,10 +374,9 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        """Add a track to the database, using a tracks source_type and source_id.
+        Returns a the newly created track as a json object
         """
-        Adds a track to the database, using a tracks source_type and source_id
-        """
-        # Fetch track data
         try:
             track_data = _get_track_data(
                 request.POST['source_type'],
@@ -400,7 +385,9 @@ class TrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotFound
 
-        # Save/Retrieve track to/from database
+        if track_data is None:
+            raise RecordNotFound
+
         try:
             track = _get_or_create_track(track_data, self.request.user)
             _get_or_create_artists(track_data['artists'])
@@ -414,9 +401,7 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        """
-        Removes track from database, and returns a detail reponse
-        """
+        """Removes track from database, returning a detail reponse."""
         try:
             track = Track.objects.get(id=kwargs['pk'])
         except:
@@ -432,7 +417,5 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Track successfully removed'})
 
     def pre_save(self, obj):
-        """
-        Remove the cached track list after database is updated
-        """
+        """Remove the cached track list after a database record is updated."""
         cache.delete(self._get_cache_key())

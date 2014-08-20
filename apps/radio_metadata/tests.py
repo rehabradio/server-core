@@ -1,4 +1,4 @@
-# lib imports
+# stdlib imports
 import json
 import os
 # third-party imports
@@ -194,13 +194,13 @@ class TrackViewSetTestCase(BaseTestCase):
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
 
-    def test_create_with_no_source_id(self):
-        """Try to create a track, without specifying the source_id.
+    def test_create_with_bad_id(self):
+        """Try to create a track, with a bad source_id.
         Returns a 404 response with detail message.
         """
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
-        post_data = {'source_type': 'spotify'}
+        post_data = {'source_type': 'spotify', 'source_id': 0}
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = Track.objects.all().count()
