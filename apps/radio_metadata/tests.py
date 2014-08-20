@@ -1,31 +1,20 @@
+# lib imports
 import json
 import os
-
+# third-party imports
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
-
+# local imports
 from .models import Track
 
 
 class BaseTestCase(TestCase):
-    """
-    Load in default data for tests
-    """
+    """Load in default data for tests, and login user."""
     fixtures = ['radio/fixtures/testdata.json']
     factory = APIRequestFactory()
     api_client = APIClient()
-
-    """
-    Log in a user
-    """
-    paginated_attrs = (
-        'count',
-        'next',
-        'previous',
-        'results',
-    )
-
+    paginated_attrs = ('count', 'next', 'previous', 'results')
     track_attrs = (
         'source_type',
         'source_id',
@@ -45,6 +34,7 @@ class BaseTestCase(TestCase):
     )
 
     def setUp(self):
+        """Log in the test user."""
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
         login = self.api_client.login(username=username, password=password)
@@ -52,60 +42,51 @@ class BaseTestCase(TestCase):
 
 
 class MetadataAPIRootViewTestCase(BaseTestCase):
-    """
-    Root index for all metadata routes
-    List of endpoint links for further navigation
-    """
+    """Root index for all metadata routes."""
     def test_get(self):
+        """Return a valid response."""
         resp = self.api_client.get('/api/metadata/')
-        # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
 
 
 class LookupRootViewTestCase(BaseTestCase):
-    """
-    Root index for all metadata/lookup routes
-    List of endpoint links for track lookups
-    """
+    """Root index for all metadata/lookup routes."""
     def test_get(self):
+        """Return a valid response."""
         resp = self.api_client.get('/api/metadata/lookup/')
-        # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
 
 
 class LookupViewTestCase(BaseTestCase):
+    """Uses a backend(spotify/soundcloud) and a source ID,
+    fetch a track from the given backend api.
     """
-    Test looking up a track using the spotify and soundcloud backends
-    """
-    def test_get(self):
-
-        resp1 = self.api_client.get(
+    def test_get_spotify(self):
+        """Return a json object for spotify backend."""
+        resp = self.api_client.get(
             '/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/'
         )
-        data1 = json.loads(resp1.content)
-
+        data = json.loads(resp.content)
         # Ensure request was successful
-        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(self.track_attrs) <= set(data1))
+        self.assertTrue(set(self.track_attrs) <= set(data))
 
-        resp2 = self.api_client.get(
+    def test_get_soundcloud(self):
+        """Return a json object for soundcloud backend."""
+        resp = self.api_client.get(
             '/api/metadata/lookup/soundcloud/153868082/'
         )
-        data2 = json.loads(resp2.content)
-
+        data = json.loads(resp.content)
         # Ensure request was successful
-        self.assertEqual(resp2.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(self.track_attrs) <= set(data2))
+        self.assertTrue(set(self.track_attrs) <= set(data))
 
-    """
-    Test 404 error and detail message returns, using a bad backend
-    """
-    def test_get_bad_backend(self):
+    def test_get_with_bad_backend(self):
+        """Throw a 404 response error with a detail message."""
         resp = self.api_client.get('/api/metadata/lookup/test/153868082/')
         data = json.loads(resp.content)
-
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
         # Ensure "detail" message is set, and the message matches expected
@@ -114,60 +95,54 @@ class LookupViewTestCase(BaseTestCase):
             u'Invalid lookup_type, type not supported by backend.'
         )
 
+    def test_get_with_bad_souce_id(self):
+        """Throw a 404 response error with a detail message."""
+        resp = self.api_client.get('/api/metadata/lookup/soundcloud/1/')
+        data = json.loads(resp.content)
+        # Ensure request failed
+        self.assertEqual(resp.status_code, 404)
+        # Ensure "detail" message is set, and the message matches expected
+        self.assertEqual(data['detail'], u'The record could not be found.')
+
 
 class SearchRootViewTestCase(BaseTestCase):
-    """
-    Root index for all metadata/search routes
-    List of endpoint links for search lookups
-    """
+    """Root index for all metadata/search routes."""
     def test_get(self):
+        """Return a valid response."""
         resp = self.api_client.get('/api/metadata/search/')
-        data = json.loads(resp.content)
-
-        # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure the returned json keys match the expected
-        self.assertTrue(data['endpoints'])
-        self.assertTrue(data['endpoints']['soundcloud'])
-        self.assertTrue(data['endpoints']['soundcloud']['tracks'])
-        self.assertTrue(data['endpoints']['spotify'])
-        self.assertTrue(data['endpoints']['spotify']['tracks'])
 
 
 class SearchViewTestCase(BaseTestCase):
+    """Uses a backend(spotify/soundcloud) and a `q` parament,
+    to search for tracks from the given backend api.
     """
-    Test searching for tracks using the spotify and soundcloud backends
-    """
-    def test_get(self):
-        resp1 = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
-        data1 = json.loads(resp1.content)
-        tracks1 = data1['results'][0]
-
+    def test_get_spotify(self):
+        """Return a json object for spotify backend."""
+        resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
+        data = json.loads(resp.content)
+        tracks = data['results'][0]
         # Ensure request was successful
-        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(self.paginated_attrs) <= set(data1))
-        self.assertTrue(set(self.track_attrs) <= set(tracks1))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(tracks))
 
-        resp2 = self.api_client.get(
-            '/api/metadata/search/soundcloud/?q=narsti/'
-        )
-        data2 = json.loads(resp2.content)
-        tracks2 = data2['results'][0]
-
+    def test_get_soundcloud(self):
+        """Return a json object for soundcloud backend."""
+        resp = self.api_client.get('/api/metadata/search/soundcloud/?q=Haim/')
+        data = json.loads(resp.content)
+        tracks = data['results'][0]
         # Ensure request was successful
-        self.assertEqual(resp2.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(self.paginated_attrs) <= set(data2))
-        self.assertTrue(set(self.track_attrs) <= set(tracks2))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(tracks))
 
-    """
-    Test 404 error and detail message returns, using a bad backend
-    """
     def test_get_bad_backend(self):
+        """Throw a 404 response error with a detail message."""
         resp = self.api_client.get('/api/metadata/search/test/?q=Haim/')
         data = json.loads(resp.content)
-
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
         # Ensure "detail" message is set, and the message matches expected
@@ -176,13 +151,10 @@ class SearchViewTestCase(BaseTestCase):
             u'Invalid backend, provider not recognised.'
         )
 
-    """
-    Test 400 error and detail message returns, if no "q" parameter is set
-    """
     def test_get_no_parameter(self):
+        """Throw a 404 response error with a detail message."""
         resp = self.api_client.get('/api/metadata/search/soundcloud/')
         data = json.loads(resp.content)
-
         # Ensure request failed
         self.assertEqual(resp.status_code, 400)
         # Ensure "detail" message is set, and the message matches expected
@@ -190,25 +162,23 @@ class SearchViewTestCase(BaseTestCase):
 
 
 class TrackViewSetTestCase(BaseTestCase):
-    """
-    Retrieve a list of all Tracks, with an excepted result set
-    """
+    """CRUD commands for the track database table"""
     def test_list(self):
+        """Return a paginated set of track json objects."""
         track_attrs = self.track_attrs + ('id',)
         resp = self.api_client.get('/api/metadata/tracks/')
         data = json.loads(resp.content)
-        Tracks = data['results'][0]
-
+        tracks = data['results'][0]
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(self.paginated_attrs) <= set(data))
-        self.assertTrue(set(track_attrs) <= set(Tracks))
+        self.assertTrue(set(track_attrs) <= set(tracks))
 
-    """
-    Create a Track with all data
-    """
     def test_create(self):
+        """Add a track to the database.
+        Returns a track json object of the newly created record.
+        """
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
         post_data = {
@@ -224,20 +194,16 @@ class TrackViewSetTestCase(BaseTestCase):
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
 
-    """
-    Create a track with no source id
-    """
     def test_create_with_no_source_id(self):
+        """Try to create a track, without specifying the source_id.
+        Returns a 404 response with detail message.
+        """
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
-        post_data = {
-            'source_type': 'spotify',
-        }
-
+        post_data = {'source_type': 'spotify'}
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = Track.objects.all().count()
-
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
         # Ensure a new record was not added to the database
@@ -245,55 +211,62 @@ class TrackViewSetTestCase(BaseTestCase):
         # Ensure validation flags where raised for each field
         self.assertEqual(data['detail'], u'The record could not be found.')
 
-    """
-    Create a track with bad backend
-    """
     def test_create_with_bad_backend(self):
+        """Returns a 404 response with detail message."""
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
         post_data = {
             'source_type': 'test',
             'source_id': '4bCOAuhvjsxbVBM5MM8oik',
         }
-
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = Track.objects.all().count()
-
         # Ensure request failed
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 404)
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
         self.assertEqual(data['detail'], u'The record could not be found.')
 
-    """
-    Retrieve a track
-    """
     def test_retrieve(self):
+        """Return a track json object of a given record."""
         track_attrs = self.track_attrs + ('id',)
         resp = self.api_client.get('/api/metadata/tracks/1/')
         data = json.loads(resp.content)
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
         self.assertTrue(set(track_attrs) <= set(data))
 
-    """
-    Cascade remove a track from the database
-    """
+    def test_retrieve_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.get('/api/metadata/tracks/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'Not found')
+
     def test_destroy(self):
+        """Return a successful response, with a detail message."""
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
-
         resp = self.api_client.delete('/api/metadata/tracks/2/')
         data = json.loads(resp.content)
         new_records_count = Track.objects.all().count()
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(data['detail'], 'Track successfully removed')
+
+    def test_delete_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.delete('/api/metadata/tracks/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'The record could not be found.')
