@@ -9,7 +9,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import link
+from rest_framework.decorators import action, link
 from rest_framework.response import Response
 # local imports
 from .models import Queue, QueueTrack, QueueTrackHistory
@@ -36,10 +36,11 @@ def _add_random_track_to_queue(queue_id):
 
     returns track json object
     """
-    # Grab the first 50 tracks with the highest number of votes
     track_ids = QueueTrackHistory.objects.filter(
-        queue_id=queue_id
-        ).values_list('track_id', flat=True)[:50]
+        queue_id=queue_id).values_list('track_id', flat=True)[:50]
+    if not track_ids:
+        track_ids = Track.objects.all().order_by(
+            'play_count').values_list('id', flat=True)[:50]
     # Select a track ID at random
     track_id = random.choice(track_ids)
     # Add the track to the top of the queue
@@ -248,7 +249,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        return Response({'detail': 'Track successfully removed from queue'})
+        return Response({'detail': 'Track successfully removed from queue.'})
 
     @link()
     def head(self, request, *args, **kwargs):
@@ -268,7 +269,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
-    @link()
+    @action()
     def pop(self, request, *args, **kwargs):
         """Remove a track from the top of a given queue."""
         try:
@@ -292,7 +293,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        return Response({'detail': 'Queued track successfully removed'})
+        return Response({'detail': 'Track successfully removed from queue.'})
 
 
 class QueueTrackHistoryViewSet(viewsets.ModelViewSet):

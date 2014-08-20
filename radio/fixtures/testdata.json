@@ -838,6 +838,24 @@
 },
 {
     "fields": {
+        "username": "Rehabradio",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": true,
+        "is_staff": true,
+        "last_login": "2014-08-20T13:20:27.733Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$12000$bLjXxXDflLBl$6kCogAOIgBf6llAZ/bl9C4+Rzg/rWuGC+odOgDr9FiA=",
+        "email": "",
+        "date_joined": "2014-08-14T15:42:28.776Z"
+    },
+    "model": "auth.user",
+    "pk": 1
+},
+{
+    "fields": {
         "username": "admin",
         "first_name": "",
         "last_name": "",
@@ -1267,6 +1285,17 @@
     },
     "model": "radio_queue.queue",
     "pk": 1
+},
+{
+    "fields": {
+        "owner": 12,
+        "updated": "2014-08-15T09:08:20.717Z",
+        "created": "2014-08-15T09:08:20.717Z",
+        "name": "test 2",
+        "description": "test 2"
+    },
+    "model": "radio_queue.queue",
+    "pk": 2
 },
 {
     "fields": {

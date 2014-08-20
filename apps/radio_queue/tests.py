@@ -301,7 +301,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertEqual(int(data['position']), post_data['position'])
 
-    def test_destroy(self):
+    def test_delete(self):
         """Remove a queue track from the database
         Returns a successful response, with a detail message.
         """
@@ -318,11 +318,64 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], u'Track successfully removed from queue')
+        self.assertEqual(
+            data['detail'],
+            u'Track successfully removed from queue.'
+        )
 
     def test_delete_with_bad_id(self):
         """Returns a 404 response with detail message."""
         resp = self.api_client.delete('/api/queues/1/tracks/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'The record could not be found.')
+
+    def test_head(self):
+        """Returns the queue track in position 1, in a given queue."""
+        resp = self.api_client.get('/api/queues/1/head/')
+        data = json.loads(resp.content)
+        track = data['track']
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.queue_track_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(track))
+
+    def test_head_with_empty_queue(self):
+        """Return the queue track in position 1, in a given queue."""
+        resp = self.api_client.get('/api/queues/2/head/')
+        data = json.loads(resp.content)
+        track = data['track']
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.queue_track_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(track))
+
+    def test_pop(self):
+        """Remove a queue track from the database
+        Returns a successful response, with a detail message.
+        """
+        # Count the number of records before the save
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+
+        resp = self.api_client.delete('/api/queues/1/pop/')
+        data = json.loads(resp.content)
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the record was removed from the database
+        self.assertEqual(existing_records_count-1, new_records_count)
+        # Ensure "detail" message is set, and the message matches expected
+        self.assertEqual(data['detail'], u'Track successfully removed from queue.')
+
+    def test_pop_with_empty_queue(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.delete('/api/queues/2/pop/')
         data = json.loads(resp.content)
         # Ensure request was successful
         self.assertEqual(resp.status_code, 404)
