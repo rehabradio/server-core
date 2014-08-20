@@ -162,7 +162,7 @@ class SearchViewTestCase(BaseTestCase):
 
 
 class TrackViewSetTestCase(BaseTestCase):
-    """CRUD commands for the track database table"""
+    """CRUD commands for the track database table."""
     def test_list(self):
         """Return a paginated set of track json objects."""
         track_attrs = self.track_attrs + ('id',)

@@ -17,9 +17,6 @@ from .serializers import (
     PaginatedPlaylistTrackSerializer
 )
 from radio.exceptions import (
-    InvalidBackend,
-    InvalidLookupType,
-    MissingParameter,
     RecordDeleteFailed,
     RecordNotFound,
     RecordNotSaved,
@@ -113,7 +110,7 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
 
 class PlaylistTrackViewSet(viewsets.ModelViewSet):
-    """CRUD API endpoints that allow managing playlists.
+    """CRUD API endpoints that allow managing playlist tracks.
     For update and delete functions, user must be owner of track or playlist
 
     position -- Patch request param (int) - form
@@ -228,7 +225,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             playlist_track.delete()
             _reset_track_positions(playlist_id)
         except:
-            raise RecordNotSaved
+            raise RecordDeleteFailed
 
         cache.delete(self._get_cache_key(playlist_id))
 

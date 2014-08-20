@@ -1,18 +1,18 @@
+# -*- coding: utf-8 -*-
+"""Queue related views
+"""
+# stdlib imports
 import datetime
 import random
 # third-party imports
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F
-
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import link
 from rest_framework.response import Response
-
 # local imports
 from .models import Queue, QueueTrack, QueueTrackHistory
-from radio_metadata.models import Track
-
 from .serializers import (
     QueueSerializer,
     PaginatedQueueSerializer,
@@ -21,13 +21,20 @@ from .serializers import (
     QueueTrackHistorySerializer,
     PaginatedQueueTrackHistorySerializer
 )
+from radio.exceptions import (
+    RecordDeleteFailed,
+    RecordNotFound,
+    RecordNotSaved,
+)
 from radio.permissions import IsStaffOrOwnerToDelete
+from radio_metadata.models import Track
 
 
 def _add_random_track_to_queue(queue_id):
-    """
-    Grabs a random track from the queues history,
+    """Grabs a random track from the queues history,
     and adds it back into the queue
+
+    returns track json object
     """
     # Grab the first 50 tracks with the highest number of votes
     track_ids = QueueTrackHistory.objects.filter(
@@ -47,9 +54,7 @@ def _add_random_track_to_queue(queue_id):
 
 
 def _reset_track_positions(queue_id):
-    """
-    Once a record has been removed, reset the postions
-    """
+    """Set positions of a given queue track list."""
     records = QueueTrack.objects.filter(queue_id=queue_id)
 
     for (i, track) in enumerate(records):
@@ -58,24 +63,19 @@ def _reset_track_positions(queue_id):
 
 
 class QueueViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API endpoints that allow managing playlists.
-    """
+    """CRUD API endpoints that allow managing queue."""
     permission_classes = (IsStaffOrOwnerToDelete, permissions.IsAuthenticated)
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
 
     def _get_cache_key(self):
-        """Build key used for caching the queue list
-        """
+        """Build key used for caching the queue list."""
         return 'queuelist-{0}'.format(
             datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
     def list(self, request, queue_id=None):
-        """
-        Returns a paginated set of tracks in a given queue
-        """
+        """Return a paginated list of queue json objects."""
         cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
 
@@ -104,39 +104,37 @@ class QueueViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        """
-        Removes queue from database, and returns a detail reponse
-        Must be owner or staff
+        """Removes queue and its associated queue tracks from database.
+        Returns a detail reponse.
         """
         try:
             queue = Queue.objects.get(id=kwargs['pk'])
         except:
-            response = {'detail': 'Queue not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            raise RecordNotFound
 
         try:
             queue.delete()
         except:
-            response = {
-                'detail': 'Failed to remove queue',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordDeleteFailed
 
         cache.delete(self._get_cache_key())
 
-        return Response({'detail': 'Queue successfully removed'})
+        return Response({'detail': 'Queue successfully removed.'})
 
     def pre_save(self, obj):
-        """
-        Set user id, for each record saved/updated
+        """Set the record owner as the current logged in user,
+        when creating/updating a record.
+
+        Remove the cached track list after a database record is updated.
         """
         obj.owner = self.request.user
         cache.delete(self._get_cache_key())
 
 
 class QueueTrackViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API endpoints that allow managing playlists.
+    """CRUD API endpoints that allow managing queue tracks.
+    User must be staff to delete
+
     position -- Patch request param (int) - form
     """
     queryset = QueueTrack.objects.all()
@@ -144,16 +142,13 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrOwnerToDelete, permissions.IsAuthenticated)
 
     def _get_cache_key(self, queue_id):
-        """Build key used for caching the queue data
-        """
+        """Build key used for caching the queue data."""
         return 'queue-{0}-{1}'.format(
             queue_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
     def list(self, request, queue_id=None):
-        """
-        Returns a paginated set of tracks in a given queue
-        """
+        """Return a paginated list of queue track json objects."""
         cache_key = self._get_cache_key(queue_id)
         queryset = cache.get(cache_key)
 
@@ -186,32 +181,28 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        """
-        Uses a track id to add a track to the end of a queue
+        """Add a track to the database.
+        params - track
+
+        Returns a the newly created track as a json object
         """
         position = QueueTrack.objects.filter(
             queue=kwargs['queue_id']
-        ).count()+1
+        ).count()
         try:
             queued_track = QueueTrack.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
                 queue=Queue.objects.get(id=kwargs['queue_id']),
-                position=position,
-                owner_id=self.request.user.id
+                position=position+1,
+                owner=self.request.user
             )
-        except:
-            response = {'detail': 'Track could not be saved to queue'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
             QueueTrackHistory.objects.create(
                 track=Track.objects.get(id=request.DATA['track']),
                 queue=Queue.objects.get(id=kwargs['queue_id']),
-                owner_id=self.request.user.id
+                owner=self.request.user
             )
         except:
-            response = {'detail': 'Track could not be saved to queue history'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordNotSaved
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
@@ -219,16 +210,20 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
-        """
-        Update a queued track's position
+        """Update a queue track position.
+        params - position
+
+        Returns a the updated track as a json object
         """
         try:
             queued_track = QueueTrack.objects.get(id=kwargs['pk'])
+        except:
+            raise RecordNotFound
+        try:
             queued_track.position = request.DATA['position']
             queued_track.save()
         except:
-            response = {'detail': 'Queued track could not be updated'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordNotSaved
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
@@ -236,32 +231,28 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        """
-        Removes queue from database, and returns a detail reponse
+        """Removes queue track from database and resests the
+        remaining track positions.
+
+        Returns a detail reponse.
         """
         try:
             queued_track = QueueTrack.objects.get(id=kwargs['pk'])
         except:
-            response = {'detail': 'Queued track not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            raise RecordNotFound
 
         try:
             queued_track.delete()
         except:
-            response = {
-                'detail': 'Failed to remove track from queue',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordDeleteFailed
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        return Response({'detail': 'Queued track successfully removed'})
+        return Response({'detail': 'Track successfully removed from queue'})
 
     @link()
     def head(self, request, *args, **kwargs):
-        """
-        Fetch the top track in a given queue
-        """
+        """Fetch the top track in a given queue."""
         try:
             queued_track = QueueTrack.objects.select_related(
                 'track',
@@ -279,17 +270,14 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
     @link()
     def pop(self, request, *args, **kwargs):
-        """
-        Remove a track from the top of a given queue
-        """
+        """Remove a track from the top of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
                 queue_id=kwargs['queue_id'],
                 position=1
             )
         except:
-            response = {'detail': 'Queued track not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            raise RecordNotFound
 
         try:
             track = queued_track.track
@@ -300,10 +288,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             # reset the remaining tracks into their new positions
             _reset_track_positions(kwargs['queue_id'])
         except:
-            response = {
-                'detail': 'Failed to remove track from queue',
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            raise RecordDeleteFailed
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
@@ -311,16 +296,12 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
 
 class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API endpoints that allow managing playlists.
-    """
+    """CRUD API endpoints that allow managing queue history tracks."""
     queryset = QueueTrackHistory.objects.all()
     serializer_class = QueueTrackHistorySerializer
 
     def list(self, request, queue_id=None):
-        """
-        Returns a paginated set of track history records for a given queue
-        """
+        """Return a paginated list of queue history track json objects."""
         queryset = self.queryset.filter(queue_id=queue_id)
         paginator = Paginator(queryset, 20)
 

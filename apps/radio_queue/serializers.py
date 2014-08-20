@@ -18,9 +18,7 @@ class QueueSerializer(serializers.ModelSerializer):
 
 
 class PaginatedQueueSerializer(pagination.PaginationSerializer):
-    """
-    Serializes page objects of queue querysets.
-    """
+    """Serializes page objects of queue querysets."""
     class Meta:
         object_serializer_class = QueueSerializer
 
@@ -36,9 +34,7 @@ class QueueTrackSerializer(serializers.ModelSerializer):
 
 
 class PaginatedQueueTrackSerializer(pagination.PaginationSerializer):
-    """
-    Serializes page objects of queue track querysets.
-    """
+    """Serializes page objects of queue track querysets."""
     class Meta:
         object_serializer_class = QueueTrackSerializer
 
@@ -47,15 +43,13 @@ class QueueTrackHistorySerializer(serializers.ModelSerializer):
     track = TrackSerializer()
     queue = serializers.PrimaryKeyRelatedField(read_only=True)
     owner = serializers.Field(source='owner.username')
-    created = serializers.DateTimeField()
+    created = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = QueueTrackHistory
 
 
 class PaginatedQueueTrackHistorySerializer(pagination.PaginationSerializer):
-    """
-    Serializes page objects of queue track history querysets.
-    """
+    """Serializes page objects of queue track history querysets."""
     class Meta:
         object_serializer_class = QueueTrackHistorySerializer

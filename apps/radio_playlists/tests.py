@@ -7,7 +7,6 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 # local imports
 from .models import Playlist, PlaylistTrack
-from radio_metadata.models import Track
 
 
 class BaseTestCase(TestCase):
@@ -220,9 +219,8 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         existing_records_count = PlaylistTrack.objects.filter(
             playlist=2
         ).count()
-        track = Track.objects.get(id=3)
         post_data = {
-            'track': track.id,
+            'track': 3,
         }
 
         resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
@@ -234,7 +232,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['track']['id'], track.id)
+        self.assertEqual(data['track']['id'], post_data['track'])
         self.assertEqual(data['position'], int(new_records_count))
 
     def test_create_with_empty_values(self):

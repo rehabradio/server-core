@@ -1,25 +1,43 @@
+# stdlib imports
 import json
 import os
-
+# third-party imports
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
-
+# local imports
 from .models import Queue, QueueTrack, QueueTrackHistory
 
 
 class BaseTestCase(TestCase):
-    """
-    Load in default data for tests
-    """
+    """Load in default data for tests, and login user."""
     fixtures = ['radio/fixtures/testdata.json']
     factory = APIRequestFactory()
     api_client = APIClient()
+    paginated_attrs = ('count', 'next', 'previous', 'results')
+    queue_attrs = ('id', 'name', 'description', 'created', 'updated')
+    queue_track_attrs = ('id', 'track', 'position', 'owner')
+    track_attrs = (
+        'id',
+        'source_type',
+        'source_id',
+        'name',
+        'artists',
+        'album',
+        'duration_ms',
+        'preview_url',
+        'track_number',
+        'image_small',
+        'image_medium',
+        'image_large',
+        'play_count',
+        'owner',
+        'created',
+        'updated',
+    )
 
-    """
-    Log in a user
-    """
     def setUp(self):
+        """Log in the test user."""
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
         login = self.api_client.login(username=username, password=password)
@@ -27,45 +45,27 @@ class BaseTestCase(TestCase):
 
 
 class QueueViewSetTestCase(BaseTestCase):
-    """
-    Retrieve a list of all queues in database
-    """
+    """CRUD commands for the queue database table"""
     def test_list(self):
-        expected_attrs = (
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-
-        expected_results_attrs = (
-            'id',
-            'name',
-            'description',
-            'owner',
-            'created',
-            'updated',
-        )
-
+        """Return a paginated set of queue json objects."""
         resp = self.api_client.get('/api/queues/')
         data = json.loads(resp.content)
         queues = data['results'][0]
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
-        self.assertTrue(set(expected_results_attrs) <= set(queues))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(self.queue_attrs) <= set(queues))
 
-    """
-    Create a queue
-    """
     def test_create(self):
+        """Add a queue to the database.
+        Returns a queue json object of the newly created record.
+        """
         # Count the number of records before the save
         existing_records_count = Queue.objects.all().count()
         post_data = {
-            'name': 'rehab',
-            'description': 'test'
+            'name': 'test queue',
+            'description': 'a queue for tdd',
         }
 
         resp = self.api_client.post('/api/queues/', data=post_data)
@@ -80,18 +80,22 @@ class QueueViewSetTestCase(BaseTestCase):
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
         self.assertEqual(data['name'], post_data['name'])
         self.assertEqual(data['description'], post_data['description'])
+        self.assertTrue(set(self.queue_attrs) <= set(data))
 
-    """
-    Create a queue with no data
-    """
     def test_create_with_empty_values(self):
+        """Try to create a track, with a empty post data.
+        Returns a 404 response with detail message.
+        """
         # Count the number of records before the save
         existing_records_count = Queue.objects.all().count()
+        post_data = {
+            'name': '',
+            'description': '',
+        }
 
-        resp = self.api_client.post('/api/queues/', data={})
+        resp = self.api_client.post('/api/queues/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = Queue.objects.all().count()
-
         # Ensure request failed
         self.assertEqual(resp.status_code, 400)
         # Ensure a new record was not added to the database
@@ -100,39 +104,39 @@ class QueueViewSetTestCase(BaseTestCase):
         self.assertEqual(data['name'], ['This field is required.'])
         self.assertEqual(data['description'], ['This field is required.'])
 
-    """
-    Retrieve a queue
-    """
     def test_retrieve(self):
-        expected_attrs = (
-            'id',
-            'name',
-            'description',
-        )
-
+        """Return a queue json object of a given record."""
         resp = self.api_client.get('/api/queues/1/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(self.queue_attrs) <= set(data))
 
-    """
-    Update a queue's data
-    """
+    def test_retrieve_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.get('/api/queues/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'Not found')
+
     def test_update(self):
+        """Update a queue from the database.
+        Returns a queue json object of the updated record.
+        """
         # Count the number of records before the save
         existing_records_count = Queue.objects.all().count()
         post_data = {
-            'name': 'updated playlist',
-            'description': 'playlist is now updated',
+            'name': 'Updated queue',
+            'description': 'Queue is now updated',
         }
 
         resp = self.api_client.put('/api/queues/1/', data=post_data)
         new_record = Queue.objects.filter(id=1).values()[0]
         new_records_count = Queue.objects.all().count()
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a the record was updated
@@ -141,15 +145,13 @@ class QueueViewSetTestCase(BaseTestCase):
         self.assertEqual(new_record['name'], post_data['name'])
         self.assertEqual(new_record['description'], post_data['description'])
 
-    """
-    Update a single piece of the queue's data
-    """
     def test_partial_update(self):
+        """Update a single piece of queue information from the database.
+        Returns a queue json object of the updated record.
+        """
         # Count the number of records before the save
         existing_records_count = Queue.objects.all().count()
-        post_data = {
-            'name': 'patched playlist',
-        }
+        post_data = {'name': 'patched queue'}
 
         resp = self.api_client.patch('/api/queues/1/', data=post_data)
         new_record = Queue.objects.filter(id=1).values()[0]
@@ -162,10 +164,12 @@ class QueueViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count, new_records_count)
         self.assertEqual(new_record['name'], post_data['name'])
 
-    """
-    Cascade remove a queue and its tracks from the database
-    """
     def test_destroy(self):
+        """Recursively remove a queue and its associated queue
+        tracks from the database
+
+        Returns a successful response, with a detail message.
+        """
         # Count the number of records before the save
         existing_records_count = Queue.objects.all().count()
 
@@ -178,160 +182,159 @@ class QueueViewSetTestCase(BaseTestCase):
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], 'Queue successfully removed')
+        self.assertEqual(data['detail'], u'Queue successfully removed.')
+
+    def test_delete_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.delete('/api/queues/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'The record could not be found.')
 
 
 class QueueTrackViewSetTestCase(BaseTestCase):
-    """
-    Retrieve a list of all queues in database
-    """
+    """CRUD commands for the queue_track database table."""
     def test_list(self):
-        expected_attrs = (
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-
-        expected_results_attrs = (
-            'id',
-            'position',
-            'track',
-            'queue',
-            'created',
-            'updated',
-        )
-
+        """Return a paginated set of queue track json objects."""
         resp = self.api_client.get('/api/queues/1/tracks/')
         data = json.loads(resp.content)
-        queues = data['results'][0]
-
+        queue_tracks = data['results'][0]
+        track = queue_tracks['track']
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
-        self.assertTrue(set(expected_results_attrs) <= set(queues))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(self.queue_track_attrs) <= set(queue_tracks))
+        self.assertTrue(set(self.track_attrs) <= set(track))
 
-    """
-    Add a track to a queue
-    """
     def test_create(self):
+        """Add a queue track to the database.
+        params - track
+
+        Returns a queue track json object of the newly created record.
+        """
         # Count the number of records before the save
-        existing_records_count = QueueTrack.objects.all().count()
-        existing_history_records_count = QueueTrackHistory.objects.all().count()
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
         post_data = {
-            'track': 1,
+            'track': 3,
         }
 
         resp = self.api_client.post('/api/queues/1/tracks/', data=post_data)
         data = json.loads(resp.content)
-        new_records_count = QueueTrack.objects.all().count()
-        new_history_records_count = QueueTrackHistory.objects.all().count()
-
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
-        # Ensure the track has been saved in the history
-        self.assertEqual(existing_history_records_count+1, new_history_records_count)
         # Ensure the returned json keys match the expected
         self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['position'], new_records_count)
         self.assertEqual(data['track']['id'], post_data['track'])
-        self.assertEqual(data['queue'], 1)
+        self.assertEqual(data['position'], int(new_records_count))
 
-    """
-    Try to add a track to the queue, without specifying the track ID
-    """
     def test_create_with_empty_values(self):
+        """Try to create a track, empty post variables.
+        Returns a 404 response with detail message.
+        """
         # Count the number of records before the save
-        existing_records_count = QueueTrack.objects.all().count()
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+        post_data = {
+            'track': None,
+        }
 
-        resp = self.api_client.post('/api/queues/1/tracks/', data={})
+        resp = self.api_client.post('/api/queues/1/tracks/', data=post_data)
         data = json.loads(resp.content)
-        new_records_count = QueueTrack.objects.all().count()
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
 
         # Ensure request failed
         self.assertEqual(resp.status_code, 400)
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['detail'], 'Track could not be saved to queue')
+        self.assertEqual(data['detail'], u'The record could not be saved.')
 
-    """
-    Retrieve a queued track's attribrutes
-    """
     def test_retrieve(self):
-        expected_attrs = (
-            'id',
-            'position',
-            'track',
-            'queue',
-            'created',
-            'updated',
-        )
-
-        resp = self.api_client.get('/api/queues/1/tracks/1/')
+        """Return a track json object of a given record."""
+        resp = self.api_client.get('/api/queues/1/tracks/3/')
         data = json.loads(resp.content)
-
+        track = data['track']
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(self.queue_track_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(track))
 
-    """
-    Update a single piece of a queued track's data
-    """
-    def test_partial_update(self):
-        # Count the number of records before the save
-        existing_records_count = QueueTrack.objects.all().count()
-        post_data = {
-            'position': 22,
-        }
-
-        resp = self.api_client.patch('/api/queues/1/tracks/1/', data=post_data)
+    def test_retrieve_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.get('/api/queues/1/tracks/100000/')
         data = json.loads(resp.content)
-        new_records_count = QueueTrack.objects.all().count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'Not found')
 
+    def test_partial_update(self):
+        """Update a queue track's position.
+        Returns a queue track json object of the updated record.
+        """
+        # Count the number of records before the save
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+        post_data = {'position': 33}
+
+        resp = self.api_client.patch(
+            '/api/queues/1/tracks/3/',
+            data=post_data
+        )
+        data = json.loads(resp.content)
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure a the record was updated
-        # and a new records was not added to the database
+        # Ensure a new record was created in the database
         self.assertEqual(existing_records_count, new_records_count)
+        # Ensure the returned json keys match the expected
         self.assertEqual(int(data['position']), post_data['position'])
 
-    """
-    Remove a track from a queue
-    """
     def test_destroy(self):
+        """Remove a queue track from the database
+        Returns a successful response, with a detail message.
+        """
         # Count the number of records before the save
-        existing_records_count = QueueTrack.objects.all().count()
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
 
-        resp = self.api_client.delete('/api/queues/1/tracks/1/')
+        resp = self.api_client.delete('/api/queues/1/tracks/3/')
         data = json.loads(resp.content)
-        new_records_count = QueueTrack.objects.all().count()
-
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], 'Queued track successfully removed')
+        self.assertEqual(data['detail'], u'Track successfully removed from queue')
+
+    def test_delete_with_bad_id(self):
+        """Returns a 404 response with detail message."""
+        resp = self.api_client.delete('/api/queues/1/tracks/100000/')
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 404)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['detail'], u'The record could not be found.')
 
 
 class QueueTrackHistoryViewSetTestCase(BaseTestCase):
-    """
-    Retrieve a list of all queues in database
-    """
+    """CRUD commands for the queue_history database table."""
     def test_list(self):
-        expected_attrs = (
-            'count',
-            'next',
-            'previous',
-            'results',
-        )
-
-        expected_results_attrs = (
+        """Return a paginated set of queue track history json objects."""
+        history_attrs = (
             'id',
             'track',
             'queue',
@@ -342,18 +345,15 @@ class QueueTrackHistoryViewSetTestCase(BaseTestCase):
         resp = self.api_client.get('/api/queues/1/history/')
         data = json.loads(resp.content)
         queues = data['results'][0]
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
-        self.assertTrue(set(expected_results_attrs) <= set(queues))
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(history_attrs) <= set(queues))
 
-    """
-    Retrieve a queued track's attribrutes
-    """
     def test_retrieve(self):
-        expected_attrs = (
+        """Return a queue track history json object."""
+        history_attrs = (
             'id',
             'track',
             'queue',
@@ -363,8 +363,7 @@ class QueueTrackHistoryViewSetTestCase(BaseTestCase):
 
         resp = self.api_client.get('/api/queues/1/history/1/')
         data = json.loads(resp.content)
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure the returned json keys match the expected
-        self.assertTrue(set(expected_attrs) <= set(data))
+        self.assertTrue(set(history_attrs) <= set(data))
