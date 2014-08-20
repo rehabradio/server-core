@@ -1,12 +1,10 @@
 # third-party imports
 from django.conf import settings
 from django.conf.urls import *
-from django.contrib import admin
 from django.conf.urls.static import static
-
-
+from django.contrib import admin
 # local imports
-from .views.api import APIRootView, SwaggerView
+from radio.views.api import APIRootView, SwaggerView
 
 # autodiscover all admin urls
 admin.autodiscover()
@@ -14,9 +12,6 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    # google oauth urls
-    url(r'', include('social_auth.urls')),
-
     # Swagger urls
     url(
         r'^api/docs/api-docs/$',
