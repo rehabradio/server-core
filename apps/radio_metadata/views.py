@@ -374,7 +374,9 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        """Add a track to the database, using a tracks source_type and source_id.
+        """Add a track to the database.
+        params - source_type, source_id
+
         Returns a the newly created track as a json object
         """
         try:

@@ -188,7 +188,6 @@ class TrackViewSetTestCase(BaseTestCase):
 
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
         new_records_count = Track.objects.all().count()
-
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
@@ -249,7 +248,9 @@ class TrackViewSetTestCase(BaseTestCase):
         self.assertEqual(data['detail'], u'Not found')
 
     def test_destroy(self):
-        """Return a successful response, with a detail message."""
+        """Remove a track from the database
+        Returns a successful response, with a detail message.
+        """
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
         resp = self.api_client.delete('/api/metadata/tracks/2/')
