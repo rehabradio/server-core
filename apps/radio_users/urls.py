@@ -16,7 +16,6 @@ urlpatterns = patterns(
         r'^(?P<pk>[^/]+)/$',
         UserViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
         }),

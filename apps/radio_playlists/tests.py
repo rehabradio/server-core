@@ -135,15 +135,15 @@ class PlaylistViewSetTestCase(BaseTestCase):
         }
 
         resp = self.api_client.put('/api/playlists/1/', data=post_data)
-        new_record = Playlist.objects.filter(id=1).values()[0]
+        data = json.loads(resp.content)
         new_records_count = Playlist.objects.all().count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a the record was updated
         # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(new_record['name'], post_data['name'])
-        self.assertEqual(new_record['description'], post_data['description'])
+        self.assertEqual(data['name'], post_data['name'])
+        self.assertEqual(data['description'], post_data['description'])
 
     def test_partial_update(self):
         """Update a single piece of playlist information from the database.
@@ -154,7 +154,7 @@ class PlaylistViewSetTestCase(BaseTestCase):
         post_data = {'name': 'patched playlist'}
 
         resp = self.api_client.patch('/api/playlists/1/', data=post_data)
-        new_record = Playlist.objects.filter(id=1).values()[0]
+        data = json.loads(resp.content)
         new_records_count = Playlist.objects.all().count()
 
         # Ensure request was successful
@@ -162,7 +162,7 @@ class PlaylistViewSetTestCase(BaseTestCase):
         # Ensure a the record was updated
         # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(new_record['name'], post_data['name'])
+        self.assertEqual(data['name'], post_data['name'])
 
     def test_destroy(self):
         """Recursively remove a playlist and its associated playlist

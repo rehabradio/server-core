@@ -1,39 +1,36 @@
+# -*- coding: utf-8 -*-
+"""User related views
+"""
+# stdlib imports
 import datetime
 # Third party imports
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.cache import cache
-
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework import viewsets
-
 # Local imports
 from .models import Profile
 from .serializers import UserSerializer, PaginatedUserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API endpoints that allow managing playlists.
-    User must be staff to remove track from database
+    """CRUD API endpoints that allow managing playlists.
+    User must be signed in as admin.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    #permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUser,)
 
     def _get_cache_key(self):
-        """Build key used for caching the lookup data
-        """
+        """Build key used for caching the user list."""
         return 'userlist-{0}'.format(
             datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
 
     def list(self, request):
-        """
-        CRUD API endpoints that allow managing users.
-        Admin permissions required
-        """
+        """Return a paginated list of queue json objects."""
         cache_key = self._get_cache_key()
         queryset = cache.get(cache_key)
         if queryset is None:
@@ -61,34 +58,15 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        """
-        CRUD API endpoints that allow managing users.
-        Admin permissions required
-        """
-        cache_key = u'userdetail-{0}-{1}'.format(
-            pk, datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
-        queryset = cache.get(cache_key)
-        if queryset is None:
-            users = User.objects.select_related('profile').get(id=pk)
-            serializer = UserSerializer(users)
-            queryset = serializer.data
-            cache.set(cache_key, queryset, 86400)
-
-        return Response(queryset)
-
     def post_save(self, user, created=False):
-        """
-        On creation, create a profile
-        """
-        # Destory the existing track list cache, to force an update
-        cache.delete(self._get_cache_key())
+        """Remove the cached track list after a database record is updated.
 
+        On creation, create a profile.
+        """
+        cache.delete(self._get_cache_key())
         if created:
-            # Create an empty profile
             Profile.objects.create(user=user)
 
-    def post_delete(self):
-        # Destory the existing track list cache, to force an update
+    def post_delete(self, user):
+        """Remove the cached track list after a database record is removed."""
         cache.delete(self._get_cache_key())

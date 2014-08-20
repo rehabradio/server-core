@@ -6,7 +6,7 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 # local imports
-from .models import Queue, QueueTrack, QueueTrackHistory
+from .models import Queue, QueueTrack
 
 
 class BaseTestCase(TestCase):
@@ -135,15 +135,15 @@ class QueueViewSetTestCase(BaseTestCase):
         }
 
         resp = self.api_client.put('/api/queues/1/', data=post_data)
-        new_record = Queue.objects.filter(id=1).values()[0]
+        data = json.loads(resp.content)
         new_records_count = Queue.objects.all().count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a the record was updated
         # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(new_record['name'], post_data['name'])
-        self.assertEqual(new_record['description'], post_data['description'])
+        self.assertEqual(data['name'], post_data['name'])
+        self.assertEqual(data['description'], post_data['description'])
 
     def test_partial_update(self):
         """Update a single piece of queue information from the database.
@@ -154,7 +154,7 @@ class QueueViewSetTestCase(BaseTestCase):
         post_data = {'name': 'patched queue'}
 
         resp = self.api_client.patch('/api/queues/1/', data=post_data)
-        new_record = Queue.objects.filter(id=1).values()[0]
+        data = json.loads(resp.content)
         new_records_count = Queue.objects.all().count()
 
         # Ensure request was successful
@@ -162,7 +162,7 @@ class QueueViewSetTestCase(BaseTestCase):
         # Ensure a the record was updated
         # and a new records was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(new_record['name'], post_data['name'])
+        self.assertEqual(data['name'], post_data['name'])
 
     def test_destroy(self):
         """Recursively remove a queue and its associated queue

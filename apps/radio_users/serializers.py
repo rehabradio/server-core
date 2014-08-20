@@ -14,11 +14,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(source='profile.avatar', read_only=True)
-
-    duration_ms = serializers.IntegerField(read_only=True)
-    preview_url = serializers.URLField(read_only=True)
-    play_count = serializers.IntegerField(read_only=True)
-    owner = serializers.Field(source='owner.username')
     last_login = serializers.DateTimeField(read_only=True)
     date_joined = serializers.DateTimeField(read_only=True)
 
@@ -43,8 +38,9 @@ class UserSerializer(serializers.ModelSerializer):
         # call set_password on user object. Without this
         # the password will be stored in plain text.
         user = super(UserSerializer, self).restore_object(attrs, instance)
-        user.username = attrs['username'].lower()
-        user.set_password(attrs['password'])
+        if instance is None:
+            user.username = attrs['username'].lower()
+            user.set_password(attrs['password'])
 
         return user
 
