@@ -4,7 +4,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 # stdlib imports
-import itertools
 import logging
 
 # third-party imports
@@ -74,14 +73,7 @@ class SoundcloudClient(object):
     def search(self, query, limit=200, offset=0):
         """Search for tracks using the soundcloud API
         """
-        tracks = []
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
 
-        results = self.client.get('/tracks', q=query,
-                                  limit=limit, offset=offset)
-        tracks.append([x.obj for x in results])
-
-        tracks = list(itertools.chain.from_iterable(tracks))
-        tracks = [_transform_track(x) for x in tracks]
-
-        return tracks
+        tracks = self.client.get('/tracks', q=query, limit=limit, offset=offset)
+        return [_transform_track(x.obj) for x in tracks]
