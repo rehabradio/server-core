@@ -12,6 +12,7 @@ import requests
 # local imports
 from radiobabel.errors import TrackNotFound
 
+
 logger = logging.getLogger('radiobabel.backends.spotify')
 
 
@@ -36,7 +37,8 @@ def _transform_search_response(search_results, offset):
 
 
 def _transform_track(track):
-    """Transform result into a format that more closely matches our unified API.
+    """Transform result into a format that more
+    closely matches our unified API.
     """
     transformed_track = dict([
         ('source_type', 'spotify'),
@@ -61,14 +63,17 @@ def _transform_track(track):
     if track['album']['images']:
         transformed_track['image_small'] = track['album']['images'][0]['url']
         try:
-            transformed_track['image_medium'] = track['album']['images'][1]['url']
+            transformed_track['image_medium'] = \
+                track['album']['images'][1]['url']
         except:
-            transformed_track['image_medium'] = transformed_track['image_small']
-
+            transformed_track['image_medium'] = \
+                transformed_track['image_small']
         try:
-            transformed_track['image_large'] = track['album']['images'][2]['url']
+            transformed_track['image_large'] = \
+                track['album']['images'][2]['url']
         except:
-            transformed_track['image_large'] = transformed_track['image_medium']
+            transformed_track['image_large'] = \
+                transformed_track['image_medium']
     else:
         transformed_track['image_small'] = None
         transformed_track['image_medium'] = None
@@ -82,9 +87,9 @@ class SpotifyClient(object):
     def track(self, track_id):
         """Lookup an individual track using the Spotify Web API
 
-        radiobabel uses a unified format to show lookup results across all supported
-        sources. This allows simple interaction for clients and easy implementation
-        of a unified search API in future.
+        radiobabel uses a unified format to show lookup results across all
+        supported sources. This allows simple interaction for clients and easy
+        implementation of a unified search API in future.
 
         track_id (required): id of the Spotify track to retrieve metadata for.
         """
@@ -97,13 +102,18 @@ class SpotifyClient(object):
 
         return _transform_track(track)
 
-    def search(self, query, limit=200, offset=0):
+    def search(self, query, limit=20, offset=0):
         """Search for tracks using the spotify API
         """
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
 
-        params = {'q': query, 'type': 'track', 'limit': limit, 'offset': offset}
+        # Max limit for the spotify api is 20
+        if limit > 20:
+            limit = 20
+
+        params = {'q': query, 'type': 'track',
+                  'limit': limit, 'offset': offset}
         response = _make_request('https://api.spotify.com/v1/search', params)
         tracks = _transform_search_response(response, offset)
 
-        return [_transform_track(x.obj) for x in tracks]
+        return tracks

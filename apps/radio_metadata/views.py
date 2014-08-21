@@ -5,6 +5,7 @@
 import collections
 import datetime
 # third-party imports
+from django.conf import settings
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import permissions, viewsets
@@ -14,8 +15,6 @@ from rest_framework.views import APIView
 # local imports
 from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
-from .sources import soundcloud
-from .sources import spotify
 from radio.exceptions import (
     InvalidBackend,
     InvalidLookupType,
@@ -25,6 +24,10 @@ from radio.exceptions import (
     RecordNotSaved,
 )
 from radio.permissions import IsStaffToDelete
+
+from radiobabel import SpotifyClient, SoundcloudClient
+spotify_client = SpotifyClient()
+soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
 
 
 def _get_track_data(source_type, source_id):
@@ -41,14 +44,14 @@ def _get_track_data(source_type, source_id):
     if track_data is None:
         if source_type == 'spotify':
             # Query the spotify api for all the track data
-            track_data = spotify.lookup_track(source_id)
+            track_data = spotify_client.track(source_id)
             # Get or create relational album field
             track_data['album'] = _get_or_create_album(
                 track_data['album']
             )
         elif source_type == 'soundcloud':
             # Query the soundcloud api for all the track data
-            track_data = soundcloud.lookup_track(source_id)
+            track_data = soundcloud_client.track(source_id)
         else:
             return None
         cache.set(cache_key, track_data)
@@ -218,8 +221,8 @@ class LookupView(APIView):
             return Response(response)
 
         lookup_func = {
-            'soundcloud': soundcloud.lookup_track,
-            'spotify': spotify.lookup_track,
+            'soundcloud': soundcloud_client.track,
+            'spotify': spotify_client.track,
         }.get(source_type.lower())
         if lookup_func is None:
             raise InvalidLookupType
@@ -295,10 +298,9 @@ class SearchView(APIView):
         if not query:
             raise MissingParameter
         page = int(request.QUERY_PARAMS.get('page', 1))
-        page_size = int(request.QUERY_PARAMS.get('page_size', 20))
 
-        cache_key = u'mtdttrcksrch-{0}-{1}-{2}-{3}-{4}'.format(
-            source_type, query, page, page_size,
+        cache_key = u'mtdttrcksrch-{0}-{1}-{2}-{3}'.format(
+            source_type, query, page,
             datetime.datetime.utcnow().strftime('%Y%m%d'),
         )
         response = cache.get(cache_key)
@@ -307,24 +309,35 @@ class SearchView(APIView):
             return Response(response)
 
         search_func = {
-            'soundcloud': soundcloud.search_tracks,
-            'spotify': spotify.search_tracks,
+            'soundcloud': soundcloud_client.search,
+            'spotify': spotify_client.search,
         }.get(source_type.lower())
         if search_func is None:
             raise InvalidBackend
 
         # search using requested source_type
-        results = search_func(query, page, page_size)
+        queryset = search_func(query, 200, 0)
+
+        paginator = Paginator(queryset, 20)
+
+        try:
+            tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            tracks = paginator.page(paginator.num_pages)
 
         serializer_context = {'request': request}
         serializer = PaginatedTrackSerializer(
-            results, context=serializer_context
+            tracks, context=serializer_context
         )
-        response = serializer.data
-
         # return response to the client
         cache.set(cache_key, response)
-        return Response(response)
+
+        return Response(serializer.data)
 
 
 class TrackViewSet(viewsets.ModelViewSet):

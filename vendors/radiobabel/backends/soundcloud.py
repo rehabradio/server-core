@@ -4,6 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 # stdlib imports
+import itertools
 import logging
 
 # third-party imports
@@ -17,8 +18,18 @@ logger = logging.getLogger('radiobabel.backends.soundcloud')
 
 
 def _transform_track(track):
-    """Transform result into a format that more closely matches our unified API.
+    """Transform result into a format that
+    more closely matches our unified API.
     """
+    large_artwork = None
+    medium_artwork = None
+    small_artwork = None
+
+    if track['artwork_url']:
+        large_artwork = (track['artwork_url']).replace('large', 't500x500')
+        medium_artwork = (track['artwork_url']).replace('large', 't300x300')
+        small_artwork = (track['artwork_url']).replace('large', 't67x67')
+
     transformed_track = dict([
         ('source_type', 'soundcloud'),
         ('source_id', track['id']),
@@ -26,6 +37,9 @@ def _transform_track(track):
         ('duration_ms', track['duration']),
         ('preview_url', track.get('stream_url')),
         ('track_number', 0),
+        ('image_small', small_artwork),
+        ('image_medium', medium_artwork),
+        ('image_large', large_artwork),
     ])
     transformed_track['artists'] = [
         dict([
@@ -35,10 +49,7 @@ def _transform_track(track):
         ]),
     ]
     transformed_track['album'] = None
-    if track['artwork_url']:
-        transformed_track['image_url'] = track['artwork_url']
-    else:
-        transformed_track['image_url'] = 'http://judejohnstone.com/wp-content/themes/soundcheck/images/default-artwork.png'
+
     return transformed_track
 
 
@@ -63,7 +74,14 @@ class SoundcloudClient(object):
     def search(self, query, limit=200, offset=0):
         """Search for tracks using the soundcloud API
         """
+        tracks = []
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
 
-        tracks = self.client.get('/tracks', q=query, limit=limit, offset=offset)
-        return [_transform_track(x.obj) for x in tracks]
+        results = self.client.get('/tracks', q=query,
+                                  limit=limit, offset=offset)
+        tracks.append([x.obj for x in results])
+
+        tracks = list(itertools.chain.from_iterable(tracks))
+        tracks = [_transform_track(x) for x in tracks]
+
+        return tracks
