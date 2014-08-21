@@ -8,6 +8,7 @@ import datetime
 from django.conf import settings
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from radiobabel import SpotifyClient, SoundcloudClient
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -25,7 +26,7 @@ from radio.exceptions import (
 )
 from radio.permissions import IsStaffToDelete
 
-from radiobabel import SpotifyClient, SoundcloudClient
+
 spotify_client = SpotifyClient()
 soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
 
