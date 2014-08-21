@@ -37,15 +37,28 @@ class BaseTestCase(TestCase):
     )
 
     def setUp(self):
-        """Log in the test user."""
+        """Ensure Auth is required and log in the test user."""
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
+
         login = self.api_client.login(username=username, password=password)
         self.assertEqual(login, True)
 
 
 class PlaylistViewSetTestCase(BaseTestCase):
     """CRUD commands for the playlist database table"""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/playlists/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/playlists/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of playlist json objects."""
         resp = self.api_client.get('/api/playlists/')
@@ -196,6 +209,18 @@ class PlaylistViewSetTestCase(BaseTestCase):
 
 class PlaylistTrackViewSetTestCase(BaseTestCase):
     """CRUD commands for the playlist_track database table."""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/playlists/1/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/playlists/1/tracks/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of playlist track json objects."""
         resp = self.api_client.get('/api/playlists/1/tracks/')

@@ -15,7 +15,8 @@ import sys
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 sys.path.insert(0, os.path.abspath(os.path.join(BASE_DIR, os.pardir, 'apps')))
-sys.path.insert(0, os.path.abspath(os.path.join(BASE_DIR, os.pardir, 'vendors')))
+sys.path.insert(0, os.path.abspath(os.path.join(
+                BASE_DIR, os.pardir, 'vendors')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
@@ -45,7 +46,6 @@ INSTALLED_APPS = (
     'django_rq',
     'rest_framework',
     'rest_framework_swagger',
-
     'radiobabel',
 
     # local apps
@@ -120,8 +120,7 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
     'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',

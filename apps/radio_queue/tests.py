@@ -37,15 +37,28 @@ class BaseTestCase(TestCase):
     )
 
     def setUp(self):
-        """Log in the test user."""
+        """Ensure Auth is required and log in the test user."""
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
+
         login = self.api_client.login(username=username, password=password)
         self.assertEqual(login, True)
 
 
 class QueueViewSetTestCase(BaseTestCase):
     """CRUD commands for the queue database table"""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of queue json objects."""
         resp = self.api_client.get('/api/queues/')
@@ -196,6 +209,18 @@ class QueueViewSetTestCase(BaseTestCase):
 
 class QueueTrackViewSetTestCase(BaseTestCase):
     """CRUD commands for the queue_track database table."""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/1/tracks/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/1/tracks/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of queue track json objects."""
         resp = self.api_client.get('/api/queues/1/tracks/')
@@ -385,6 +410,18 @@ class QueueTrackViewSetTestCase(BaseTestCase):
 
 class QueueTrackHistoryViewSetTestCase(BaseTestCase):
     """CRUD commands for the queue_history database table."""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/1/history/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/queues/1/history/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of queue track history json objects."""
         history_attrs = (

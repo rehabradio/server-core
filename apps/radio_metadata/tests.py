@@ -34,9 +34,10 @@ class BaseTestCase(TestCase):
     )
 
     def setUp(self):
-        """Log in the test user."""
+        """Ensure Auth is required and log in the test user."""
         username = os.environ.get('TEST_USERNAME', None)
         password = os.environ.get('TEST_PASSWORD', None)
+
         login = self.api_client.login(username=username, password=password)
         self.assertEqual(login, True)
 
@@ -61,6 +62,22 @@ class LookupViewTestCase(BaseTestCase):
     """Uses a backend(spotify/soundcloud) and a source ID,
     fetch a track from the given backend api.
     """
+    def test_spotify_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get(
+            '/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/'
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_soundcloud_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get(
+            '/api/metadata/lookup/soundcloud/153868082/'
+        )
+        self.assertEqual(resp.status_code, 403)
+
     def test_get_spotify(self):
         """Return a json object for spotify backend."""
         resp = self.api_client.get(
@@ -117,6 +134,22 @@ class SearchViewTestCase(BaseTestCase):
     """Uses a backend(spotify/soundcloud) and a `q` parament,
     to search for tracks from the given backend api.
     """
+    def test_spotify_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get(
+            '/api/metadata/search/spotify/?q=Haim/'
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_soundcloud_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get(
+            '/api/metadata/search/soundcloud/?q=Haim/'
+        )
+        self.assertEqual(resp.status_code, 403)
+
     def test_get_spotify(self):
         """Return a json object for spotify backend."""
         resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
@@ -163,6 +196,18 @@ class SearchViewTestCase(BaseTestCase):
 
 class TrackViewSetTestCase(BaseTestCase):
     """CRUD commands for the track database table."""
+    def test_list_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/metadata/tracks/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_detail_auth(self):
+        """Return a 403 response error with detail message."""
+        self.api_client.logout()
+        resp = self.api_client.get('/api/metadata/tracks/1/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_list(self):
         """Return a paginated set of track json objects."""
         track_attrs = self.track_attrs + ('id',)
