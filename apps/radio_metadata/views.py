@@ -317,7 +317,8 @@ class SearchView(APIView):
             raise InvalidBackend
 
         # search using requested source_type
-        queryset = search_func(query, page*200, page-1)
+        offset = (page-1)*20
+        queryset = search_func(query, page*200, offset)
 
         paginator = Paginator(queryset, 20)
 
