@@ -1375,6 +1375,14 @@
 },
 {
     "fields": {
+        "user": 1,
+        "avatar": null
+    },
+    "model": "radio_users.profile",
+    "pk": 1
+},
+{
+    "fields": {
         "user": 12,
         "avatar": null
     },
