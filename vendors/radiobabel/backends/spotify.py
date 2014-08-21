@@ -47,6 +47,9 @@ def _transform_track(track):
         ('duration_ms', track['duration_ms']),
         ('preview_url', track['preview_url']),
         ('track_number', track['track_number']),
+        ('image_small', None),
+        ('image_medium', None),
+        ('image_large', None),
     ])
     transformed_track['artists'] = []
     for artist in track.get('artists', []):
@@ -66,16 +69,12 @@ def _transform_track(track):
             transformed_track['image_medium'] = \
                 track['album']['images'][1]['url']
         except:
-            transformed_track['image_medium'] = None
+            pass
         try:
             transformed_track['image_small'] = \
                 track['album']['images'][2]['url']
         except:
-            transformed_track['image_small'] = None
-    else:
-        transformed_track['image_small'] = None
-        transformed_track['image_medium'] = None
-        transformed_track['image_large'] = None
+            pass
 
     return transformed_track
 
