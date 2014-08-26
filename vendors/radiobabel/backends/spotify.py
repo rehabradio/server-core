@@ -29,7 +29,7 @@ def _transform_search_response(search_results, offset):
     """Transform a result returned from the spotify API into a format we
     can return to clients/use to populate the database.
     """
-    _track_list = [None for x in xrange(search_results['tracks']['total'])]
+    _track_list = [None for x in range(search_results['tracks']['total'])]
     for idx, track in enumerate(search_results['tracks']['items']):
         transformed_track = _transform_track(track)
         _track_list[offset + idx] = transformed_track
@@ -94,7 +94,7 @@ class SpotifyClient(object):
         logger.info('Track lookup: {0}'.format(track_id))
         try:
             track = _make_request(url)
-        except IndexError:
+        except:
             raise TrackNotFound('Spotify: {0}'.format(track_id))
 
         return _transform_track(track)
