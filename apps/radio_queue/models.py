@@ -19,6 +19,8 @@ class QueueTrack(models.Model):
     track = models.ForeignKey(Track)
     queue = models.ForeignKey(Queue)
     position = models.PositiveIntegerField()
+    state = models.CharField(max_length=500, null=True)
+    time_position = models.IntegerField(null=True)
     owner = models.ForeignKey('auth.User')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

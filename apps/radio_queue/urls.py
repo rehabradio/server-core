@@ -45,6 +45,12 @@ urlpatterns = patterns(
         }), name='radio-queue-track-head'
     ),
     url(
+        r'^(?P<queue_id>[0-9]+)/head/status/$',
+        QueueTrackViewSet.as_view({
+            'post': 'status',
+        }), name='radio-queue-track-head-status'
+    ),
+    url(
         r'^(?P<queue_id>[0-9]+)/head/pop/$',
         QueueTrackViewSet.as_view({
             'delete': 'pop',

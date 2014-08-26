@@ -3,6 +3,7 @@
 """
 # stdlib imports
 import datetime
+import json
 import random
 # third-party imports
 from django.core.cache import cache
@@ -271,6 +272,27 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             )
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
+
+    @action()
+    def status(self, request, *args, **kwargs):
+        post_data = json.loads(request.DATA)
+        """Update the head track of a given queue."""
+        try:
+            queued_track = QueueTrack.objects.get(
+                queue_id=kwargs['queue_id'],
+                position=1
+            )
+        except:
+            raise RecordNotFound
+
+        try:
+            queued_track.state = post_data['state']
+            queued_track.time_position = post_data['time_position']
+            queued_track.save()
+        except:
+            raise RecordNotSaved
+
+        return Response({'detail': 'Track status updated.'})
 
     @action()
     def pop(self, request, *args, **kwargs):
