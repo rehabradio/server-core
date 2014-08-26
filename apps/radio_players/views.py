@@ -2,7 +2,7 @@ import uuid
 # third-party imports
 from django.contrib.auth.models import User
 from rest_framework import viewsets
-from rest_framework.decorators import action, link
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
@@ -16,7 +16,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     CRUD API endpoints that allow managing connected players.
     User must be admin
     """
-    permissions = (IsAdminUser, )
+    permissions = (IsAdminUser,)
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
