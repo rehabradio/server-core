@@ -30,7 +30,7 @@ from radio.permissions import IsStaffOrOwnerToDelete
 from radio_metadata.models import Track
 
 
-def _add_random_track_to_queue(queue_id):
+def _add_random_track_to_queue(queue_id, user_id):
     """Grabs a random track from the queues history,
     and adds it back into the queue
 
@@ -48,7 +48,7 @@ def _add_random_track_to_queue(queue_id):
         track=Track.objects.get(id=track_id),
         queue=Queue.objects.get(id=queue_id),
         position=1,
-        owner_id=1
+        owner_id=user_id
     )
     # Return the track instance
     return queue_track
@@ -265,7 +265,10 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
                 position=1
             )
         except:
-            queued_track = _add_random_track_to_queue(kwargs['queue_id'])
+            queued_track = _add_random_track_to_queue(
+                kwargs['queue_id'],
+                request.user.id
+            )
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
