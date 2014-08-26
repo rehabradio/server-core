@@ -11,6 +11,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     token = serializers.CharField(read_only=True)
     queue = serializers.PrimaryKeyRelatedField(required=False)
     active = serializers.BooleanField()
+    owner = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)
 

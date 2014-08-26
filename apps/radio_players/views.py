@@ -1,5 +1,6 @@
 import uuid
 # third-party imports
+from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.decorators import action, link
 from rest_framework.permissions import IsAdminUser
@@ -15,7 +16,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     CRUD API endpoints that allow managing connected players.
     User must be admin
     """
-    permission_classes = (IsAdminUser,)
+    permissions = (IsAdminUser, )
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
@@ -37,5 +38,14 @@ class PlayerViewSet(viewsets.ModelViewSet):
         On creation, create a token
         """
         if created:
-            player.token = uuid.uuid4()
+            token = uuid.uuid4()
+
+            user = User.objects.create(
+                username=player.name,
+                password=token,
+                is_staff=True,
+            )
+
+            player.owner = user
+            player.token = token
             player.save()

@@ -16,20 +16,22 @@ class PlayerTokenAuthBackend(authentication.BaseAuthentication):
     """
     def authenticate(self, request):
         # Retrieve the access token from the request header
-        access_token = request.META.get('HTTP_X_PLAYER_AUTH_TOKEN')
+        access_token = request.META.get('HTTP_PLAYER_AUTH_TOKEN')
 
         if access_token:
             cache_key = 'playertoken-{0}-{1}'.format(
                 access_token, datetime.datetime.utcnow().strftime('%Y%m%d'),
             )
-            player = cache.get(cache_key)
+            user = cache.get(cache_key)
 
-            if player is None:
+            if user is None:
                 try:
-                    player = Player.objects.get(token=access_token)
-                    cache.set(cache_key, player, 3600)
+                    player = Player.objects.select_related(
+                        'owner'
+                    ).get(token=access_token)
+                    user = player.owner
+                    cache.set(cache_key, user, 3600)
                 except:
                     raise exceptions.AuthenticationFailed()
-
-            return (player, None)
+            return (user, None)
         return None

@@ -75,8 +75,10 @@ CORS_ALLOW_HEADERS = (
     'content-type',
     'origin',
     'x-csrftoken',
-    'x_google_auth_token',
     'x-requested-with',
+    # Cusom request header objects
+    'x_google_auth_token',
+    'x_player_auth_token'
 )
 
 ROOT_URLCONF = 'radio.urls'
@@ -125,7 +127,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'radio.auth.GoogleOauthBackend',
+        'radio.google_oauth.GoogleOauthBackend',
+        'radio.player_token_auth.PlayerTokenAuthBackend',
     ),
 }
 

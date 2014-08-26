@@ -10,6 +10,7 @@ class Player(models.Model):
     token = models.CharField(max_length=500)
     queue = models.ForeignKey(Queue, null=True)
     active = models.BooleanField(default=0)
+    owner = models.ForeignKey('auth.User', null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
