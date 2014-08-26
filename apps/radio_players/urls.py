@@ -16,13 +16,25 @@ urlpatterns = patterns(
         }), name='radio-players-list'
     ),
     url(
-        r'^(?P<pk>[0-9]+)/$',
+        r'^(?P<pk>[\w\-_]+)/$',
         PlayerViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',
             'patch': 'partial_update',
             'delete': 'destroy',
         }), name='radio-players-detail'
+    ),
+    url(
+        r'^(?P<pk>[\w\-_]+)/event/',
+        PlayerViewSet.as_view({
+            'post': 'mopidy_event',
+        }), name='radio-players-mopidy-event'
+    ),
+    url(
+        r'^(?P<pk>[\w\-_]+)/status/',
+        PlayerViewSet.as_view({
+            'post': 'mopidy_status',
+        }), name='radio-players-mopidy-status'
     ),
 )
 
