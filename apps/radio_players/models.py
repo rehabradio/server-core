@@ -3,6 +3,7 @@ import uuid
 
 # third-party imports
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from radio_queue.models import Queue
@@ -27,6 +28,12 @@ class Player(models.Model):
         Also create a unique token for the player to as an auth tokken.
         """
         if self._state.adding:
+            active_player = Player.objects.filter(
+                queue=self.queue, active=True)
+
+            if self.active and active_player:
+                raise ValidationError("A player is already active on the selected queue")
+
             token = uuid.uuid4()
 
             user = User.objects.create(
