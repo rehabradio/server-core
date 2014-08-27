@@ -9,6 +9,15 @@ from rest_framework.test import APIClient
 from .models import Queue, QueueTrack
 
 
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, complex):
+            return [obj.real, obj.imag]
+        # Let the base class default method raise the TypeError
+        return json.JSONEncoder.default(self, obj)
+
+
+
 class BaseTestCase(TestCase):
     """Load in default data for tests, and login user."""
     fixtures = ['radio/fixtures/testdata.json']
@@ -379,7 +388,62 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         self.assertTrue(set(self.queue_track_attrs) <= set(data))
         self.assertTrue(set(self.track_attrs) <= set(track))
 
-    def test_pop(self):
+    def test_head_status(self):
+        """Update a the head track of a given queue.
+        """
+        # Count the number of records before the save
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+        post_data = {
+            'state': 'playing',
+            'time_position': 12345
+        }
+        json_data = json.dumps(post_data, cls=ComplexEncoder, indent=2)
+
+        resp = self.api_client.patch(
+            '/api/queues/1/head/status/',
+            data=json_data,
+            format='json'
+        )
+
+        data = json.loads(resp.content)
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count, new_records_count)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(data['state'], post_data['state'])
+        self.assertEqual(
+            int(data['time_position']), post_data['time_position'])
+
+    def test_head_events(self):
+        """Update time position value of the head track in a given queue.
+        """
+        # Count the number of records before the save
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+        post_data = {'time_position': 12345}
+        json_data = json.dumps(post_data, cls=ComplexEncoder, indent=2)
+
+        resp = self.api_client.patch(
+            '/api/queues/1/head/events/seeked/',
+            data=json_data,
+            format='json'
+        )
+        data = json.loads(resp.content)
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count, new_records_count)
+        # Ensure the returned json keys match the expected
+        self.assertEqual(
+            int(data['time_position']), post_data['time_position'])
+
+    def test_head_pop(self):
         """Remove a queue track from the database
         Returns a successful response, with a detail message.
         """
@@ -388,7 +452,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
             queue=1
         ).count()
 
-        resp = self.api_client.delete('/api/queues/1/pop/')
+        resp = self.api_client.delete('/api/queues/1/head/pop/')
         data = json.loads(resp.content)
         new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
@@ -396,11 +460,12 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(data['detail'], u'Track successfully removed from queue.')
+        self.assertEqual(
+            data['detail'], u'Track successfully removed from queue.')
 
-    def test_pop_with_empty_queue(self):
+    def test_head_pop_with_empty_queue(self):
         """Returns a 404 response with detail message."""
-        resp = self.api_client.delete('/api/queues/2/pop/')
+        resp = self.api_client.delete('/api/queues/2/head/pop/')
         data = json.loads(resp.content)
         # Ensure request was successful
         self.assertEqual(resp.status_code, 404)
