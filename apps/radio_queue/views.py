@@ -275,8 +275,10 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
     @action()
     def status(self, request, *args, **kwargs):
+        """Updates the head track of a given queue,
+        based on the mopidy playback status.
+        """
         post_data = json.loads(request.DATA)
-        """Update the head track of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
                 queue_id=kwargs['queue_id'],
@@ -287,6 +289,28 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         try:
             queued_track.state = post_data['state']
+            queued_track.time_position = post_data['time_position']
+            queued_track.save()
+        except:
+            raise RecordNotSaved
+
+        return Response({'detail': 'Track status updated.'})
+
+    @action()
+    def event(self, request, *args, **kwargs):
+        """Updates the head track of a given queue,
+        based on mopidy tracklist and playback events.
+        """
+        post_data = json.loads(request.DATA)
+        try:
+            queued_track = QueueTrack.objects.get(
+                queue_id=kwargs['queue_id'],
+                position=1
+            )
+        except:
+            raise RecordNotFound
+
+        try:
             queued_track.time_position = post_data['time_position']
             queued_track.save()
         except:

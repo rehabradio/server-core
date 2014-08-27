@@ -24,18 +24,6 @@ urlpatterns = patterns(
             'delete': 'destroy',
         }), name='radio-players-detail'
     ),
-    url(
-        r'^(?P<pk>[\w\-_]+)/event/',
-        PlayerViewSet.as_view({
-            'post': 'mopidy_event',
-        }), name='radio-players-mopidy-event'
-    ),
-    url(
-        r'^(?P<pk>[\w\-_]+)/status/',
-        PlayerViewSet.as_view({
-            'post': 'mopidy_status',
-        }), name='radio-players-mopidy-status'
-    ),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
