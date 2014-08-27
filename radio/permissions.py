@@ -1,3 +1,6 @@
+# std-lib imports
+import re
+
 from rest_framework import permissions
 
 
@@ -12,22 +15,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         return obj.owner == request.user
-
-
-class IsOwnerOrPlaylistOwnerElseReadOnly(permissions.BasePermission):
-    """Object-level permission
-    Allows playlist or playlist track owners to update a record.
-    Assumes the model instance has an `owner` attribute.
-    """
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        if obj.owner == request.user or obj.playlist.owner == request.user:
-            return True
-
-        return False
 
 
 class IsStaffToDelete(permissions.BasePermission):
