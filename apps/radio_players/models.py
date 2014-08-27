@@ -23,6 +23,9 @@ class Player(models.Model):
         return u'%s - %s' % (self.location, self.name)
 
     def save(self, *args, **kwargs):
+        """Create user/profile for new devices.
+        Also create a unique token for the player to as an auth tokken.
+        """
         if self._state.adding:
             token = uuid.uuid4()
 
