@@ -1,7 +1,12 @@
+# std-lib imports
+import uuid
+
 # third-party imports
+from django.contrib.auth.models import User
 from django.db import models
 
 from radio_queue.models import Queue
+from radio_users.models import Profile
 
 
 class Player(models.Model):
@@ -9,10 +14,25 @@ class Player(models.Model):
     location = models.CharField(max_length=500)
     token = models.CharField(max_length=500)
     queue = models.ForeignKey(Queue, null=True)
-    active = models.BooleanField(default=0)
+    active = models.BooleanField(default=False)
     owner = models.ForeignKey('auth.User', null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = (('queue', 'active'),)
+    def __unicode__(self):
+        return u'%s - %s' % (self.location, self.name)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            token = uuid.uuid4()
+
+            user = User.objects.create(
+                username=self.name,
+                password=token,
+                is_staff=True,
+            )
+            Profile.objects.create(user=user)
+
+            self.owner = user
+            self.token = token
+            super(Player, self).save()
