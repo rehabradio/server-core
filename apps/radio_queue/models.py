@@ -14,6 +14,9 @@ class Queue(models.Model):
     class Meta:
         ordering = ('name',)
 
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
 
 class QueueTrack(models.Model):
     track = models.ForeignKey(Track)
