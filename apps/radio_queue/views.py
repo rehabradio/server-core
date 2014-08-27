@@ -294,7 +294,8 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotSaved
 
-        return Response({'detail': 'Track status updated.'})
+        serializer = QueueTrackSerializer(queued_track)
+        return Response(serializer.data)
 
     @action()
     def event(self, request, *args, **kwargs):
@@ -316,7 +317,8 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotSaved
 
-        return Response({'detail': 'Track status updated.'})
+        serializer = QueueTrackSerializer(queued_track)
+        return Response(serializer.data)
 
     @action()
     def pop(self, request, *args, **kwargs):
