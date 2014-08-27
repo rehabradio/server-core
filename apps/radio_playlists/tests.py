@@ -79,6 +79,7 @@ class PlaylistViewSetTestCase(BaseTestCase):
         post_data = {
             'name': 'test playlist',
             'description': 'a playlist for tdd',
+            'protection': 'public',
         }
 
         resp = self.api_client.post('/api/playlists/', data=post_data)
@@ -268,9 +269,7 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         existing_records_count = PlaylistTrack.objects.filter(
             playlist=1
         ).count()
-        post_data = {
-            'track': None,
-        }
+        post_data = {'track': None}
 
         resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
         data = json.loads(resp.content)

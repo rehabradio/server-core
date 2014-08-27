@@ -5,9 +5,17 @@ from .models import Playlist, PlaylistTrack
 from radio_metadata.serializers import TrackSerializer
 
 
+PROTECTION_OPTIONS = [
+    ('private', 'Private'),
+    ('public', 'Public'),
+]
+
+
 class PlaylistSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     description = serializers.CharField()
+    protection = serializers.ChoiceField(
+        choices=PROTECTION_OPTIONS, default='private')
     owner = serializers.Field(source='owner.username')
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)
@@ -15,7 +23,6 @@ class PlaylistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Playlist
         view_name = 'radio-playlists-api-list'
-        fields = ('id', 'name', 'description', 'created', 'updated')
 
 
 class PaginatedPlaylistSerializer(pagination.PaginationSerializer):
@@ -35,7 +42,6 @@ class PlaylistTrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaylistTrack
         view_name = 'radio-playlists-api-detail'
-        fields = ('id', 'position', 'owner', 'track', 'created', 'updated')
 
 
 class PaginatedPlaylistTrackSerializer(pagination.PaginationSerializer):

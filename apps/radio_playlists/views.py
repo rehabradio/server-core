@@ -3,11 +3,14 @@
 """
 # stdlib imports
 import datetime
+
 # third-party imports
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import permissions, viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+
 # local imports
 from .models import Playlist, PlaylistTrack
 from .serializers import (
@@ -21,10 +24,7 @@ from radio.exceptions import (
     RecordNotFound,
     RecordNotSaved,
 )
-from radio.permissions import (
-    IsOwnerOrReadOnly,
-    IsOwnerOrPlaylistOwnerElseReadOnly
-)
+from radio.permissions import IsOwnerOrReadOnly
 from radio_metadata.models import Track
 
 
@@ -41,7 +41,10 @@ class PlaylistViewSet(viewsets.ModelViewSet):
     """CRUD API endpoints that allow managing playlists.
     For update and delete functions, user must be owner
     """
-    permission_classes = (IsOwnerOrReadOnly, permissions.IsAuthenticated)
+    permission_classes = (
+        IsOwnerOrReadOnly,
+        permissions.IsAuthenticated
+    )
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
 
@@ -115,10 +118,6 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
     position -- Patch request param (int) - form
     """
-    permission_classes = (
-        IsOwnerOrPlaylistOwnerElseReadOnly,
-        permissions.IsAuthenticated
-    )
     queryset = PlaylistTrack.objects.all()
     serializer_class = PlaylistTrackSerializer
 
@@ -170,14 +169,22 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         """
         track_id = request.POST['track']
         playlist_id = kwargs['playlist_id']
-        total_playlist_records = PlaylistTrack.objects.filter(
-            playlist=kwargs['playlist_id']
-        ).count()
+
+        playlist = Playlist.objects.get(id=playlist_id)
+        if (playlist.protection != 'public'
+                and request.user != playlist.owner):
+            raise PermissionDenied(
+                detail='Could not save track. Playlist is marked private.')
 
         try:
+            track = Track.objects.get(id=track_id)
+            total_playlist_records = PlaylistTrack.objects.filter(
+                playlist=playlist_id
+            ).count()
+
             playlist_track = PlaylistTrack.objects.create(
-                track=Track.objects.get(id=track_id),
-                playlist=Playlist.objects.get(id=playlist_id),
+                track=track,
+                playlist=playlist,
                 position=total_playlist_records+1,
                 owner=self.request.user
             )
