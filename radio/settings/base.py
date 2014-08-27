@@ -172,7 +172,7 @@ LOGGING = {
 
 # Django template settings
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
+    os.path.abspath(os.path.join(BASE_DIR, os.pardir, 'templates')),
 )
 
 # Django RQ configuration
