@@ -12,16 +12,12 @@ urlpatterns = patterns(
         r'^$',
         PlayerViewSet.as_view({
             'get': 'list',
-            'post': 'create',
         }), name='radio-players-list'
     ),
     url(
         r'^(?P<pk>[\w\-_]+)/$',
         PlayerViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
-            'patch': 'partial_update',
-            'delete': 'destroy',
         }), name='radio-players-detail'
     ),
 )
