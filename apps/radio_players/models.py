@@ -32,7 +32,8 @@ class Player(models.Model):
                 queue=self.queue, active=True)
 
             if self.active and active_player:
-                raise ValidationError("A player is already active on the selected queue")
+                raise ValidationError(
+                    "A player is already active on the selected queue")
 
             token = uuid.uuid4()
 
@@ -45,4 +46,5 @@ class Player(models.Model):
 
             self.owner = user
             self.token = token
-            super(Player, self).save()
+
+        super(Player, self).save()
