@@ -3,13 +3,14 @@ from rest_framework import serializers
 
 # local imports
 from .models import Player
+from radio_queue.serializers import QueueSerializer
 
 
 class PlayerSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     location = serializers.CharField()
     token = serializers.CharField(write_only=True)
-    queue = serializers.PrimaryKeyRelatedField(required=False)
+    queue = QueueSerializer()
     active = serializers.BooleanField()
     owner = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     created = serializers.DateTimeField(read_only=True)
