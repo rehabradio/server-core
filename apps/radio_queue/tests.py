@@ -227,7 +227,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
     def test_detail_auth(self):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
-        resp = self.api_client.get('/api/queues/1/tracks/1/')
+        resp = self.api_client.get('/api/queues/1/tracks/61/')
         self.assertEqual(resp.status_code, 403)
 
     def test_list(self):
@@ -294,7 +294,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
 
     def test_retrieve(self):
         """Return a track json object of a given record."""
-        resp = self.api_client.get('/api/queues/1/tracks/3/')
+        resp = self.api_client.get('/api/queues/1/tracks/61/')
         data = json.loads(resp.content)
         track = data['track']
         # Ensure request was successful
@@ -323,7 +323,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         post_data = {'position': 33}
 
         resp = self.api_client.patch(
-            '/api/queues/1/tracks/3/',
+            '/api/queues/1/tracks/61/',
             data=post_data
         )
         data = json.loads(resp.content)
@@ -344,7 +344,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
             queue=1
         ).count()
 
-        resp = self.api_client.delete('/api/queues/1/tracks/3/')
+        resp = self.api_client.delete('/api/queues/1/tracks/61/')
         data = json.loads(resp.content)
         new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
@@ -379,7 +379,8 @@ class QueueTrackViewSetTestCase(BaseTestCase):
 
     def test_head_with_empty_queue(self):
         """Return the queue track in position 1, in a given queue."""
-        resp = self.api_client.get('/api/queues/2/head/')
+        self.api_client.delete('/api/queues/1/head/pop/')
+        resp = self.api_client.get('/api/queues/1/head/')
         data = json.loads(resp.content)
         track = data['track']
         # Ensure request was successful
