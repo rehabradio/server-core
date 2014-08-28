@@ -2,6 +2,7 @@
 import json
 import os
 # third-party imports
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
@@ -64,13 +65,45 @@ class PlayerViewSetTestCase(BaseTestCase):
         """Add a player to the database.
         Returns a player json object of the newly created record.
         """
-        pass
+        # Count the number of records before the save
+        existing_records_count = Player.objects.all().count()
 
-    def test_create_with_empty_values(self):
+        post_data = {
+            'name': 'TDD player',
+            'location': 'test env',
+            'queue': 1,
+        }
+
+        resp = self.api_client.post(
+            '/admin/radio_players/player/add/', data=post_data)
+        new_records_count = Player.objects.all().count()
+
+        # Ensure request was successful and user is redirected to player list
+        self.assertRedirects(resp, '/admin/radio_players/player/')
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count+1, new_records_count)
+
+    def test_create_with_active_not_unique(self):
         """Try to create a track, with a empty post data.
         Returns a 404 response with detail message.
         """
-        pass
+        # Count the number of records before the save
+        existing_records_count = Player.objects.all().count()
+
+        post_data = {
+            'name': 'TDD player',
+            'location': 'test env',
+            'queue': 1,
+            'active': True,
+        }
+        resp = self.api_client.post(
+                '/admin/radio_players/player/add/', data=post_data)
+        new_records_count = Player.objects.all().count()
+
+        # Ensure error message was returned
+        self.assertContains(resp, "A player is already active on the selected queue")
+        # Ensure a new record was not created in the database
+        self.assertEqual(existing_records_count, new_records_count)
 
     def test_retrieve(self):
         """Return a player json object of a given record."""
@@ -90,27 +123,3 @@ class PlayerViewSetTestCase(BaseTestCase):
         self.assertEqual(resp.status_code, 404)
         # Ensure the returned json keys match the expected
         self.assertEqual(data['detail'], u'The record could not be found.')
-
-    def test_update(self):
-        """Update a player from the database.
-        Returns a player json object of the updated record.
-        """
-        pass
-
-    def test_partial_update(self):
-        """Update a single piece of player information from the database.
-        Returns a player json object of the updated record.
-        """
-        pass
-
-    def test_destroy(self):
-        """Recursively remove a player and its associated player
-        tracks from the database
-
-        Returns a successful response, with a detail message.
-        """
-        pass
-
-    def test_delete_with_bad_id(self):
-        """Returns a 404 response with detail message."""
-        pass

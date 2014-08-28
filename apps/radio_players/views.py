@@ -10,7 +10,7 @@ from radio.exceptions import RecordNotFound
 
 class PlayerViewSet(viewsets.ModelViewSet):
     """
-    CRUD API endpoints that allow managing connected players.
+    List and retrieve endpoints for the players
     User must be admin.
     """
     permissions = (IsAdminUser,)
