@@ -4,6 +4,7 @@
 # stdlib imports
 import collections
 import datetime
+
 # third-party imports
 from django.conf import settings
 from django.core.cache import cache
@@ -13,6 +14,7 @@ from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+
 # local imports
 from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer

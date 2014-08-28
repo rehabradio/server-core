@@ -312,6 +312,11 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
+            if kwargs['event'] == 'track_playback_paused':
+                queued_track.state = 'paused'
+            if kwargs['event'] == 'track_playback_resumed':
+                queued_track.state = 'playing'
+
             queued_track.time_position = post_data['time_position']
             queued_track.save()
         except:
