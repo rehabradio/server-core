@@ -8,7 +8,7 @@ from .models import Player
 class PlayerSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     location = serializers.CharField()
-    token = serializers.CharField(read_only=True)
+    token = serializers.CharField(write_only=True)
     queue = serializers.PrimaryKeyRelatedField(required=False)
     active = serializers.BooleanField()
     owner = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
