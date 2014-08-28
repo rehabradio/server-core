@@ -23,17 +23,22 @@ class Player(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.location, self.name)
 
-    def save(self, *args, **kwargs):
-        """Create user/profile for new devices.
-        Also create a unique token for the player to as an auth tokken.
-        """
-        if self._state.adding:
-            active_player = Player.objects.filter(
-                queue=self.queue, active=True)
+    def clean(self):
+        """Ensures that only one player is active on a given queue."""
+        active_player = Player.objects.filter(
+            queue=self.queue, active=True).exclude(id=self.id)
 
-            if self.active and active_player:
-                raise ValidationError(
-                    "A player is already active on the selected queue")
+        if self.active and active_player:
+            raise ValidationError(
+                "A player is already active on the selected queue")
+
+    def save(self, *args, **kwargs):
+        """Create user/profile for new records.
+        
+        Finally create a unique token for the record (mopidy auth token).
+        """
+
+        if self._state.adding:
 
             token = uuid.uuid4()
 
