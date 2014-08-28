@@ -17,7 +17,6 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-
 class BaseTestCase(TestCase):
     """Load in default data for tests, and login user."""
     fixtures = ['radio/fixtures/testdata.json']
@@ -243,7 +242,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         self.assertTrue(set(self.queue_track_attrs) <= set(queue_tracks))
         self.assertTrue(set(self.track_attrs) <= set(track))
 
-    def test_create(self):
+    def test_create_with_track(self):
         """Add a queue track to the database.
         params - track
 
@@ -259,15 +258,48 @@ class QueueTrackViewSetTestCase(BaseTestCase):
 
         resp = self.api_client.post('/api/queues/1/tracks/', data=post_data)
         data = json.loads(resp.content)
+
+        # Only expecting one object in list
+        self.assertEqual(len(data), 1)
+
+        queue_track = data[0]
         new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
         # Ensure the returned json keys match the expected
-        self.assertRegexpMatches(str(data['id']), r'[0-9]+')
-        self.assertEqual(data['track']['id'], post_data['track'])
-        self.assertEqual(data['position'], int(new_records_count))
+        self.assertRegexpMatches(str(queue_track['id']), r'[0-9]+')
+        self.assertEqual(queue_track['track']['id'], post_data['track'])
+        self.assertEqual(queue_track['position'], int(new_records_count))
+
+    def test_create_with_playlist(self):
+        """Add a queue track to the database.
+        params - track
+
+        Returns a queue track json object of the newly created record.
+        """
+        # Count the number of records before the save
+        existing_records_count = QueueTrack.objects.filter(
+            queue=1
+        ).count()
+        post_data = {
+            'playlist': 1,
+        }
+
+        resp = self.api_client.post('/api/queues/1/tracks/', data=post_data)
+        data = json.loads(resp.content)
+
+        # Only expecting one object in list
+        num_records = len(data)
+        self.assertGreater(num_records, 1)
+
+        new_records_count = QueueTrack.objects.filter(queue=1).count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(
+            existing_records_count+num_records, new_records_count)
 
     def test_create_with_empty_values(self):
         """Try to create a track, empty post variables.

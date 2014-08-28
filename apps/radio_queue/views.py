@@ -29,6 +29,7 @@ from radio.exceptions import (
 )
 from radio.permissions import IsStaffOrOwnerToDelete
 from radio_metadata.models import Track
+from radio_playlists.models import PlaylistTrack
 
 
 def _add_random_track_to_queue(queue_id, user_id):
@@ -183,32 +184,51 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        """Add a track to the database.
-        params - track
+        """Add tracks to a given queue.
+        params - track or playlist
 
-        Returns a the newly created track as a json object
+        Returns a list of the newly added queue_track objects
         """
-        position = QueueTrack.objects.filter(
+        current_count = QueueTrack.objects.filter(
             queue=kwargs['queue_id']
         ).count()
-        try:
-            queued_track = QueueTrack.objects.create(
-                track=Track.objects.get(id=request.DATA['track']),
-                queue=Queue.objects.get(id=kwargs['queue_id']),
-                position=position+1,
-                owner=self.request.user
-            )
-            QueueTrackHistory.objects.create(
-                track=Track.objects.get(id=request.DATA['track']),
-                queue=Queue.objects.get(id=kwargs['queue_id']),
-                owner=self.request.user
-            )
-        except:
-            raise RecordNotSaved
+        queued_tracks = []
+
+        if 'playlist' in request.DATA:
+            playlist_tracks = PlaylistTrack.objects.prefetch_related(
+                'track',
+                'track__artists',
+                'track__album',
+                'track__owner',
+                'owner'
+            ).filter(playlist_id=request.DATA['playlist'])
+            track_ids = ()
+            for playlist_track in playlist_tracks:
+                track_ids = track_ids + (playlist_track.track.id,)
+
+        else:
+            track_ids = (request.DATA['track'],)
+
+        for (i, track_id) in enumerate(track_ids):
+            try:
+                queued_track = QueueTrack.objects.create(
+                    track=Track.objects.get(id=track_id),
+                    queue=Queue.objects.get(id=kwargs['queue_id']),
+                    position=(current_count+i)+1,
+                    owner=self.request.user
+                )
+                QueueTrackHistory.objects.create(
+                    track=Track.objects.get(id=track_id),
+                    queue=Queue.objects.get(id=kwargs['queue_id']),
+                    owner=self.request.user
+                )
+                queued_tracks.append(queued_track)
+            except:
+                raise RecordNotSaved
 
         cache.delete(self._get_cache_key(kwargs['queue_id']))
 
-        serializer = QueueTrackSerializer(queued_track)
+        serializer = QueueTrackSerializer(queued_tracks)
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
