@@ -467,18 +467,18 @@ class UserAuthView(APIView):
 class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
-    def _get_cache_key(self, source_type, user_id):
-        """Build key used for caching the user playlist data
-        """
-        return 'user-playlists-{0}-{1}-{2}'.format(
-            source_type,
-            user_id,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
-
     def list(self, request, source_type, format=None):
         """Perform metadata lookup on the user playlists.
         """
+        cache_key = u'user-playlists-{0}-{1}-{2}'.format(
+            source_type, request.user.id,
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
+        playlists = cache.get(cache_key)
+        if playlists:
+            return Response(playlists)
+
         oauth_cache_key = 'user-credentials-{0}-{1}'.format(
             source_type,
             request.user.id,
@@ -486,13 +486,6 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         credentials = cache.get(oauth_cache_key)
         if credentials is None:
             raise ThridPartyOauthRequired
-
-        cache_key = self._get_cache_key(
-            source_type, request.user.id)
-
-        playlists = cache.get(cache_key)
-        if playlists:
-            return Response(playlists)
 
         source_client = {
             'soundcloud': soundcloud_client,
@@ -508,7 +501,60 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
     def retrieve(self, request, source_type, playlist_id, format=None):
         """Perform metadata lookup on the user playlists.
         """
-        return Response()
+        page = int(request.QUERY_PARAMS.get('page', 1))
+
+        cache_key = u'user-playlist-tracks-{0}-{1}-{2}'.format(
+            source_type, playlist_id,
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
+        queryset = cache.get(cache_key)
+        if queryset is None:
+            oauth_cache_key = 'user-credentials-{0}-{1}'.format(
+                source_type,
+                request.user.id,
+            )
+            credentials = cache.get(oauth_cache_key)
+            if credentials is None:
+                raise ThridPartyOauthRequired
+
+            search_func = {
+                'soundcloud': soundcloud_client.playlist_tracks,
+                'spotify': spotify_client.playlist_tracks,
+            }.get(source_type.lower())
+            if search_func is None:
+                raise InvalidBackend
+
+            # search using requested source_type
+            offset = (page-1)*20
+            queryset = search_func(
+                playlist_id,
+                credentials['user']['id'],
+                credentials['auth']['access_token'],
+                page*200,
+                offset
+            )
+
+        paginator = Paginator(queryset, 20)
+
+        try:
+            tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            tracks = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedTrackSerializer(
+            tracks, context=serializer_context
+        )
+        # return response to the client
+        cache.set(cache_key, queryset)
+
+        return Response(serializer.data)
 
 
 class TrackViewSet(viewsets.ModelViewSet):
