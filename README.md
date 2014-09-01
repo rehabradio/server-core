@@ -51,10 +51,14 @@ ENVIRONMENT=["LOCAL"/"LIVE"]
 SECRET_KEY=[django secret key]
 
 GOOGLE_OAUTH2_CLIENT_ID=[google client id]
-GOOGLE_OAUTH2_CLIENT_SECRET=[google client secret key]
+GOOGLE_OAUTH2_CLIENT_SECRET=[google client secret]
 GOOGLE_WHITE_LISTED_DOMAINS=[list of email domains that can access the api]
 
-SOUNDCLOUD_CLIENT_ID=[soundcloud secret key]
+SOUNDCLOUD_CLIENT_ID=[soundcloud client id]
+SOUNDCLOUD_CLIENT_SECRET=[soundcloud client secret]
+
+SPOTIFY_CLIENT_ID=[soundcloud client id]
+SPOTIFY_CLIENT_SECRET=[soundcloud client secret]
 
 TEST_USERNAME=[username for test login]
 TEST_PASSWORD=[password for test login]
