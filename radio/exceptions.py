@@ -20,10 +20,15 @@ class MissingParameter(APIException):
 
 
 class OauthFailed(APIException):
-    """Simple exception used to show missing params on the search endpoint"""
+    """Simple exception used to show user auth failed"""
     status_code = 400
     default_detail = 'Failed to authenticate user from source type.'
 
+
+class ThridPartyOauthRequired(APIException):
+    """Simple exception used to show thrid party oauth required"""
+    status_code = 400
+    default_detail = 'Thrid party authentication failed.'
 
 class RecordDeleteFailed(APIException):
     """Simple exception used to show record could not be removed from database
