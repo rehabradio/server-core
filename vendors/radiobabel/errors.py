@@ -4,3 +4,7 @@ class RadiobabelException(Exception):
 
 class TrackNotFound(Exception):
     pass
+
+
+class PlaylistNotFound(Exception):
+    pass

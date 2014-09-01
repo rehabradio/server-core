@@ -10,7 +10,7 @@ import logging
 import soundcloud
 
 # local imports
-from radiobabel.errors import TrackNotFound
+from radiobabel.errors import TrackNotFound, PlaylistNotFound
 
 
 logger = logging.getLogger('radiobabel.backends.soundcloud')
@@ -50,6 +50,19 @@ def _transform_track(track):
     transformed_track['album'] = None
 
     return transformed_track
+
+
+def _transform_playlist(playlist):
+    """Transform result into a format that more
+    closely matches our unified API.
+    """
+    transformed_playlist = dict([
+        ('source_type', 'soundcloud'),
+        ('source_id', playlist.id),
+        ('name', playlist.title),
+        ('tracks', playlist.track_count),
+    ])
+    return transformed_playlist
 
 
 class SoundcloudClient(object):
@@ -126,3 +139,32 @@ class SoundcloudClient(object):
             '/tracks', q=query, limit=limit, offset=offset)
 
         return [_transform_track(x.obj) for x in tracks]
+
+    def playlists(self, user_id, token):
+        """Lookup user playlists using the Spotify Web API
+
+        Returns standard radiobabel playlist list response.
+        """
+        playlists = self.client.get('/me/playlists')
+
+        logger.info('Playlist lookup: {0}'.format(user_id))
+
+        transform_playlists = []
+        for playlist in playlists:
+            transformed_playlist = _transform_playlist(playlist)
+            transform_playlists.append(transformed_playlist)
+
+        return transform_playlists
+
+    def playlist_tracks(self, playlist_id, user_id, token, limit=20, offset=0):
+        """Search for tracks using the soundcloud API
+        """
+        logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
+
+        url = '/me/playlists/{0}'.format(playlist_id)
+        playlist_tracks = self.client.get(url, limit=limit, offset=offset)
+
+        return [_transform_track(x) for x in playlist_tracks.tracks]
+
+    def favorites(self, user_id, token):
+        pass

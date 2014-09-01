@@ -10,7 +10,7 @@ import logging
 import requests
 
 # local imports
-from radiobabel.errors import TrackNotFound
+from radiobabel.errors import TrackNotFound, PlaylistNotFound
 
 
 logger = logging.getLogger('radiobabel.backends.spotify')
@@ -34,10 +34,10 @@ def _make_post_request(url, data):
     return response.json()
 
 
-def _make_oauth_request(url, token):
+def _make_oauth_request(url, token, params=None):
     # Use token in authorization header of call
     headers = {'Authorization': 'Bearer {}'.format(token)}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, params=params)
     # raise an exception if 400 <= response.status_code <= 599
     response.raise_for_status()
     return response.json()
@@ -50,6 +50,14 @@ def _transform_search_response(search_results, offset):
     _track_list = [None for x in range(search_results['tracks']['total'])]
     for idx, track in enumerate(search_results['tracks']['items']):
         transformed_track = _transform_track(track)
+        _track_list[offset + idx] = transformed_track
+    return _track_list
+
+
+def _transform_playlist_response(playlist_tracks, offset):
+    _track_list = [None for x in range(playlist_tracks['total'])]
+    for idx, track in enumerate(playlist_tracks['items']):
+        transformed_track = _transform_track(track['track'])
         _track_list[offset + idx] = transformed_track
     return _track_list
 
@@ -97,11 +105,24 @@ def _transform_track(track):
     return transformed_track
 
 
+def _transform_playlist(playlist):
+    """Transform result into a format that more
+    closely matches our unified API.
+    """
+    transformed_playlist = dict([
+        ('source_type', 'spotify'),
+        ('source_id', playlist['id']),
+        ('name', playlist['name']),
+        ('tracks', playlist['tracks']['total']),
+    ])
+    return transformed_playlist
+
+
 class SpotifyClient(object):
 
     def login_url(self, callback_url, client_id, client_secret):
         """Generates a login url, for the user to authenticate the app."""
-        url = 'https://accounts.spotify.com/authorize/?client_id={0}&response_type=code&redirect_uri={1}&scope=playlist-modify-public%20playlist-modify-private&state=profile%2Factivity'.format(
+        url = 'https://accounts.spotify.com/authorize/?client_id={0}&response_type=code&redirect_uri={1}&scope=playlist-read-private&state=profile%2Factivity'.format(
             client_id, callback_url
         )
         return url
@@ -174,3 +195,51 @@ class SpotifyClient(object):
         tracks = _transform_search_response(response, offset)
 
         return tracks
+
+    def playlists(self, user_id, token):
+        """Lookup user playlists using the Spotify Web API
+
+        Returns standard radiobabel playlist list response.
+        """
+        url = 'https://api.spotify.com/v1/users/{0}/playlists'.format(user_id)
+        logger.info('Playlist lookup: {0}'.format(user_id))
+
+        try:
+            playlists = _make_oauth_request(url, token)
+        except:
+            raise TrackNotFound('Spotify: {0}'.format(user_id))
+
+        transform_playlists = []
+        for playlist in playlists['items']:
+            transformed_playlist = _transform_playlist(playlist)
+            transform_playlists.append(transformed_playlist)
+
+        return transform_playlists
+
+    def playlist_tracks(self, playlist_id, user_id, token, limit=20, offset=0):
+        """Lookup user playlists using the Spotify Web API
+
+        Returns standard radiobabel track list response.
+        """
+        logger.info('Playlist tracks lookup: {0}'.format(user_id))
+        # Max limit for the spotify api is 20
+        if limit > 20:
+            limit = 20
+
+        params = {'limit': limit, 'offset': offset}
+        url = 'https://api.spotify.com/v1/users/{0}/playlists/{1}/tracks'.format(user_id, playlist_id)
+        try:
+            response = _make_oauth_request(url, token, params)
+        except:
+            raise PlaylistNotFound('Soundcloud: {0}'.format(playlist_id))
+
+        tracks = _transform_playlist_response(response, offset)
+
+        return tracks
+
+    def favorites(self, user_id, token):
+        """Lookup user starred tracks using the Spotify Web API.
+
+        Returns standard radiobabel track list response.
+        """
+        pass
