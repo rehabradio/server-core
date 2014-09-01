@@ -8,6 +8,8 @@ from .views import (
     MetadataAPIRootView,
     SearchRootView,
     SearchView,
+    PlaylistRootView,
+    PlaylistViewSet,
     TrackViewSet,
 )
 
@@ -23,6 +25,23 @@ urlpatterns = patterns(
     url(
         r'^search/(?P<source_type>[^/]+)/$',
         SearchView.as_view(), name='radio-data-search'
+    ),
+    url(
+        r'^user/playlists/$',
+        PlaylistRootView.as_view(),
+        name='radio-data-user-playlists-root'
+    ),
+    url(
+        r'^user/playlists/(?P<source_type>[^/]+)/$',
+        PlaylistViewSet.as_view({
+            'get': 'list'
+        }), name='radio-data-user-playlists'
+    ),
+    url(
+        r'^user/playlists/(?P<source_type>[^/]+)/(?P<playlist_id>[^/]+)/tracks/$',
+        PlaylistViewSet.as_view({
+            'get': 'retrieve'
+        }), name='radio-data-user-playlist-tracks'
     ),
     url(
         r'^tracks/$',

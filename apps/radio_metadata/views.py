@@ -9,6 +9,7 @@ import datetime
 from django.conf import settings
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import redirect
 from radiobabel import SpotifyClient, SoundcloudClient
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
@@ -22,6 +23,7 @@ from radio.exceptions import (
     InvalidBackend,
     InvalidLookupType,
     MissingParameter,
+    OauthFailed,
     RecordDeleteFailed,
     RecordNotFound,
     RecordNotSaved,
@@ -159,6 +161,8 @@ class MetadataAPIRootView(APIView):
             ('endpoints', collections.OrderedDict([
                 ('lookup', reverse('radio-data-lookup-root', request=request)),
                 ('search', reverse('radio-data-search-root', request=request)),
+                ('playlists', reverse(
+                    'radio-data-user-playlists-root', request=request)),
                 ('tracks', reverse('radio-data-tracks-list', request=request)),
             ])),
         ])
@@ -308,7 +312,6 @@ class SearchView(APIView):
         )
         response = cache.get(cache_key)
         if response is not None:
-            pass
             return Response(response)
 
         search_func = {
@@ -342,6 +345,59 @@ class SearchView(APIView):
         cache.set(cache_key, response)
 
         return Response(serializer.data)
+
+
+class PlaylistRootView(APIView):
+    """The user playlist loopup API allows retrieval of metadata
+    from supported source_types.
+
+    Data is cached after initial lookup but is keyed by calendar date to
+    ensure that fresh data is fetched at least once per day.
+
+    **Note:** The URLs shown below are examples, to show the standard format of
+    the endpoints.
+    """
+
+    def get(self, request, format=None):
+        response = collections.OrderedDict([
+            ('endpoints', collections.OrderedDict([
+                ('soundcloud', collections.OrderedDict([
+                    (
+                        'user_playlists',
+                        reverse(
+                            'radio-data-user-playlists',
+                            args=['soundcloud'],
+                            request=request
+                        )
+                    ),
+                ])),
+                ('spotify', collections.OrderedDict([
+                    (
+                        'user_playlists',
+                        reverse(
+                            'radio-data-user-playlists',
+                            args=['spotify'],
+                            request=request
+                        )
+                    ),
+                ])),
+            ])),
+        ])
+        return Response(response)
+
+
+class PlaylistViewSet(viewsets.GenericViewSet):
+    """Lookup tracks using any configured source_type."""
+
+    def list(self, request, source_type, format=None):
+        """Perform metadata lookup on the user playlists
+        """
+        return Response()
+
+    def retrieve(self, request, source_type, playlist_id, format=None):
+        """Perform metadata lookup on the user playlists
+        """
+        return Response()
 
 
 class TrackViewSet(viewsets.ModelViewSet):
