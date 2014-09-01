@@ -19,6 +19,12 @@ class MissingParameter(APIException):
     default_detail = 'Required parameters are missing.'
 
 
+class OauthFailed(APIException):
+    """Simple exception used to show missing params on the search endpoint"""
+    status_code = 400
+    default_detail = 'Failed to authenticate user from source type.'
+
+
 class RecordDeleteFailed(APIException):
     """Simple exception used to show record could not be removed from database
     """
