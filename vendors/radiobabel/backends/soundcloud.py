@@ -145,7 +145,10 @@ class SoundcloudClient(object):
 
         Returns standard radiobabel playlist list response.
         """
-        playlists = self.client.get('/me/playlists')
+        try:
+            playlists = self.client.get('/me/playlists')
+        except:
+            raise PlaylistNotFound('Soundcloud: {0}'.format(user_id))
 
         logger.info('Playlist lookup: {0}'.format(user_id))
 
@@ -162,9 +165,24 @@ class SoundcloudClient(object):
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
 
         url = '/me/playlists/{0}'.format(playlist_id)
-        playlist_tracks = self.client.get(url, limit=limit, offset=offset)
+        try:
+            playlist_tracks = self.client.get(url, limit=limit, offset=offset)
+        except:
+            raise PlaylistNotFound('Soundcloud: {0}'.format(playlist_id))
 
         return [_transform_track(x) for x in playlist_tracks.tracks]
 
-    def favorites(self, user_id, token):
-        pass
+    def favorites(self, user_id, token, limit=20, offset=0):
+        """Lookup user favourite tracks using the soundcloud Web API.
+
+        Returns standard radiobabel track list response.
+        """
+        logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
+
+        url = '/users/{0}/favorites'.format(user_id)
+        try:
+            fav_tracks = self.client.get(url, limit=limit, offset=offset)
+        except:
+            raise PlaylistNotFound('Soundcloud: {0}'.format(user_id))
+
+        return [_transform_track(x.obj) for x in fav_tracks]

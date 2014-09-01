@@ -361,11 +361,11 @@ class UserRootView(APIView):
     def get(self, request, format=None):
         response = collections.OrderedDict([
             ('endpoints', collections.OrderedDict([
-                ('user playlists', collections.OrderedDict([
+                ('oauth', collections.OrderedDict([
                     (
                         'soundcloud',
                         reverse(
-                            'radio-data-user-playlists',
+                            'radio-data-user-auth',
                             args=['soundcloud'],
                             request=request
                         )
@@ -373,17 +373,17 @@ class UserRootView(APIView):
                     (
                         'spotify',
                         reverse(
-                            'radio-data-user-playlists',
+                            'radio-data-user-auth',
                             args=['spotify'],
                             request=request
                         )
                     )
                 ])),
-                ('Oauth', collections.OrderedDict([
+                ('favourites', collections.OrderedDict([
                     (
                         'soundcloud',
                         reverse(
-                            'radio-data-user-auth',
+                            'radio-data-user-favorites',
                             args=['soundcloud'],
                             request=request
                         )
@@ -391,7 +391,25 @@ class UserRootView(APIView):
                     (
                         'spotify',
                         reverse(
-                            'radio-data-user-auth',
+                            'radio-data-user-favorites',
+                            args=['spotify'],
+                            request=request
+                        )
+                    )
+                ])),
+                ('playlists', collections.OrderedDict([
+                    (
+                        'soundcloud',
+                        reverse(
+                            'radio-data-user-playlists',
+                            args=['soundcloud'],
+                            request=request
+                        )
+                    ),
+                    (
+                        'spotify',
+                        reverse(
+                            'radio-data-user-playlists',
                             args=['spotify'],
                             request=request
                         )
@@ -405,6 +423,8 @@ class UserRootView(APIView):
 class UserAuthView(APIView):
     """Authenticate user to use oauth on a given service (spotify/soundcloud).
     """
+
+    permission_classes = ()
 
     def _get_cache_key(self, source_type, user_id):
         """Build key used for caching the users oauth token
@@ -429,40 +449,41 @@ class UserAuthView(APIView):
 
         credentials = cache.get(oauth_cache_key)
 
-        if credentials is None:
-            auth_code = request.QUERY_PARAMS.get('code', None)
+        if credentials:
+            return Response(credentials)
 
-            source_client = {
-                'soundcloud': soundcloud_client,
-                'spotify': spotify_client,
-            }.get(source_type.lower())
+        auth_code = request.QUERY_PARAMS.get('code', None)
 
-            try:
-                # Prompt user to login
-                if auth_code is None:
-                    redirect_uri = source_client.login_url(
-                        request.build_absolute_uri(request.path),
-                        source_client_id,
-                        source_client_secret
-                    )
-                    return redirect(redirect_uri)
-                # Else exchange the auth code for an oauth token
-                else:
-                    auth_code = auth_code
-                    credentials = source_client.exchange_code(
-                        auth_code,
-                        request.build_absolute_uri(request.path),
-                        source_client_id,
-                        source_client_secret
-                    )
+        source_client = {
+            'soundcloud': soundcloud_client,
+            'spotify': spotify_client,
+        }.get(source_type.lower())
 
-                    cache.set(
-                        oauth_cache_key,
-                        credentials,
-                        credentials['auth']['expires_in'] * 100
-                    )
-            except:
-                raise OauthFailed
+        try:
+            # Prompt user to login
+            if auth_code is None:
+                redirect_uri = source_client.login_url(
+                    request.build_absolute_uri(request.path),
+                    source_client_id,
+                    source_client_secret
+                )
+                return redirect(redirect_uri)
+            # Else exchange the auth code for an oauth token
+            else:
+                credentials = source_client.exchange_code(
+                    auth_code,
+                    request.build_absolute_uri(request.path),
+                    source_client_id,
+                    source_client_secret
+                )
+        except:
+            raise OauthFailed
+
+        cache.set(
+            oauth_cache_key,
+            credentials,
+            credentials['auth']['expires_in'] * 100
+        )
 
         return Response(credentials)
 
@@ -518,19 +539,21 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
                 request.user.id,
             )
             credentials = cache.get(oauth_cache_key)
+
             if credentials is None:
                 raise ThridPartyOauthRequired
 
-            search_func = {
-                'soundcloud': soundcloud_client.playlist_tracks,
-                'spotify': spotify_client.playlist_tracks,
+            source_client = {
+                'soundcloud': soundcloud_client,
+                'spotify': spotify_client,
             }.get(source_type.lower())
-            if search_func is None:
+
+            if source_client is None:
                 raise InvalidBackend
 
             # search using requested source_type
             offset = (page-1)*20
-            queryset = search_func(
+            queryset = source_client.playlist_tracks(
                 playlist_id,
                 credentials['user']['id'],
                 credentials['auth']['access_token'],
@@ -556,6 +579,71 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         )
         # return response to the client
         cache.set(cache_key, queryset)
+
+        return Response(serializer.data)
+
+
+class UserFavoritesViewSet(viewsets.GenericViewSet):
+    """Lookup tracks using any configured source_type."""
+
+    def list(self, request, source_type, format=None):
+        """Perform metadata lookup on the user playlists.
+        """
+        if source_type == 'spotify':
+            return Response({'detail': 'Spotify currently not enabled'})
+        page = int(request.QUERY_PARAMS.get('page', 1))
+
+        cache_key = u'user-favorite-tracks-{0}-{1}-{2}'.format(
+            source_type, request.user.id,
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            oauth_cache_key = 'user-credentials-{0}-{1}'.format(
+                source_type,
+                request.user.id,
+            )
+            credentials = cache.get(oauth_cache_key)
+            if credentials is None:
+                raise ThridPartyOauthRequired
+
+            source_client = {
+                'soundcloud': soundcloud_client,
+                'spotify': spotify_client,
+            }.get(source_type.lower())
+
+            if source_client is None:
+                raise InvalidBackend
+
+            # search using requested source_type
+            offset = (page-1)*20
+            queryset = source_client.favorites(
+                credentials['user']['id'],
+                credentials['auth']['access_token'],
+                page*200,
+                offset
+            )
+
+        paginator = Paginator(queryset, 20)
+
+        try:
+            tracks = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            tracks = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999),
+            # deliver last page of results.
+            tracks = paginator.page(paginator.num_pages)
+
+        serializer_context = {'request': request}
+        serializer = PaginatedTrackSerializer(
+            tracks, context=serializer_context
+        )
+        # return response to the client
+        #cache.set(cache_key, queryset)
 
         return Response(serializer.data)
 

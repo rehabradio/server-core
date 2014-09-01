@@ -122,7 +122,7 @@ class SpotifyClient(object):
 
     def login_url(self, callback_url, client_id, client_secret):
         """Generates a login url, for the user to authenticate the app."""
-        url = 'https://accounts.spotify.com/authorize/?client_id={0}&response_type=code&redirect_uri={1}&scope=playlist-read-private&state=profile%2Factivity'.format(
+        url = 'https://accounts.spotify.com/authorize/?client_id={0}&response_type=code&redirect_uri={1}&scope=playlist-read-private%20user-library-read&state=profile%2Factivity'.format(
             client_id, callback_url
         )
         return url
@@ -231,13 +231,13 @@ class SpotifyClient(object):
         try:
             response = _make_oauth_request(url, token, params)
         except:
-            raise PlaylistNotFound('Soundcloud: {0}'.format(playlist_id))
+            raise PlaylistNotFound('Spotify: {0}'.format(playlist_id))
 
         tracks = _transform_playlist_response(response, offset)
 
         return tracks
 
-    def favorites(self, user_id, token):
+    def favorites(self, user_id, token, limit=20, offset=0):
         """Lookup user starred tracks using the Spotify Web API.
 
         Returns standard radiobabel track list response.
