@@ -438,28 +438,32 @@ class UserAuthView(APIView):
                 'spotify': spotify_client,
             }.get(source_type.lower())
 
-            # Prompt user to login
-            if auth_code is None:
-                redirect_uri = source_client.login_url(
-                    request.build_absolute_uri(request.path),
-                    source_client_id,
-                    source_client_secret
-                )
-                return redirect(redirect_uri)
-            else:
-                auth_code = auth_code
-                credentials = source_client.exchange_code(
-                    auth_code,
-                    request.build_absolute_uri(request.path),
-                    source_client_id,
-                    source_client_secret
-                )
+            try:
+                # Prompt user to login
+                if auth_code is None:
+                    redirect_uri = source_client.login_url(
+                        request.build_absolute_uri(request.path),
+                        source_client_id,
+                        source_client_secret
+                    )
+                    return redirect(redirect_uri)
+                # Else exchange the auth code for an oauth token
+                else:
+                    auth_code = auth_code
+                    credentials = source_client.exchange_code(
+                        auth_code,
+                        request.build_absolute_uri(request.path),
+                        source_client_id,
+                        source_client_secret
+                    )
 
-                cache.set(
-                    oauth_cache_key,
-                    credentials,
-                    credentials['auth']['expires_in'] * 100
-                )
+                    cache.set(
+                        oauth_cache_key,
+                        credentials,
+                        credentials['auth']['expires_in'] * 100
+                    )
+            except:
+                raise OauthFailed
 
         return Response(credentials)
 
