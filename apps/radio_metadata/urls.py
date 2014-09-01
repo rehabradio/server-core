@@ -8,8 +8,9 @@ from .views import (
     MetadataAPIRootView,
     SearchRootView,
     SearchView,
-    PlaylistRootView,
-    PlaylistViewSet,
+    UserRootView,
+    UserAuthView,
+    UserPlaylistViewSet,
     TrackViewSet,
 )
 
@@ -27,19 +28,23 @@ urlpatterns = patterns(
         SearchView.as_view(), name='radio-data-search'
     ),
     url(
-        r'^user/playlists/$',
-        PlaylistRootView.as_view(),
-        name='radio-data-user-playlists-root'
+        r'^user/$',
+        UserRootView.as_view(),
+        name='radio-data-user-root'
+    ),
+    url(
+        r'^user/authenticate/(?P<source_type>[^/]+)/$',
+        UserAuthView.as_view(), name='radio-data-user-auth'
     ),
     url(
         r'^user/playlists/(?P<source_type>[^/]+)/$',
-        PlaylistViewSet.as_view({
+        UserPlaylistViewSet.as_view({
             'get': 'list'
         }), name='radio-data-user-playlists'
     ),
     url(
         r'^user/playlists/(?P<source_type>[^/]+)/(?P<playlist_id>[^/]+)/tracks/$',
-        PlaylistViewSet.as_view({
+        UserPlaylistViewSet.as_view({
             'get': 'retrieve'
         }), name='radio-data-user-playlist-tracks'
     ),

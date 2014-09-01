@@ -24,6 +24,7 @@ from radio.exceptions import (
     InvalidLookupType,
     MissingParameter,
     OauthFailed,
+    ThridPartyOauthRequired,
     RecordDeleteFailed,
     RecordNotFound,
     RecordNotSaved,
@@ -161,7 +162,7 @@ class MetadataAPIRootView(APIView):
             ('endpoints', collections.OrderedDict([
                 ('lookup', reverse('radio-data-lookup-root', request=request)),
                 ('search', reverse('radio-data-search-root', request=request)),
-                ('playlists', reverse(
+                ('user playlists', reverse(
                     'radio-data-user-playlists-root', request=request)),
                 ('tracks', reverse('radio-data-tracks-list', request=request)),
             ])),
@@ -347,7 +348,7 @@ class SearchView(APIView):
         return Response(serializer.data)
 
 
-class PlaylistRootView(APIView):
+class UserRootView(APIView):
     """The user playlist loopup API allows retrieval of metadata
     from supported source_types.
 
@@ -361,41 +362,118 @@ class PlaylistRootView(APIView):
     def get(self, request, format=None):
         response = collections.OrderedDict([
             ('endpoints', collections.OrderedDict([
-                ('soundcloud', collections.OrderedDict([
+                ('user playlists', collections.OrderedDict([
                     (
-                        'user_playlists',
+                        'soundcloud',
                         reverse(
                             'radio-data-user-playlists',
                             args=['soundcloud'],
                             request=request
                         )
                     ),
-                ])),
-                ('spotify', collections.OrderedDict([
                     (
-                        'user_playlists',
+                        'spotify',
                         reverse(
                             'radio-data-user-playlists',
                             args=['spotify'],
                             request=request
                         )
+                    )
+                ])),
+                ('Oauth', collections.OrderedDict([
+                    (
+                        'soundcloud',
+                        reverse(
+                            'radio-data-user-auth',
+                            args=['soundcloud'],
+                            request=request
+                        )
                     ),
+                    (
+                        'spotify',
+                        reverse(
+                            'radio-data-user-auth',
+                            args=['spotify'],
+                            request=request
+                        )
+                    )
                 ])),
             ])),
         ])
         return Response(response)
 
 
-class PlaylistViewSet(viewsets.GenericViewSet):
+class UserAuthView(APIView):
+    """Authenticate user to use oauth on a given service (spotify/soundcloud).
+    """
+
+    def _get_cache_key(self, source_type, user_id):
+        """Build key used for caching the users oauth token
+        """
+        return 'user-credentials-{0}-{1}'.format(
+            source_type,
+            user_id,
+        )
+
+    def get(self, request, source_type, format=None):
+        if source_type.lower() == 'spotify':
+            source_client_id = settings.SPOTIFY_CLIENT_ID
+            source_client_secret = settings.SPOTIFY_CLIENT_SECRET
+        elif source_type.lower() == 'soundcloud':
+            source_client_id = settings.SOUNDCLOUD_CLIENT_ID
+            source_client_secret = settings.SOUNDCLOUD_CLIENT_SECRET
+        else:
+            raise InvalidBackend
+
+        oauth_cache_key = self._get_cache_key(
+            source_type, request.user.id)
+
+        credentials = cache.get(oauth_cache_key)
+
+        if credentials is None:
+            auth_code = request.QUERY_PARAMS.get('code', None)
+
+            source_client = {
+                'soundcloud': soundcloud_client,
+                'spotify': spotify_client,
+            }.get(source_type.lower())
+
+            # Prompt user to login
+            if auth_code is None:
+                redirect_uri = source_client.login_url(
+                    request.build_absolute_uri(request.path),
+                    source_client_id,
+                    source_client_secret
+                )
+                return redirect(redirect_uri)
+            else:
+                auth_code = auth_code
+                credentials = source_client.exchange_code(
+                    auth_code,
+                    request.build_absolute_uri(request.path),
+                    source_client_id,
+                    source_client_secret
+                )
+
+                cache.set(
+                    oauth_cache_key,
+                    credentials,
+                    credentials['auth']['expires_in'] * 100
+                )
+
+        return Response(credentials)
+
+
+class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
     def list(self, request, source_type, format=None):
-        """Perform metadata lookup on the user playlists
+        """Perform metadata lookup on the user playlists.
         """
         return Response()
 
     def retrieve(self, request, source_type, playlist_id, format=None):
-        """Perform metadata lookup on the user playlists
+        """Perform metadata lookup on the user playlists.
         """
         return Response()
 
