@@ -25,6 +25,24 @@ def _make_request(url, params=None):
     return response.json()
 
 
+def _make_post_request(url, data):
+    """Make a HTTP request to the spotify API using the requests library
+    """
+    response = requests.post(url, data=data)
+    # raise an exception if 400 <= response.status_code <= 599
+    response.raise_for_status()
+    return response.json()
+
+
+def _make_oauth_request(url, token):
+    # Use token in authorization header of call
+    headers = {'Authorization': 'Bearer {}'.format(token)}
+    response = requests.get(url, headers=headers)
+    # raise an exception if 400 <= response.status_code <= 599
+    response.raise_for_status()
+    return response.json()
+
+
 def _transform_search_response(search_results, offset):
     """Transform a result returned from the spotify API into a format we
     can return to clients/use to populate the database.
@@ -80,6 +98,48 @@ def _transform_track(track):
 
 
 class SpotifyClient(object):
+
+    def login_url(self, callback_url, client_id, client_secret):
+        """Generates a login url, for the user to authenticate the app."""
+        url = 'https://accounts.spotify.com/authorize/?client_id={0}&response_type=code&redirect_uri={1}&scope=playlist-modify-public%20playlist-modify-private&state=profile%2Factivity'.format(
+            client_id, callback_url
+        )
+        return url
+
+    def exchange_code(self, code, callback_url, client_id, client_secret):
+        """Fetch auth and user data from the spotify api
+
+        Returns a dictionary of a auth and user object.
+        """
+        data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': callback_url,
+            'client_id': client_id,
+            'client_secret': client_secret
+        }
+        auth_data = _make_post_request(
+            'https://accounts.spotify.com/api/token',
+            data
+        )
+
+        user_obj = _make_oauth_request(
+            'https://api.spotify.com/v1/me', auth_data['access_token'])
+
+        user_data = {
+            'id': user_obj['id'],
+            'country': user_obj['country'],
+            'username': user_obj['display_name'],
+            'profile_url': user_obj['external_urls']['spotify'],
+            'avatar_url': user_obj['images'][0]['url']
+        }
+
+        response = {
+            'auth': auth_data,
+            'user': user_data
+        }
+
+        return response
 
     def track(self, track_id):
         """Lookup an individual track using the Spotify Web API
