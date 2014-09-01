@@ -467,10 +467,43 @@ class UserAuthView(APIView):
 class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
+    def _get_cache_key(self, source_type, user_id):
+        """Build key used for caching the user playlist data
+        """
+        return 'user-playlists-{0}-{1}-{2}'.format(
+            source_type,
+            user_id,
+            datetime.datetime.utcnow().strftime('%Y%m%d'),
+        )
+
     def list(self, request, source_type, format=None):
         """Perform metadata lookup on the user playlists.
         """
-        return Response()
+        oauth_cache_key = 'user-credentials-{0}-{1}'.format(
+            source_type,
+            request.user.id,
+        )
+        credentials = cache.get(oauth_cache_key)
+        if credentials is None:
+            raise ThridPartyOauthRequired
+
+        cache_key = self._get_cache_key(
+            source_type, request.user.id)
+
+        playlists = cache.get(cache_key)
+        if playlists:
+            return Response(playlists)
+
+        source_client = {
+            'soundcloud': soundcloud_client,
+            'spotify': spotify_client,
+        }.get(source_type.lower())
+
+        playlists = source_client.playlists(
+            credentials['user']['id'], credentials['auth']['access_token'])
+        cache.set(cache_key, playlists)
+
+        return Response(playlists)
 
     def retrieve(self, request, source_type, playlist_id, format=None):
         """Perform metadata lookup on the user playlists.
