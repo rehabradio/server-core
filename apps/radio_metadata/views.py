@@ -162,8 +162,7 @@ class MetadataAPIRootView(APIView):
             ('endpoints', collections.OrderedDict([
                 ('lookup', reverse('radio-data-lookup-root', request=request)),
                 ('search', reverse('radio-data-search-root', request=request)),
-                ('user playlists', reverse(
-                    'radio-data-user-playlists-root', request=request)),
+                ('user', reverse('radio-data-user-root', request=request)),
                 ('tracks', reverse('radio-data-tracks-list', request=request)),
             ])),
         ])

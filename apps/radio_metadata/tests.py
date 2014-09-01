@@ -194,6 +194,29 @@ class SearchViewTestCase(BaseTestCase):
         self.assertEqual(data['detail'], u'Required parameters are missing.')
 
 
+class UserRootViewTestCase(BaseTestCase):
+    """Root index for all metadata/search routes."""
+    def test_get(self):
+        """Return a valid response."""
+        resp = self.api_client.get('/api/metadata/user/')
+        self.assertEqual(resp.status_code, 200)
+
+
+class UserPlaylistViewSetTestCase(BaseTestCase):
+    """Uses a backend(spotify/soundcloud) and a `q` parament,
+    to search for tracks from the given backend api.
+    """
+    def test_list_soundcloud_with_no_oauth(self):
+        """Return a list of playlist json objects."""
+        resp = self.api_client.get('/api/metadata/user/playlists/soundcloud/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_list_spotify_with_no_oauth(self):
+        """Return a list of playlist json objects."""
+        resp = self.api_client.get('/api/metadata/user/playlists/spotify/')
+        self.assertEqual(resp.status_code, 403)
+
+
 class TrackViewSetTestCase(BaseTestCase):
     """CRUD commands for the track database table."""
     def test_list_auth(self):
