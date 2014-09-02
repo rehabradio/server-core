@@ -109,7 +109,7 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure "detail" message is set, and the message matches expected
         self.assertEqual(
             data['detail'],
-            u'Invalid lookup_type, type not supported by backend.'
+            u'Invalid backend, provider not recognised.'
         )
 
     def test_get_with_bad_souce_id(self):

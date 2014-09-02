@@ -7,7 +7,6 @@ import collections
 # third-party imports
 from django.conf import settings
 from django.core.cache import cache
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import redirect
 from radiobabel import SpotifyClient, SoundcloudClient
 from rest_framework import permissions, viewsets
@@ -19,17 +18,11 @@ from rest_framework.views import APIView
 from .models import Album, Artist, Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
 from radio.exceptions import (
-    InvalidBackend,
-    InvalidLookupType,
-    MissingParameter,
-    OauthFailed,
-    ThridPartyOauthRequired,
-    RecordDeleteFailed,
-    RecordNotFound,
-    RecordNotSaved,
-)
+    InvalidBackend, MissingParameter, OauthFailed, ThridPartyOauthRequired,
+    RecordDeleteFailed, RecordNotFound, RecordNotSaved)
 from radio.permissions import IsStaffToDelete
 from radio.utils.cache import build_key
+from radio.utils.pagination import paginate_queryset
 
 
 spotify_client = SpotifyClient()
@@ -53,17 +46,13 @@ def _get_track_data(source_type, source_id):
 
     track_data = cache.get(cache_key)
     if track_data is None:
+        source_client = _build_client(source_type)
+        track_data = source_client.lookup_track(source_id)
+
         if source_type == 'spotify':
-            # Query the spotify api for all the track data
-            track_data = spotify_client.lookup_track(source_id)
             # Get or create relational album field
-            track_data['album'] = _get_or_create_album(
-                track_data['album'])
-        elif source_type == 'soundcloud':
-            # Query the soundcloud api for all the track data
-            track_data = soundcloud_client.track(source_id)
-        else:
-            return None
+            track_data['album'] = _get_or_create_album(track_data['album'])
+
         cache.set(cache_key, track_data)
 
     return track_data
@@ -210,7 +199,7 @@ class LookupView(APIView):
 
         # search using requested source_type and serialize
         try:
-            results = source_client.track(source_id)
+            results = source_client.lookup_track(source_id)
         except:
             raise RecordNotFound
         response = TrackSerializer(results).data
@@ -293,22 +282,11 @@ class SearchView(APIView):
         # search using requested source_type
         offset = (page-1)*20
         queryset = source_client.search_tracks(query, page*200, offset)
-        paginator = Paginator(queryset, 20)
+        response = paginate_queryset(
+            PaginatedTrackSerializer, request, queryset, page)
 
-        try:
-            tracks = paginator.page(page)
-        except PageNotAnInteger:
-            tracks = paginator.page(1)
-        except EmptyPage:
-            tracks = paginator.page(paginator.num_pages)
-
-        serializer_context = {'request': request}
-        serializer = PaginatedTrackSerializer(
-            tracks, context=serializer_context
-        )
         cache.set(cache_key, response)
-
-        return Response(serializer.data)
+        return Response(response)
 
 
 class UserRootView(APIView):
@@ -369,12 +347,6 @@ class UserRootView(APIView):
 class UserAuthView(APIView):
     """Authenticate user to use oauth on a given service (spotify/soundcloud).
     """
-
-    def _get_cache_key(self, source_type, user_id):
-        """Build key used for caching the users oauth token
-        """
-        return 'user-credentials-{0}-{1}'.format(
-            source_type, user_id)
 
     def get(self, request, source_type, format=None):
         if source_type.lower() == 'spotify':
@@ -461,52 +433,32 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         page = int(request.QUERY_PARAMS.get('page', 1))
 
         cache_key = build_key('user-playlist-tracks', source_type, playlist_id)
+        response = cache.get(cache_key)
+        if response:
+            return Response(response)
 
-        queryset = cache.get(cache_key)
-        if queryset is None:
-            oauth_cache_key = 'user-credentials-{0}-{1}'.format(
-                source_type,
-                request.user.id,
-            )
-            credentials = cache.get(oauth_cache_key)
+        oauth_cache_key = build_key(
+            'user-credentials', source_type, request.user.id)
+        credentials = cache.get(oauth_cache_key)
 
-            if credentials is None:
-                raise ThridPartyOauthRequired
+        if credentials is None:
+            raise ThridPartyOauthRequired
 
-            source_client = _build_client(source_type)
-            if source_client is None:
-                raise InvalidBackend
+        source_client = _build_client(source_type)
+        if source_client is None:
+            raise InvalidBackend
 
-            # search using requested source_type
-            offset = (page-1)*20
-            queryset = source_client.playlist_tracks(
-                playlist_id,
-                credentials['user']['id'],
-                credentials['auth']['access_token'],
-                page*200,
-                offset
-            )
+        # search using requested source_type
+        offset = (page-1)*20
+        queryset = source_client.playlist_tracks(
+            playlist_id, credentials['user']['id'],
+            credentials['auth']['access_token'], page*200, offset)
 
-        paginator = Paginator(queryset, 20)
+        response = paginate_queryset(
+            PaginatedTrackSerializer, request, queryset, page)
 
-        try:
-            tracks = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            tracks = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
-            tracks = paginator.page(paginator.num_pages)
-
-        serializer_context = {'request': request}
-        serializer = PaginatedTrackSerializer(
-            tracks, context=serializer_context
-        )
-        # return response to the client
-        cache.set(cache_key, queryset)
-
-        return Response(serializer.data)
+        cache.set(cache_key, response)
+        return Response(response)
 
 
 class UserFavoritesViewSet(viewsets.GenericViewSet):
@@ -521,50 +473,32 @@ class UserFavoritesViewSet(viewsets.GenericViewSet):
 
         cache_key = build_key(
             'user-favorite-tracks', source_type, request.user.id)
+        response = cache.get(cache_key)
+        if response:
+            return Response(response)
 
-        queryset = cache.get(cache_key)
+        oauth_cache_key = build_key(
+            'user-credentials', source_type, request.user.id)
+        credentials = cache.get(oauth_cache_key)
 
-        if queryset is None:
-            oauth_cache_key = build_key(
-                'user-credentials', source_type, request.user.id)
-            credentials = cache.get(oauth_cache_key)
+        if credentials is None:
+            raise ThridPartyOauthRequired
 
-            if credentials is None:
-                raise ThridPartyOauthRequired
+        source_client = _build_client(source_type)
+        if source_client is None:
+            raise InvalidBackend
 
-            source_client = _build_client(source_type)
-            if source_client is None:
-                raise InvalidBackend
+        # search using requested source_type
+        offset = (page-1)*20
+        queryset = source_client.favorites(
+            credentials['user']['id'],
+            credentials['auth']['access_token'], page*200, offset)
 
-            # search using requested source_type
-            offset = (page-1)*20
-            queryset = source_client.favorites(
-                credentials['user']['id'],
-                credentials['auth']['access_token'],
-                page*200,
-                offset
-            )
+        response = paginate_queryset(
+            PaginatedTrackSerializer, request, queryset, page)
 
-        paginator = Paginator(queryset, 20)
-
-        try:
-            tracks = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            tracks = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
-            tracks = paginator.page(paginator.num_pages)
-
-        serializer_context = {'request': request}
-        serializer = PaginatedTrackSerializer(
-            tracks, context=serializer_context
-        )
-        # return response to the client
-        cache.set(cache_key, queryset)
-
-        return Response(serializer.data)
+        cache.set(cache_key, response)
+        return Response(response)
 
 
 class TrackViewSet(viewsets.ModelViewSet):
@@ -579,34 +513,20 @@ class TrackViewSet(viewsets.ModelViewSet):
 
     def list(self, request, pk=None):
         """Return a paginated list of track json objects."""
-        queryset = cache.get(self.cache_key)
+        page = int(request.QUERY_PARAMS.get('page', 1))
 
-        if queryset is None:
-            queryset = Track.objects.prefetch_related(
-                'artists',
-                'album',
-                'owner',
-            ).all()
-            cache.set(self.cache_key, queryset, 86400)
+        response = cache.get(self.cache_key)
+        if response:
+            return Response(response)
 
-        paginator = Paginator(queryset, 20)
+        queryset = Track.objects.prefetch_related(
+            'artists', 'album', 'owner',).all()
 
-        page = request.QUERY_PARAMS.get('page')
-        try:
-            tracks = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            tracks = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
-            tracks = paginator.page(paginator.num_pages)
+        response = paginate_queryset(
+            PaginatedTrackSerializer, request, queryset, page)
 
-        serializer_context = {'request': request}
-        serializer = PaginatedTrackSerializer(
-            tracks, context=serializer_context
-        )
-        return Response(serializer.data)
+        cache.set(self.cache_key, response)
+        return Response(response)
 
     def create(self, request, *args, **kwargs):
         """Add a track to the database.
@@ -616,20 +536,18 @@ class TrackViewSet(viewsets.ModelViewSet):
         """
         try:
             track_data = _get_track_data(
-                request.POST['source_type'],
-                request.POST['source_id']
-            )
+                request.POST['source_type'], request.POST['source_id'])
         except:
             raise RecordNotFound
-
-        if track_data is None:
-            raise RecordNotFound
+        else:
+            if track_data is None:
+                raise RecordNotFound
 
         try:
             track = _get_or_create_track(track_data, self.request.user)
             _get_or_create_artists(track_data['artists'])
             serializer = TrackSerializer(track)
-            cache.delete(self._get_cache_key())
+            cache.delete(self.cache_key)
         except:
             raise RecordNotSaved
 

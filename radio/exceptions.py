@@ -7,12 +7,6 @@ class InvalidBackend(APIException):
     default_detail = 'Invalid backend, provider not recognised.'
 
 
-class InvalidLookupType(APIException):
-    """Simple exception used to show that an invalid source has been used"""
-    status_code = 404
-    default_detail = 'Invalid lookup_type, type not supported by backend.'
-
-
 class MissingParameter(APIException):
     """Simple exception used to show missing params on the search endpoint"""
     status_code = 400
