@@ -55,7 +55,7 @@ def _get_track_data(source_type, source_id):
             track_data['album'] = Album.objects.cached_get_or_create(
                 track_data['album'])
 
-        cache.set(cache_key, track_data)
+        cache.set(cache_key, track_data, 86400)
 
     return track_data
 
@@ -133,7 +133,7 @@ class LookupView(APIView):
             raise RecordNotFound
 
         response = TrackSerializer(results).data
-        cache.set(cache_key, response)
+        cache.set(cache_key, response, 86400)
         return Response(response)
 
 
@@ -209,7 +209,7 @@ class SearchView(APIView):
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
-        cache.set(cache_key, response)
+        cache.set(cache_key, response, 86400)
         return Response(response)
 
 
@@ -313,7 +313,7 @@ class UserAuthView(APIView):
             raise OauthFailed
 
         cache.set(
-            cache_key, credentials, credentials['auth']['expires_in'] * 100)
+            cache_key, credentials, credentials['auth']['expires_in'])
 
         return Response(credentials)
 
@@ -341,7 +341,7 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
 
         response = source_client.playlists(
             credentials['user']['id'], credentials['auth']['access_token'])
-        cache.set(cache_key, response)
+        cache.set(cache_key, response, 86400)
 
         return Response(response)
 
@@ -374,7 +374,7 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
-        cache.set(cache_key, response)
+        cache.set(cache_key, response, 86400)
         return Response(response)
 
 
@@ -413,7 +413,7 @@ class UserFavoritesViewSet(viewsets.GenericViewSet):
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
-        cache.set(cache_key, response)
+        cache.set(cache_key, response, 86400)
         return Response(response)
 
 
@@ -441,7 +441,7 @@ class TrackViewSet(viewsets.ModelViewSet):
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
-        cache.set(self.cache_key, response)
+        cache.set(self.cache_key, response, 86400)
         return Response(response)
 
     def create(self, request, *args, **kwargs):
