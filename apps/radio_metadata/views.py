@@ -425,23 +425,21 @@ class TrackViewSet(viewsets.ModelViewSet):
     serializer_class = TrackSerializer
     permission_classes = (IsStaffToDelete, permissions.IsAuthenticated)
 
-    cache_key = build_key('tracklist')
+    cache_key = build_key('tracklist-queryset')
 
     def list(self, request, pk=None):
         """Return a paginated list of track json objects."""
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        response = cache.get(self.cache_key)
-        if response:
-            return Response(response)
-
-        queryset = Track.objects.prefetch_related(
-            'artists', 'album', 'owner').all()
+        queryset = cache.get(self.cache_key)
+        if queryset is None:
+            queryset = Track.objects.prefetch_related(
+                'artists', 'album', 'owner').all()
+            cache.set(self.cache_key, queryset, 86400)
 
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
-        cache.set(self.cache_key, response, 86400)
         return Response(response)
 
     def create(self, request, *args, **kwargs):
