@@ -1,6 +1,4 @@
-# std-lib imports
-import re
-
+# thrid party imports
 from rest_framework import permissions
 
 

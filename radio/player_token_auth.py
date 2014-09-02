@@ -11,8 +11,7 @@ from radio_players.models import Player
 
 
 class PlayerTokenAuthBackend(authentication.BaseAuthentication):
-    """
-    Validate a player based on the token provided in the request header
+    """Validate a player based on the token provided in the request header.
     """
     def authenticate(self, request):
         # Retrieve the access token from the request header
