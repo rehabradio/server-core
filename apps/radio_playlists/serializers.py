@@ -1,5 +1,6 @@
 # third-party imports
 from rest_framework import pagination, serializers
+
 # local imports
 from .models import Playlist, PlaylistTrack
 from radio_metadata.serializers import TrackSerializer

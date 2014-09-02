@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 """Playlist related views
 """
-# stdlib imports
-import datetime
-
 # third-party imports
 from django.core.cache import cache
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import permissions, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -14,75 +10,37 @@ from rest_framework.response import Response
 # local imports
 from .models import Playlist, PlaylistTrack
 from .serializers import (
-    PlaylistSerializer,
-    PaginatedPlaylistSerializer,
-    PlaylistTrackSerializer,
-    PaginatedPlaylistTrackSerializer
-)
-from radio.exceptions import (
-    RecordDeleteFailed,
-    RecordNotFound,
-    RecordNotSaved,
-)
+    PlaylistSerializer, PaginatedPlaylistSerializer,
+    PlaylistTrackSerializer, PaginatedPlaylistTrackSerializer)
+from radio.exceptions import RecordDeleteFailed, RecordNotFound, RecordNotSaved
 from radio.permissions import IsOwnerOrReadOnly
-from radio_metadata.models import Track
-
-
-def _reset_track_positions(playlist_id):
-    """Set positions of a given playlist track list."""
-    records = PlaylistTrack.objects.filter(playlist_id=playlist_id)
-
-    for (i, track) in enumerate(records):
-        track.position = i+1
-        track.save()
+from radio.utils.cache import build_key
+from radio.utils.pagination import paginate_queryset
 
 
 class PlaylistViewSet(viewsets.ModelViewSet):
     """CRUD API endpoints that allow managing playlists.
-    For update and delete functions, user must be owner
+    For update and delete functions, user must be owner.
     """
-    permission_classes = (
-        IsOwnerOrReadOnly,
-        permissions.IsAuthenticated
-    )
+
+    cache_key = build_key('playlists-queryset')
+    permission_classes = (IsOwnerOrReadOnly, permissions.IsAuthenticated)
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
 
-    def _get_cache_key(self):
-        """Build key used for caching the playlist data."""
-        return 'playlists-{0}'.format(
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
-
     def list(self, request):
         """Return a paginated list of playlist json objects."""
-        cache_key = self._get_cache_key()
-        queryset = cache.get(cache_key)
+        page = int(request.QUERY_PARAMS.get('page', 1))
 
+        queryset = cache.get(self.cache_key)
         if queryset is None:
-            queryset = Playlist.objects.prefetch_related(
-                'owner'
-            ).all()
-            cache.set(cache_key, queryset, 86400)
+            queryset = Playlist.objects.select_related('owner').all()
+            cache.set(self.cache_key, queryset, 86400)
 
-        paginator = Paginator(queryset, 20)
+        response = paginate_queryset(
+            PaginatedPlaylistSerializer, request, queryset, page)
 
-        page = request.QUERY_PARAMS.get('page')
-        try:
-            playlists = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            playlists = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
-            playlists = paginator.page(paginator.num_pages)
-
-        serializer_context = {'request': request}
-        serializer = PaginatedPlaylistSerializer(
-            playlists, context=serializer_context
-        )
-        return Response(serializer.data)
+        return Response(response)
 
     def destroy(self, request, *args, **kwargs):
         """Removes playlist and its associated playlist tracks from database.
@@ -95,10 +53,9 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         try:
             playlist.delete()
+            cache.delete(self.cache_key)
         except:
             raise RecordDeleteFailed
-
-        cache.delete(self._get_cache_key())
 
         return Response({'detail': 'playlist successfully removed'})
 
@@ -109,7 +66,7 @@ class PlaylistViewSet(viewsets.ModelViewSet):
         Remove the cached track list after a database record is updated.
         """
         obj.owner = self.request.user
-        cache.delete(self._get_cache_key())
+        cache.delete(self.cache_key)
 
 
 class PlaylistTrackViewSet(viewsets.ModelViewSet):
@@ -121,45 +78,26 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
     queryset = PlaylistTrack.objects.all()
     serializer_class = PlaylistTrackSerializer
 
-    def _get_cache_key(self, playlist_id):
-        """Build key used for caching the playlist data."""
-        return 'playlisttracks-{0}-{1}'.format(
-            playlist_id, datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+    def _cache_key(self, playlist_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('playlists-queryset', playlist_id)
 
     def list(self, request, playlist_id=None):
         """Return a paginated list of playlist track json objects."""
-        cache_key = self._get_cache_key(playlist_id)
-        queryset = cache.get(cache_key)
+        page = int(request.QUERY_PARAMS.get('page', 1))
 
+        queryset = cache.get(self._cache_key(playlist_id))
         if queryset is None:
             queryset = PlaylistTrack.objects.prefetch_related(
-                'track',
-                'track__artists',
-                'track__album',
-                'track__owner',
-                'owner'
+                'track', 'track__artists', 'track__album',
+                'track__owner', 'owner'
             ).filter(playlist_id=playlist_id)
-            cache.set(cache_key, queryset, 86400)
+            cache.set(self._cache_key(playlist_id), queryset, 86400)
 
-        paginator = Paginator(queryset, 20)
+        response = paginate_queryset(
+            PaginatedPlaylistTrackSerializer, request, queryset, page)
 
-        page = request.QUERY_PARAMS.get('page')
-        try:
-            playlist_tracks = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            playlist_tracks = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
-            playlist_tracks = paginator.page(paginator.num_pages)
-
-        serializer_context = {'request': request}
-        serializer = PaginatedPlaylistTrackSerializer(
-            playlist_tracks, context=serializer_context
-        )
-        return Response(serializer.data)
+        return Response(response)
 
     def create(self, request, *args, **kwargs):
         """Add a track to the database.
@@ -177,21 +115,11 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
                 detail='Could not save track. Playlist is marked private.')
 
         try:
-            track = Track.objects.get(id=track_id)
-            total_playlist_records = PlaylistTrack.objects.filter(
-                playlist=playlist_id
-            ).count()
-
-            playlist_track = PlaylistTrack.objects.create(
-                track=track,
-                playlist=playlist,
-                position=total_playlist_records+1,
-                owner=self.request.user
-            )
+            playlist_track = PlaylistTrack.objects.custom_create(
+                track_id, playlist, request.user)
+            cache.delete(self._cache_key(playlist_id))
         except:
             raise RecordNotSaved
-
-        cache.delete(self._get_cache_key(playlist_id))
 
         serializer = PlaylistTrackSerializer(playlist_track)
         return Response(serializer.data)
@@ -209,10 +137,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         try:
             playlist_track.position = request.DATA['position']
             playlist_track.save()
+            cache.delete(self._cache_key(playlist_track.playlist.id))
         except:
             raise RecordNotSaved
-
-        cache.delete(self._get_cache_key(playlist_track.playlist.id))
 
         serializer = PlaylistTrackSerializer(playlist_track)
         return Response(serializer.data)
@@ -230,10 +157,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         try:
             playlist_id = playlist_track.playlist.id
             playlist_track.delete()
-            _reset_track_positions(playlist_id)
+            PlaylistTrack.objects.reset_track_positions(playlist_id)
+            cache.delete(self._cache_key(playlist_id))
         except:
             raise RecordDeleteFailed
-
-        cache.delete(self._get_cache_key(playlist_id))
 
         return Response({'detail': 'Track removed from playlist'})

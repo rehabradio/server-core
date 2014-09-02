@@ -1,6 +1,7 @@
 # third-party imports
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
+
 # local imports
 from .views import PlaylistViewSet, PlaylistTrackViewSet
 

@@ -10,6 +10,10 @@ PROTECTION_OPTIONS = [
 ]
 
 
+class PlaylistManager(models.Manager):
+    pass
+
+
 class Playlist(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=500)
@@ -19,9 +23,36 @@ class Playlist(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    objects = PlaylistManager()
+
     class Meta:
         unique_together = (('name', 'owner'),)
         ordering = ('name',)
+
+
+class PlaylistTrackManager(models.Manager):
+    def reset_track_positions(self, playlist_id):
+        """Set positions of a given playlist track list."""
+        records = self.filter(playlist_id=playlist_id)
+
+        for (i, track) in enumerate(records):
+            track.position = i+1
+            track.save()
+
+    def custom_create(self, track_id, playlist, owner):
+        """Create playlist track."""
+        track = Track.objects.get(id=track_id)
+        total_playlist_records = PlaylistTrack.objects.filter(
+            playlist=playlist).count()
+
+        playlist_track = PlaylistTrack.objects.create(
+            track=track,
+            playlist=playlist,
+            position=total_playlist_records+1,
+            owner=owner
+        )
+
+        return playlist_track
 
 
 class PlaylistTrack(models.Model):
@@ -31,6 +62,8 @@ class PlaylistTrack(models.Model):
     owner = models.ForeignKey('auth.User')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    objects = PlaylistTrackManager()
 
     class Meta:
         ordering = ('position',)
