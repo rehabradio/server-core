@@ -17,7 +17,7 @@ from radio_users.models import Profile
 class GoogleOauthBackend(authentication.BaseAuthentication):
     """
     Uses a Google Oauth2 token passed in the request header.
-    Retreives or creates a user object, based on their email domain
+    Retreives or creates a user object, based on their email domain.
     """
     def authenticate(self, request):
         # Retrieve the access token from the request header
@@ -64,10 +64,9 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
                             last_name=person['family_name'],
                             email=person['email']
                         )
-                        Profile.objects.create(
-                            user=user,
-                            avatar=person['picture']
-                        )
+                        profile = Profile.objects.get(user=user)
+                        profile.avatar = person['picture']
+                        profile.save()
                     except:
                         raise exceptions.AuthenticationFailed(
                             'User could not be created'
