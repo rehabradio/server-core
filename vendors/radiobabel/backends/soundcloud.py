@@ -119,7 +119,7 @@ class SoundcloudClient(object):
 
         return response
 
-    def track(self, track_id):
+    def lookup_track(self, track_id):
         """Lookup a single track using the soundcloud API
         """
         logger.info('Track lookup: {0}'.format(track_id))
@@ -130,7 +130,7 @@ class SoundcloudClient(object):
             raise TrackNotFound('Soundcloud: {0}'.format(track_id))
         return _transform_track(track)
 
-    def search(self, query, limit=200, offset=0):
+    def search_tracks(self, query, limit=200, offset=0):
         """Search for tracks using the soundcloud API
         """
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
