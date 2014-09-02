@@ -42,15 +42,12 @@ class PlaylistTrackManager(models.Manager):
     def custom_create(self, track_id, playlist, owner):
         """Create playlist track."""
         track = Track.objects.get(id=track_id)
-        total_playlist_records = PlaylistTrack.objects.filter(
+        total_playlist_records = self.filter(
             playlist=playlist).count()
 
-        playlist_track = PlaylistTrack.objects.create(
-            track=track,
-            playlist=playlist,
-            position=total_playlist_records+1,
-            owner=owner
-        )
+        playlist_track = self.create(
+            track=track, playlist=playlist,
+            position=total_playlist_records+1, owner=owner)
 
         return playlist_track
 

@@ -80,7 +80,7 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
 
     def _cache_key(self, playlist_id):
         """Build key used for caching the playlist tracks data."""
-        return build_key('playlists-queryset', playlist_id)
+        return build_key('playlist-tracks-queryset', playlist_id)
 
     def list(self, request, playlist_id=None):
         """Return a paginated list of playlist track json objects."""
