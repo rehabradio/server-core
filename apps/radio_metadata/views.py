@@ -30,6 +30,7 @@ soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
 
 
 def _build_client(source_type):
+    """Builds the thrid party api client based on the given source type."""
     source_client = {
         'soundcloud': soundcloud_client,
         'spotify': spotify_client,
@@ -39,7 +40,7 @@ def _build_client(source_type):
 
 
 def _get_track_data(source_type, source_id):
-    """Does a track lookup using the API specified in "source_type".
+    """Does a track lookup using the thrid party api client.
     Returns a dictionary.
     """
     cache_key = build_key('search', source_type, source_id)
@@ -63,8 +64,8 @@ def _get_or_create_album(album):
     Returns an Album model reference.
     """
     cache_key = build_key('album', album['source_type'], album['source_id'])
-
     record = cache.get(cache_key)
+
     if record is None:
         record, created = Album.objects.get_or_create(
             source_id=album['source_id'],
@@ -81,9 +82,10 @@ def _get_or_create_artists(artists):
     """
     records = []
     for (i, artist) in enumerate(artists):
-        cache_key = build_key('artist', artist['source_type'], artist['source_id'])
-
+        cache_key = build_key(
+            'artist', artist['source_type'], artist['source_id'])
         record = cache.get(cache_key)
+
         if record is None:
             record, created = Artist.objects.get_or_create(
                 source_id=artist['source_id'],
@@ -101,8 +103,8 @@ def _get_or_create_track(track, owner):
     Returns a track json object
     """
     cache_key = build_key('artist', track['source_type'], track['source_id'])
-
     record = cache.get(cache_key)
+
     if record is None:
         try:
             record = Track.objects.get(
@@ -186,8 +188,6 @@ class LookupView(APIView):
     """Lookup tracks using any configured source_type."""
 
     def get(self, request, source_type, source_id, format=None):
-        """perform metadata lookup
-        """
         cache_key = build_key('mtdt-lkp', source_type, source_id)
         response = cache.get(cache_key)
         if response is not None:
@@ -197,14 +197,12 @@ class LookupView(APIView):
         if source_client is None:
             raise InvalidBackend
 
-        # search using requested source_type and serialize
         try:
             results = source_client.lookup_track(source_id)
         except:
             raise RecordNotFound
-        response = TrackSerializer(results).data
 
-        # return response to the client
+        response = TrackSerializer(results).data
         cache.set(cache_key, response)
         return Response(response)
 
@@ -261,17 +259,15 @@ class SearchView(APIView):
     """
 
     def get(self, request, source_type, format=None):
-        """perform track search and return the results in a consistent format.
-        """
-        # parse search data from query params
+        """perform track search and return the results in a consistent format."""
+        page = int(request.QUERY_PARAMS.get('page', 1))
+
         query = request.QUERY_PARAMS.get('q', '')
         if not query:
             raise MissingParameter
-        page = int(request.QUERY_PARAMS.get('page', 1))
 
         cache_key = build_key('mtdttrcksrch', source_type, query, page)
         response = cache.get(cache_key)
-
         if response is not None:
             return Response(response)
 
@@ -279,7 +275,6 @@ class SearchView(APIView):
         if source_client is None:
             raise InvalidBackend
 
-        # search using requested source_type
         offset = (page-1)*20
         queryset = source_client.search_tracks(query, page*200, offset)
         response = paginate_queryset(
@@ -290,8 +285,8 @@ class SearchView(APIView):
 
 
 class UserRootView(APIView):
-    """The user playlist loopup API allows retrieval of metadata
-    from supported source_types.
+    """The user loopup API allows authentication and
+    retrieval of metadata from supported source_types.
 
     Data is cached after initial lookup but is keyed by calendar date to
     ensure that fresh data is fetched at least once per day.
@@ -345,10 +340,11 @@ class UserRootView(APIView):
 
 
 class UserAuthView(APIView):
-    """Authenticate user to use oauth on a given service (spotify/soundcloud).
-    """
+    """Authenticate user to use oauth on a given service (spotify/soundcloud)."""
 
     def get(self, request, source_type, format=None):
+        auth_code = request.QUERY_PARAMS.get('code', None)
+
         if source_type.lower() == 'spotify':
             source_client_id = settings.SPOTIFY_CLIENT_ID
             source_client_secret = settings.SPOTIFY_CLIENT_SECRET
@@ -360,11 +356,8 @@ class UserAuthView(APIView):
 
         cache_key = build_key('user-credentials', source_type, request.user.id)
         credentials = cache.get(cache_key)
-
         if credentials:
             return Response(credentials)
-
-        auth_code = request.QUERY_PARAMS.get('code', None)
 
         source_client = _build_client(source_type)
         if source_client is None:
@@ -391,9 +384,7 @@ class UserAuthView(APIView):
             raise OauthFailed
 
         cache.set(
-            cache_key, credentials,
-            credentials['auth']['expires_in'] * 100
-        )
+            cache_key, credentials, credentials['auth']['expires_in'] * 100)
 
         return Response(credentials)
 
@@ -402,8 +393,7 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
     def list(self, request, source_type, format=None):
-        """Perform metadata lookup on the user playlists.
-        """
+        """Perform metadata lookup on the user playlists."""
         cache_key = build_key('user-playlists', source_type, request.user.id)
 
         playlists = cache.get(cache_key)
@@ -413,7 +403,6 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         oauth_cache_key = build_key(
             'user-credentials', source_type, request.user.id)
         credentials = cache.get(oauth_cache_key)
-
         if credentials is None:
             raise ThridPartyOauthRequired
 
@@ -421,15 +410,14 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         if source_client is None:
             raise InvalidBackend
 
-        playlists = source_client.playlists(
+        response = source_client.playlists(
             credentials['user']['id'], credentials['auth']['access_token'])
-        cache.set(cache_key, playlists)
+        cache.set(cache_key, response)
 
-        return Response(playlists)
+        return Response(response)
 
     def retrieve(self, request, source_type, playlist_id, format=None):
-        """Perform metadata lookup on the user playlists.
-        """
+        """Perform metadata lookup on the user playlists."""
         page = int(request.QUERY_PARAMS.get('page', 1))
 
         cache_key = build_key('user-playlist-tracks', source_type, playlist_id)
@@ -480,7 +468,6 @@ class UserFavoritesViewSet(viewsets.GenericViewSet):
         oauth_cache_key = build_key(
             'user-credentials', source_type, request.user.id)
         credentials = cache.get(oauth_cache_key)
-
         if credentials is None:
             raise ThridPartyOauthRequired
 
@@ -520,7 +507,7 @@ class TrackViewSet(viewsets.ModelViewSet):
             return Response(response)
 
         queryset = Track.objects.prefetch_related(
-            'artists', 'album', 'owner',).all()
+            'artists', 'album', 'owner').all()
 
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
@@ -569,5 +556,5 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Track successfully removed'})
 
     def pre_save(self, obj):
-        """Remove the cached track list after a database record is updated."""
+        """Remove the cached track list each time a database record is updated."""
         cache.delete(self.cache_key)
