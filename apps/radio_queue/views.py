@@ -81,7 +81,7 @@ class QueueViewSet(viewsets.ModelViewSet):
         except:
             raise RecordDeleteFailed
 
-        return Response({'detail': 'Queue successfully removed'})
+        return Response({'detail': 'Queue successfully removed.'})
 
     def pre_save(self, obj):
         """Set the record owner as the current logged in user,
@@ -283,7 +283,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordDeleteFailed
 
-        cache.delete(self._get_cache_key(kwargs['queue_id']))
+        cache.delete(self._cache_key(kwargs['queue_id']))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
