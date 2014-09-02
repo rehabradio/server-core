@@ -6,19 +6,12 @@ urlpatterns = patterns(
     '',
     url(
         r'^$',
-        UserViewSet.as_view({
-            'get': 'list',
-            'post': 'create',
-        }),
+        UserViewSet.as_view({'get': 'list'}),
         name='radio-users-api-list'
     ),
     url(
         r'^(?P<pk>[^/]+)/$',
-        UserViewSet.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-            'delete': 'destroy',
-        }),
+        UserViewSet.as_view({'get': 'retrieve'}),
         name='radio-users-api-detail'
     ),
 )
