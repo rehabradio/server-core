@@ -48,7 +48,7 @@ class PlayerViewSetTestCase(BaseTestCase):
     def test_detail_auth(self):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
-        resp = self.api_client.get('/api/players/3/')
+        resp = self.api_client.get('/api/players/1/')
         self.assertEqual(resp.status_code, 403)
 
     def test_list(self):
@@ -111,7 +111,7 @@ class PlayerViewSetTestCase(BaseTestCase):
 
     def test_retrieve(self):
         """Return a player json object of a given record."""
-        resp = self.api_client.get('/api/players/3/')
+        resp = self.api_client.get('/api/players/1/')
         data = json.loads(resp.content)
 
         # Ensure request was successful

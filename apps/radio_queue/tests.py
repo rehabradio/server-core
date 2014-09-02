@@ -326,7 +326,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
 
     def test_retrieve(self):
         """Return a track json object of a given record."""
-        resp = self.api_client.get('/api/queues/1/tracks/61/')
+        resp = self.api_client.get('/api/queues/1/tracks/1/')
         data = json.loads(resp.content)
         track = data['track']
         # Ensure request was successful
@@ -355,7 +355,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
         post_data = {'position': 33}
 
         resp = self.api_client.patch(
-            '/api/queues/1/tracks/61/',
+            '/api/queues/1/tracks/1/',
             data=post_data
         )
         data = json.loads(resp.content)
@@ -376,7 +376,7 @@ class QueueTrackViewSetTestCase(BaseTestCase):
             queue=1
         ).count()
 
-        resp = self.api_client.delete('/api/queues/1/tracks/61/')
+        resp = self.api_client.delete('/api/queues/1/tracks/1/')
         data = json.loads(resp.content)
         new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful
