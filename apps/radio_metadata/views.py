@@ -52,82 +52,12 @@ def _get_track_data(source_type, source_id):
 
         if source_type == 'spotify':
             # Get or create relational album field
-            track_data['album'] = _get_or_create_album(track_data['album'])
+            track_data['album'] = Album.objects.cached_get_or_create(
+                track_data['album'])
 
         cache.set(cache_key, track_data)
 
     return track_data
-
-
-def _get_or_create_album(album):
-    """Get or create an album record from db,
-    Returns an Album model reference.
-    """
-    cache_key = build_key('album', album['source_type'], album['source_id'])
-    record = cache.get(cache_key)
-
-    if record is None:
-        record, created = Album.objects.get_or_create(
-            source_id=album['source_id'],
-            source_type=album['source_type'],
-            name=album['name'],
-        )
-        cache.set(cache_key, record)
-    return record
-
-
-def _get_or_create_artists(artists):
-    """Get or create artist records from db.
-    Returns a list of artist json objects
-    """
-    records = []
-    for (i, artist) in enumerate(artists):
-        cache_key = build_key(
-            'artist', artist['source_type'], artist['source_id'])
-        record = cache.get(cache_key)
-
-        if record is None:
-            record, created = Artist.objects.get_or_create(
-                source_id=artist['source_id'],
-                source_type=artist['source_type'],
-                name=artist['name'],
-            )
-            cache.set(cache_key, record)
-        records.append(record)
-
-    return records
-
-
-def _get_or_create_track(track, owner):
-    """Saves a track to the db, unless one already exists.
-    Returns a track json object
-    """
-    cache_key = build_key('artist', track['source_type'], track['source_id'])
-    record = cache.get(cache_key)
-
-    if record is None:
-        try:
-            record = Track.objects.get(
-                source_id=track['source_id'],
-                source_type=track['source_type'],
-            )
-        except:
-            record = Track.objects.create(
-                source_id=track['source_id'],
-                source_type=track['source_type'],
-                name=track['name'],
-                duration_ms=track['duration_ms'],
-                preview_url=track['preview_url'],
-                track_number=track['track_number'],
-                album=track['album'],
-                image_small=track['image_small'],
-                image_medium=track['image_medium'],
-                image_large=track['image_large'],
-                owner=owner
-            )
-        cache.set(cache_key, record)
-
-    return record
 
 
 class MetadataAPIRootView(APIView):
@@ -259,7 +189,6 @@ class SearchView(APIView):
     """
 
     def get(self, request, source_type, format=None):
-        """perform track search and return the results in a consistent format."""
         page = int(request.QUERY_PARAMS.get('page', 1))
 
         query = request.QUERY_PARAMS.get('q', '')
@@ -340,7 +269,7 @@ class UserRootView(APIView):
 
 
 class UserAuthView(APIView):
-    """Authenticate user to use oauth on a given service (spotify/soundcloud)."""
+    """Authenticate user to use oauth on a given service."""
 
     def get(self, request, source_type, format=None):
         auth_code = request.QUERY_PARAMS.get('code', None)
@@ -531,8 +460,9 @@ class TrackViewSet(viewsets.ModelViewSet):
                 raise RecordNotFound
 
         try:
-            track = _get_or_create_track(track_data, self.request.user)
-            _get_or_create_artists(track_data['artists'])
+            track = Track.objects.cached_get_or_create(
+                track_data, self.request.user)
+            Artist.objects.cached_get_or_create(track_data['artists'])
             serializer = TrackSerializer(track)
             cache.delete(self.cache_key)
         except:
@@ -556,5 +486,5 @@ class TrackViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Track successfully removed'})
 
     def pre_save(self, obj):
-        """Remove the cached track list each time a database record is updated."""
+        """Remove the cached track list each time a record is updated."""
         cache.delete(self.cache_key)

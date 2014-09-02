@@ -27,16 +27,16 @@ class AlbumSerializer(BaseSerializer):
 class TrackSerializer(BaseSerializer):
     # relationships to other models
     artists = ArtistSerializer(many=True, read_only=True)
-    album = AlbumSerializer(required=False, read_only=True)
+    album = AlbumSerializer(read_only=True)
 
     # track metadata
     name = serializers.CharField(read_only=True)
     duration_ms = serializers.IntegerField(read_only=True)
     preview_url = serializers.URLField(read_only=True)
     track_number = serializers.IntegerField(read_only=True)
-    image_small = serializers.URLField(required=False, read_only=True)
-    image_medium = serializers.URLField(required=False, read_only=True)
-    image_large = serializers.URLField(required=False, read_only=True)
+    image_small = serializers.URLField(read_only=True)
+    image_medium = serializers.URLField(read_only=True)
+    image_large = serializers.URLField(read_only=True)
 
     # Additional information
     play_count = serializers.IntegerField(read_only=True)
