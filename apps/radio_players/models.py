@@ -34,7 +34,7 @@ class Player(models.Model):
 
     def save(self, *args, **kwargs):
         """Create user/profile for new records.
-        
+
         Finally create a unique token for the record (mopidy auth token).
         """
 

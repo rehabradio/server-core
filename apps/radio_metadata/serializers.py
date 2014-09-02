@@ -1,6 +1,7 @@
 # third-party imports
 from rest_framework import pagination
 from rest_framework import serializers
+
 # local imports
 from .models import Album, Artist, Track
 
@@ -67,8 +68,6 @@ class TrackSerializer(BaseSerializer):
 
 
 class PaginatedTrackSerializer(pagination.PaginationSerializer):
-    """
-    Serializes page objects of tracks.
-    """
+    """Serializes page objects of tracks."""
     class Meta:
         object_serializer_class = TrackSerializer

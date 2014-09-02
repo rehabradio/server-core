@@ -1,11 +1,12 @@
 # stdlib imports
 import json
 import os
+
 # third-party imports
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
+
 # local imports
 from .models import Player
 
@@ -97,11 +98,14 @@ class PlayerViewSetTestCase(BaseTestCase):
             'active': True,
         }
         resp = self.api_client.post(
-                '/admin/radio_players/player/add/', data=post_data)
+            '/admin/radio_players/player/add/',
+            data=post_data
+        )
         new_records_count = Player.objects.all().count()
 
         # Ensure error message was returned
-        self.assertContains(resp, "A player is already active on the selected queue")
+        self.assertContains(
+            resp, "A player is already active on the selected queue")
         # Ensure a new record was not created in the database
         self.assertEqual(existing_records_count, new_records_count)
 
