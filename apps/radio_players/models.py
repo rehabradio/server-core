@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from radio_queue.models import Queue
-from radio_users.models import Profile
 
 
 class Player(models.Model):
@@ -47,7 +46,6 @@ class Player(models.Model):
                 password=token,
                 is_staff=True,
             )
-            Profile.objects.create(user=user)
 
             self.owner = user
             self.token = token
