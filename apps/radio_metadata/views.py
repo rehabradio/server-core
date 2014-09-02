@@ -3,7 +3,6 @@
 """
 # stdlib imports
 import collections
-import datetime
 
 # third-party imports
 from django.conf import settings
@@ -30,31 +29,36 @@ from radio.exceptions import (
     RecordNotSaved,
 )
 from radio.permissions import IsStaffToDelete
+from radio.utils.cache import build_key
 
 
 spotify_client = SpotifyClient()
 soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
 
 
+def _build_client(source_type):
+    source_client = {
+        'soundcloud': soundcloud_client,
+        'spotify': spotify_client,
+    }.get(source_type.lower())
+
+    return source_client
+
+
 def _get_track_data(source_type, source_id):
     """Does a track lookup using the API specified in "source_type".
     Returns a dictionary.
     """
-    cache_key = 'search-{0}-{1}-{2}'.format(
-        source_type,
-        source_id,
-        datetime.datetime.utcnow().strftime('%Y%m%d'),
-    )
+    cache_key = build_key('search', source_type, source_id)
 
     track_data = cache.get(cache_key)
     if track_data is None:
         if source_type == 'spotify':
             # Query the spotify api for all the track data
-            track_data = spotify_client.track(source_id)
+            track_data = spotify_client.lookup_track(source_id)
             # Get or create relational album field
             track_data['album'] = _get_or_create_album(
-                track_data['album']
-            )
+                track_data['album'])
         elif source_type == 'soundcloud':
             # Query the soundcloud api for all the track data
             track_data = soundcloud_client.track(source_id)
@@ -69,11 +73,7 @@ def _get_or_create_album(album):
     """Get or create an album record from db,
     Returns an Album model reference.
     """
-    cache_key = 'album-{0}-{1}-{2}'.format(
-        album['source_type'],
-        album['source_id'],
-        datetime.datetime.utcnow().strftime('%Y%m%d'),
-    )
+    cache_key = build_key('album', album['source_type'], album['source_id'])
 
     record = cache.get(cache_key)
     if record is None:
@@ -92,11 +92,7 @@ def _get_or_create_artists(artists):
     """
     records = []
     for (i, artist) in enumerate(artists):
-        cache_key = 'artist-{0}-{1}-{2}'.format(
-            artist['source_type'],
-            artist['source_id'],
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = build_key('artist', artist['source_type'], artist['source_id'])
 
         record = cache.get(cache_key)
         if record is None:
@@ -111,35 +107,31 @@ def _get_or_create_artists(artists):
     return records
 
 
-def _get_or_create_track(track_data, owner):
+def _get_or_create_track(track, owner):
     """Saves a track to the db, unless one already exists.
     Returns a track json object
     """
-    cache_key = 'track-{0}-{1}-{2}'.format(
-        track_data['source_type'],
-        track_data['source_id'],
-        datetime.datetime.utcnow().strftime('%Y%m%d'),
-    )
+    cache_key = build_key('artist', track['source_type'], track['source_id'])
 
     record = cache.get(cache_key)
     if record is None:
         try:
             record = Track.objects.get(
-                source_id=track_data['source_id'],
-                source_type=track_data['source_type'],
+                source_id=track['source_id'],
+                source_type=track['source_type'],
             )
         except:
             record = Track.objects.create(
-                source_id=track_data['source_id'],
-                source_type=track_data['source_type'],
-                name=track_data['name'],
-                duration_ms=track_data['duration_ms'],
-                preview_url=track_data['preview_url'],
-                track_number=track_data['track_number'],
-                album=track_data['album'],
-                image_small=track_data['image_small'],
-                image_medium=track_data['image_medium'],
-                image_large=track_data['image_large'],
+                source_id=track['source_id'],
+                source_type=track['source_type'],
+                name=track['name'],
+                duration_ms=track['duration_ms'],
+                preview_url=track['preview_url'],
+                track_number=track['track_number'],
+                album=track['album'],
+                image_small=track['image_small'],
+                image_medium=track['image_medium'],
+                image_large=track['image_large'],
                 owner=owner
             )
         cache.set(cache_key, record)
@@ -183,24 +175,18 @@ class LookupRootView(APIView):
         response = collections.OrderedDict([
             ('endpoints', collections.OrderedDict([
                 ('soundcloud', collections.OrderedDict([
-                    (
-                        'tracks',
-                        reverse(
-                            'radio-data-lookup',
-                            args=['soundcloud', 153868082],
-                            request=request
-                        )
-                    ),
+                    ('tracks', reverse(
+                        'radio-data-lookup',
+                        args=['soundcloud', 153868082],
+                        request=request
+                    )),
                 ])),
                 ('spotify', collections.OrderedDict([
-                    (
-                        'tracks',
-                        reverse(
-                            'radio-data-lookup',
-                            args=['spotify', '6MeNtkNT4ENE5yohNvGqd4'],
-                            request=request
-                        )
-                    ),
+                    ('tracks', reverse(
+                        'radio-data-lookup',
+                        args=['spotify', '6MeNtkNT4ENE5yohNvGqd4'],
+                        request=request
+                    )),
                 ])),
             ])),
         ])
@@ -210,33 +196,21 @@ class LookupRootView(APIView):
 class LookupView(APIView):
     """Lookup tracks using any configured source_type."""
 
-    def _get_cache_key(self, source_type, source_id):
-        """Build key used for caching the lookup data
-        """
-        return 'mtdt-lkp-{0}-{1}-{2}'.format(
-            source_type,
-            source_id,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
-
     def get(self, request, source_type, source_id, format=None):
         """perform metadata lookup
         """
-        cache_key = self._get_cache_key(source_type, source_id)
+        cache_key = build_key('mtdt-lkp', source_type, source_id)
         response = cache.get(cache_key)
         if response is not None:
             return Response(response)
 
-        lookup_func = {
-            'soundcloud': soundcloud_client.track,
-            'spotify': spotify_client.track,
-        }.get(source_type.lower())
-        if lookup_func is None:
-            raise InvalidLookupType
+        source_client = _build_client(source_type)
+        if source_client is None:
+            raise InvalidBackend
 
         # search using requested source_type and serialize
         try:
-            results = lookup_func(source_id)
+            results = source_client.track(source_id)
         except:
             raise RecordNotFound
         response = TrackSerializer(results).data
@@ -306,42 +280,32 @@ class SearchView(APIView):
             raise MissingParameter
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        cache_key = u'mtdttrcksrch-{0}-{1}-{2}-{3}'.format(
-            source_type, query, page,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = build_key('mtdttrcksrch', source_type, query, page)
         response = cache.get(cache_key)
+
         if response is not None:
             return Response(response)
 
-        search_func = {
-            'soundcloud': soundcloud_client.search,
-            'spotify': spotify_client.search,
-        }.get(source_type.lower())
-        if search_func is None:
+        source_client = _build_client(source_type)
+        if source_client is None:
             raise InvalidBackend
 
         # search using requested source_type
         offset = (page-1)*20
-        queryset = search_func(query, page*200, offset)
-
+        queryset = source_client.search_tracks(query, page*200, offset)
         paginator = Paginator(queryset, 20)
 
         try:
             tracks = paginator.page(page)
         except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
             tracks = paginator.page(1)
         except EmptyPage:
-            # If page is out of range (e.g. 9999),
-            # deliver last page of results.
             tracks = paginator.page(paginator.num_pages)
 
         serializer_context = {'request': request}
         serializer = PaginatedTrackSerializer(
             tracks, context=serializer_context
         )
-        # return response to the client
         cache.set(cache_key, response)
 
         return Response(serializer.data)
@@ -362,58 +326,40 @@ class UserRootView(APIView):
         response = collections.OrderedDict([
             ('endpoints', collections.OrderedDict([
                 ('oauth', collections.OrderedDict([
-                    (
-                        'soundcloud',
-                        reverse(
-                            'radio-data-user-auth',
-                            args=['soundcloud'],
-                            request=request
-                        )
-                    ),
-                    (
-                        'spotify',
-                        reverse(
-                            'radio-data-user-auth',
-                            args=['spotify'],
-                            request=request
-                        )
-                    )
+                    ('soundcloud', reverse(
+                        'radio-data-user-auth',
+                        args=['soundcloud'],
+                        request=request
+                    )),
+                    ('spotify', reverse(
+                        'radio-data-user-auth',
+                        args=['spotify'],
+                        request=request
+                    ))
                 ])),
                 ('favourites', collections.OrderedDict([
-                    (
-                        'soundcloud',
-                        reverse(
-                            'radio-data-user-favorites',
-                            args=['soundcloud'],
-                            request=request
-                        )
-                    ),
-                    (
-                        'spotify',
-                        reverse(
-                            'radio-data-user-favorites',
-                            args=['spotify'],
-                            request=request
-                        )
-                    )
+                    ('soundcloud', reverse(
+                        'radio-data-user-favorites',
+                        args=['soundcloud'],
+                        request=request
+                    )),
+                    ('spotify', reverse(
+                        'radio-data-user-favorites',
+                        args=['spotify'],
+                        request=request
+                    ))
                 ])),
                 ('playlists', collections.OrderedDict([
-                    (
-                        'soundcloud',
-                        reverse(
-                            'radio-data-user-playlists',
-                            args=['soundcloud'],
-                            request=request
-                        )
-                    ),
-                    (
-                        'spotify',
-                        reverse(
-                            'radio-data-user-playlists',
-                            args=['spotify'],
-                            request=request
-                        )
-                    )
+                    ('soundcloud', reverse(
+                        'radio-data-user-playlists',
+                        args=['soundcloud'],
+                        request=request
+                    )),
+                    ('spotify', reverse(
+                        'radio-data-user-playlists',
+                        args=['spotify'],
+                        request=request
+                    ))
                 ])),
             ])),
         ])
@@ -424,15 +370,11 @@ class UserAuthView(APIView):
     """Authenticate user to use oauth on a given service (spotify/soundcloud).
     """
 
-    permission_classes = ()
-
     def _get_cache_key(self, source_type, user_id):
         """Build key used for caching the users oauth token
         """
         return 'user-credentials-{0}-{1}'.format(
-            source_type,
-            user_id,
-        )
+            source_type, user_id)
 
     def get(self, request, source_type, format=None):
         if source_type.lower() == 'spotify':
@@ -444,20 +386,17 @@ class UserAuthView(APIView):
         else:
             raise InvalidBackend
 
-        oauth_cache_key = self._get_cache_key(
-            source_type, request.user.id)
-
-        credentials = cache.get(oauth_cache_key)
+        cache_key = build_key('user-credentials', source_type, request.user.id)
+        credentials = cache.get(cache_key)
 
         if credentials:
             return Response(credentials)
 
         auth_code = request.QUERY_PARAMS.get('code', None)
 
-        source_client = {
-            'soundcloud': soundcloud_client,
-            'spotify': spotify_client,
-        }.get(source_type.lower())
+        source_client = _build_client(source_type)
+        if source_client is None:
+            raise InvalidBackend
 
         try:
             # Prompt user to login
@@ -480,8 +419,7 @@ class UserAuthView(APIView):
             raise OauthFailed
 
         cache.set(
-            oauth_cache_key,
-            credentials,
+            cache_key, credentials,
             credentials['auth']['expires_in'] * 100
         )
 
@@ -494,27 +432,22 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
     def list(self, request, source_type, format=None):
         """Perform metadata lookup on the user playlists.
         """
-        cache_key = u'user-playlists-{0}-{1}-{2}'.format(
-            source_type, request.user.id,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = build_key('user-playlists', source_type, request.user.id)
 
         playlists = cache.get(cache_key)
         if playlists:
             return Response(playlists)
 
-        oauth_cache_key = 'user-credentials-{0}-{1}'.format(
-            source_type,
-            request.user.id,
-        )
+        oauth_cache_key = build_key(
+            'user-credentials', source_type, request.user.id)
         credentials = cache.get(oauth_cache_key)
+
         if credentials is None:
             raise ThridPartyOauthRequired
 
-        source_client = {
-            'soundcloud': soundcloud_client,
-            'spotify': spotify_client,
-        }.get(source_type.lower())
+        source_client = _build_client(source_type)
+        if source_client is None:
+            raise InvalidBackend
 
         playlists = source_client.playlists(
             credentials['user']['id'], credentials['auth']['access_token'])
@@ -527,10 +460,7 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         """
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        cache_key = u'user-playlist-tracks-{0}-{1}-{2}'.format(
-            source_type, playlist_id,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = build_key('user-playlist-tracks', source_type, playlist_id)
 
         queryset = cache.get(cache_key)
         if queryset is None:
@@ -543,11 +473,7 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
             if credentials is None:
                 raise ThridPartyOauthRequired
 
-            source_client = {
-                'soundcloud': soundcloud_client,
-                'spotify': spotify_client,
-            }.get(source_type.lower())
-
+            source_client = _build_client(source_type)
             if source_client is None:
                 raise InvalidBackend
 
@@ -587,33 +513,26 @@ class UserFavoritesViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
     def list(self, request, source_type, format=None):
-        """Perform metadata lookup on the user playlists.
-        """
+        """Perform metadata lookup on the user playlists."""
         if source_type == 'spotify':
             return Response({'detail': 'Spotify currently not enabled'})
+
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        cache_key = u'user-favorite-tracks-{0}-{1}-{2}'.format(
-            source_type, request.user.id,
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+        cache_key = build_key(
+            'user-favorite-tracks', source_type, request.user.id)
 
         queryset = cache.get(cache_key)
 
         if queryset is None:
-            oauth_cache_key = 'user-credentials-{0}-{1}'.format(
-                source_type,
-                request.user.id,
-            )
+            oauth_cache_key = build_key(
+                'user-credentials', source_type, request.user.id)
             credentials = cache.get(oauth_cache_key)
+
             if credentials is None:
                 raise ThridPartyOauthRequired
 
-            source_client = {
-                'soundcloud': soundcloud_client,
-                'spotify': spotify_client,
-            }.get(source_type.lower())
-
+            source_client = _build_client(source_type)
             if source_client is None:
                 raise InvalidBackend
 
@@ -643,7 +562,7 @@ class UserFavoritesViewSet(viewsets.GenericViewSet):
             tracks, context=serializer_context
         )
         # return response to the client
-        #cache.set(cache_key, queryset)
+        cache.set(cache_key, queryset)
 
         return Response(serializer.data)
 
@@ -656,16 +575,11 @@ class TrackViewSet(viewsets.ModelViewSet):
     serializer_class = TrackSerializer
     permission_classes = (IsStaffToDelete, permissions.IsAuthenticated)
 
-    def _get_cache_key(self):
-        """Build key used for caching the track data."""
-        return 'tracklist-{0}'.format(
-            datetime.datetime.utcnow().strftime('%Y%m%d'),
-        )
+    cache_key = build_key('tracklist')
 
     def list(self, request, pk=None):
         """Return a paginated list of track json objects."""
-        cache_key = self._get_cache_key()
-        queryset = cache.get(cache_key)
+        queryset = cache.get(self.cache_key)
 
         if queryset is None:
             queryset = Track.objects.prefetch_related(
@@ -673,7 +587,7 @@ class TrackViewSet(viewsets.ModelViewSet):
                 'album',
                 'owner',
             ).all()
-            cache.set(cache_key, queryset, 86400)
+            cache.set(self.cache_key, queryset, 86400)
 
         paginator = Paginator(queryset, 20)
 
@@ -714,12 +628,10 @@ class TrackViewSet(viewsets.ModelViewSet):
         try:
             track = _get_or_create_track(track_data, self.request.user)
             _get_or_create_artists(track_data['artists'])
+            serializer = TrackSerializer(track)
+            cache.delete(self._get_cache_key())
         except:
             raise RecordNotSaved
-
-        cache.delete(self._get_cache_key())
-
-        serializer = TrackSerializer(track)
 
         return Response(serializer.data)
 
@@ -732,13 +644,12 @@ class TrackViewSet(viewsets.ModelViewSet):
 
         try:
             track.delete()
+            cache.delete(self.cache_key)
         except:
             raise RecordDeleteFailed
-
-        cache.delete(self._get_cache_key())
 
         return Response({'detail': 'Track successfully removed'})
 
     def pre_save(self, obj):
         """Remove the cached track list after a database record is updated."""
-        cache.delete(self._get_cache_key())
+        cache.delete(self.cache_key)
