@@ -213,14 +213,14 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(seralizer.data)
 
     @action()
-    def status(self, request, *args, **kwargs):
+    def status(self, request, queue_id, *args, **kwargs):
         """Updates the head track of a given queue,
         based on the mopidy playback status.
         """
         post_data = json.loads(request.DATA)
         try:
             queued_track = QueueTrack.objects.get(
-                queue_id=kwargs['queue_id'], position=1)
+                queue_id=queue_id, position=1)
         except:
             raise RecordNotFound
 
@@ -235,26 +235,33 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action()
-    def event(self, request, *args, **kwargs):
+    def event(self, request, queue_id, event, *args, **kwargs):
         """Updates the head track of a given queue,
         based on mopidy tracklist and playback events.
         """
-        post_data = json.loads(request.DATA)
+        try:
+            post_data = json.loads(request.DATA)
+        except:
+            return Response()
+
         try:
             queued_track = QueueTrack.objects.get(
-                queue_id=kwargs['queue_id'],
-                position=1
-            )
+                queue_id=queue_id, position=1)
         except:
             raise RecordNotFound
 
-        try:
-            if kwargs['event'] == 'track_playback_paused':
-                queued_track.state = 'paused'
-            if kwargs['event'] == 'track_playback_resumed':
-                queued_track.state = 'playing'
+        if event == 'playback_state_changed':
+            queued_track.state = post_data['new_state']
 
+        if (event == 'track_playback_resumed'
+                or event == 'track_playback_started'
+                or event == 'seeked'):
+            queued_track.state = 'playing'
+
+        if 'time_position' in post_data:
             queued_track.time_position = post_data['time_position']
+
+        try:
             queued_track.save()
         except:
             raise RecordNotSaved
@@ -267,9 +274,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         """Remove a track from the top of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
-                queue_id=kwargs['queue_id'],
-                position=1
-            )
+                queue_id=kwargs['queue_id'], position=1)
         except:
             raise RecordNotFound
 
