@@ -134,7 +134,8 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         if 'playlist' in request.DATA:
             playlist_tracks = PlaylistTrack.objects.prefetch_related(
-                'track', 'track__artists', 'track__album', 'track__owner', 'owner'
+                'track', 'track__artists',
+                'track__album', 'track__owner', 'owner'
             ).filter(playlist_id=request.DATA['playlist'])
             track_ids = ()
             for playlist_track in playlist_tracks:

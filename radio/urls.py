@@ -25,6 +25,9 @@ urlpatterns = patterns(
     # monitoring/admin URL for Django-RQ
     url(r'^django-rq/', include('django_rq.urls')),
 
+    # login url
+    url(r'^api/_auth/', include('rest_framework.urls', namespace='rest_framework')),
+
     # API urls (browsable)
     url(r'^api/$', APIRootView.as_view(), name='radio-api-root'),
     url(r'^api/metadata/', include('radio_metadata.urls')),
