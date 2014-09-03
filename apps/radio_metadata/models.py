@@ -99,6 +99,7 @@ class TrackManager(models.Manager):
                     name=track['name'],
                     duration_ms=track['duration_ms'],
                     preview_url=track['preview_url'],
+                    uri=track['uri'],
                     track_number=track['track_number'],
                     album=track['album'],
                     image_small=track['image_small'],
@@ -119,6 +120,7 @@ class Track(MetadataBase):
     # track metadata
     duration_ms = models.IntegerField()
     preview_url = models.URLField()
+    uri = models.CharField(max_length=500)
     track_number = models.IntegerField()
     image_small = models.URLField(null=True)
     image_medium = models.URLField(null=True)

@@ -72,6 +72,7 @@ def _transform_track(track):
         ('name', track['name']),
         ('duration_ms', track['duration_ms']),
         ('preview_url', track['preview_url']),
+        ('uri', track['uri']),
         ('track_number', track['track_number']),
         ('image_small', None),
         ('image_medium', None),

@@ -26,6 +26,7 @@ class BaseTestCase(TestCase):
         'album',
         'duration_ms',
         'preview_url',
+        'uri',
         'track_number',
         'image_small',
         'image_medium',

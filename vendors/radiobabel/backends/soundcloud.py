@@ -35,6 +35,7 @@ def _transform_track(track):
         ('name', track['title']),
         ('duration_ms', track['duration']),
         ('preview_url', track.get('stream_url')),
+        ('uri', 'soundcloud:song/' + track['title'] + '.' + str(track['id'])),
         ('track_number', 0),
         ('image_small', small_artwork),
         ('image_medium', medium_artwork),

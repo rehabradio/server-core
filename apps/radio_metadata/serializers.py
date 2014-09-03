@@ -34,6 +34,7 @@ class TrackSerializer(BaseSerializer):
     name = serializers.CharField(read_only=True)
     duration_ms = serializers.IntegerField(read_only=True)
     preview_url = serializers.URLField(read_only=True)
+    uri = serializers.CharField(read_only=True)
     track_number = serializers.IntegerField(read_only=True)
     image_small = serializers.URLField(read_only=True)
     image_medium = serializers.URLField(read_only=True)
@@ -56,6 +57,7 @@ class TrackSerializer(BaseSerializer):
             'album',
             'duration_ms',
             'preview_url',
+            'uri',
             'track_number',
             'image_small',
             'image_medium',
