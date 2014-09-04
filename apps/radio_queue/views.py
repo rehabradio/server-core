@@ -124,7 +124,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         return Response(response)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, queue_id, *args, **kwargs):
         """Add tracks to a given queue.
         params - track or playlist
 
@@ -147,23 +147,23 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         for (i, track_id) in enumerate(track_ids):
             try:
                 queued_track = QueueTrack.objects.custom_create(
-                    track_id, kwargs['queue_id'], self.request.user)
+                    track_id, queue_id, self.request.user)
                 queued_tracks.append(queued_track)
             except:
                 raise RecordNotSaved
 
-        cache.delete(self._cache_key(kwargs['queue_id']))
+        cache.delete(self._cache_key(queue_id))
         serializer = QueueTrackSerializer(queued_tracks)
         return Response(serializer.data)
 
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, queue_id, pk, *args, **kwargs):
         """Update a queue track position.
         params - position
 
         Returns a the updated track as a json object
         """
         try:
-            queued_track = QueueTrack.objects.get(id=kwargs['pk'])
+            queued_track = QueueTrack.objects.get(id=pk)
         except:
             raise RecordNotFound
 
@@ -173,44 +173,42 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotSaved
 
-        cache.delete(self._cache_key(kwargs['queue_id']))
+        cache.delete(self._cache_key(queue_id))
 
         serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request, queue_id, pk, *args, **kwargs):
         """Removes queue track from database and resests the
         remaining track positions.
 
         Returns a detail reponse.
         """
         try:
-            queued_track = QueueTrack.objects.get(id=kwargs['pk'])
+            queued_track = QueueTrack.objects.get(id=pk)
         except:
             raise RecordNotFound
 
         try:
             queued_track.delete()
-            # reset the remaining tracks into their new positions
-            QueueTrack.objects.reset_track_positions(kwargs['queue_id'])
-            cache.delete(self._cache_key(kwargs['queue_id']))
         except:
             raise RecordDeleteFailed
+
+        # reset the remaining tracks into their new positions
+        QueueTrack.objects.reset_track_positions(queue_id)
+        cache.delete(self._cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
     @link()
-    def head(self, request, *args, **kwargs):
+    def head(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
             queued_track = QueueTrack.objects.select_related(
                 'track', 'track__album', 'track__owner', 'owner'
-            ).get(queue_id=kwargs['queue_id'], position=1)
+            ).get(queue_id=queue_id, position=1)
         except:
-            queued_track = _add_random_track_to_queue(
-                kwargs['queue_id'],
-                request.user
-            )
+            queued_track = _add_random_track_to_queue(queue_id, request.user)
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
@@ -227,8 +225,10 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
-            queued_track.state = post_data['state']
-            queued_track.time_position = post_data['time_position']
+            if 'state' in post_data:
+                queued_track.state = post_data['state']
+            if 'time_position' in post_data:
+                queued_track.time_position = post_data['time_position']
             queued_track.save()
         except:
             raise RecordNotSaved
@@ -272,11 +272,11 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action()
-    def pop(self, request, *args, **kwargs):
+    def pop(self, request, queue_id, *args, **kwargs):
         """Remove a track from the top of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
-                queue_id=kwargs['queue_id'], position=1)
+                queue_id=queue_id, position=1)
         except:
             raise RecordNotFound
 
@@ -286,12 +286,12 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             track.save()
 
             queued_track.delete()
-            # reset the remaining tracks into their new positions
-            QueueTrack.objects.reset_track_positions(kwargs['queue_id'])
         except:
             raise RecordDeleteFailed
 
-        cache.delete(self._cache_key(kwargs['queue_id']))
+        # reset the remaining tracks into their new positions
+        QueueTrack.objects.reset_track_positions(queue_id)
+        cache.delete(self._cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
