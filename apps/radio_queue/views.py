@@ -191,6 +191,8 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         try:
             queued_track.delete()
+            # reset the remaining tracks into their new positions
+            QueueTrack.objects.reset_track_positions(kwargs['queue_id'])
             cache.delete(self._cache_key(kwargs['queue_id']))
         except:
             raise RecordDeleteFailed
