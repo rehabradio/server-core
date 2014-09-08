@@ -10,7 +10,6 @@ from .views import (
     SearchView,
     UserRootView,
     UserAuthView,
-    UserFavoritesViewSet,
     UserPlaylistViewSet,
     TrackViewSet,
 )
@@ -36,12 +35,6 @@ urlpatterns = patterns(
     url(
         r'^user/authenticate/(?P<source_type>[^/]+)/$',
         UserAuthView.as_view(), name='radio-data-user-auth'
-    ),
-    url(
-        r'^user/favorites/(?P<source_type>[^/]+)/$',
-        UserFavoritesViewSet.as_view({
-            'get': 'list'
-        }), name='radio-data-user-favorites'
     ),
     url(
         r'^user/playlists/(?P<source_type>[^/]+)/$',

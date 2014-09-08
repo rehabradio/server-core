@@ -239,18 +239,6 @@ class UserRootView(APIView):
                         request=request
                     ))
                 ])),
-                ('favourites', collections.OrderedDict([
-                    ('soundcloud', reverse(
-                        'radio-data-user-favorites',
-                        args=['soundcloud'],
-                        request=request
-                    )),
-                    ('spotify', reverse(
-                        'radio-data-user-favorites',
-                        args=['spotify'],
-                        request=request
-                    ))
-                ])),
                 ('playlists', collections.OrderedDict([
                     ('soundcloud', reverse(
                         'radio-data-user-playlists',
@@ -378,45 +366,6 @@ class UserPlaylistViewSet(viewsets.GenericViewSet):
         return Response(response)
 
 
-class UserFavoritesViewSet(viewsets.GenericViewSet):
-    """Lookup tracks using any configured source_type."""
-
-    def list(self, request, source_type, format=None):
-        """Perform metadata lookup on the user playlists."""
-        if source_type == 'spotify':
-            return Response({'detail': 'Spotify currently not enabled'})
-
-        page = int(request.QUERY_PARAMS.get('page', 1))
-
-        cache_key = build_key(
-            'user-favorite-tracks', source_type, request.user.id)
-        response = cache.get(cache_key)
-        if response:
-            return Response(response)
-
-        oauth_cache_key = build_key(
-            'user-credentials', source_type, request.user.id)
-        credentials = cache.get(oauth_cache_key)
-        if credentials is None:
-            raise ThridPartyOauthRequired
-
-        source_client = _build_client(source_type)
-        if source_client is None:
-            raise InvalidBackend
-
-        # search using requested source_type
-        offset = (page-1)*20
-        queryset = source_client.favorites(
-            credentials['user']['id'],
-            credentials['auth']['access_token'], page*200, offset)
-
-        response = paginate_queryset(
-            PaginatedTrackSerializer, request, queryset, page)
-
-        cache.set(cache_key, response, 86400)
-        return Response(response)
-
-
 class TrackViewSet(viewsets.ModelViewSet):
     """CRUD API endpoints that allow managing playlists.
     User must be staff to remove track from database.
@@ -482,7 +431,3 @@ class TrackViewSet(viewsets.ModelViewSet):
             raise RecordDeleteFailed
 
         return Response({'detail': 'Track successfully removed'})
-
-    def pre_save(self, obj):
-        """Remove the cached track list each time a record is updated."""
-        cache.delete(self.cache_key)

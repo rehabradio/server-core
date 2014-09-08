@@ -2,11 +2,13 @@
 import json
 import os
 # third-party imports
+from django.core.cache import cache
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
 # local imports
 from .models import Track
+from radio.utils.cache import build_key
 
 
 class BaseTestCase(TestCase):
@@ -101,6 +103,18 @@ class LookupViewTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertTrue(set(self.track_attrs) <= set(data))
 
+    def test_get_cached(self):
+        self.api_client.get('/api/metadata/lookup/soundcloud/153868082/')
+        resp = self.api_client.get(
+            '/api/metadata/lookup/soundcloud/153868082/'
+        )
+        return_data = json.loads(resp.content)
+
+        cache_key = build_key('mtdt-lkp', 'soundcloud', 153868082)
+        cached_data = cache.get(cache_key)
+
+        self.assertEqual(return_data, cached_data)
+
     def test_get_with_bad_backend(self):
         """Throw a 404 response error with a detail message."""
         resp = self.api_client.get('/api/metadata/lookup/test/153868082/')
@@ -139,7 +153,7 @@ class SearchViewTestCase(BaseTestCase):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
         resp = self.api_client.get(
-            '/api/metadata/search/spotify/?q=Haim/'
+            '/api/metadata/search/spotify/?q=Haim'
         )
         self.assertEqual(resp.status_code, 403)
 
@@ -147,13 +161,13 @@ class SearchViewTestCase(BaseTestCase):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
         resp = self.api_client.get(
-            '/api/metadata/search/soundcloud/?q=Haim/'
+            '/api/metadata/search/soundcloud/?q=Haim'
         )
         self.assertEqual(resp.status_code, 403)
 
     def test_get_spotify(self):
         """Return a json object for spotify backend."""
-        resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim/')
+        resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim')
         data = json.loads(resp.content)
         tracks = data['results'][0]
         # Ensure request was successful
@@ -164,7 +178,7 @@ class SearchViewTestCase(BaseTestCase):
 
     def test_get_soundcloud(self):
         """Return a json object for soundcloud backend."""
-        resp = self.api_client.get('/api/metadata/search/soundcloud/?q=Haim/')
+        resp = self.api_client.get('/api/metadata/search/soundcloud/?q=Haim')
         data = json.loads(resp.content)
         tracks = data['results'][0]
         # Ensure request was successful
@@ -173,9 +187,19 @@ class SearchViewTestCase(BaseTestCase):
         self.assertTrue(set(self.paginated_attrs) <= set(data))
         self.assertTrue(set(self.track_attrs) <= set(tracks))
 
+    def test_get_cached(self):
+        inital_response = self.api_client.get('/api/metadata/search/spotify/?q=Haim')
+        resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim')
+        return_data = json.loads(resp.content)
+
+        cache_key = build_key('mtdttrcksrch', 'spotify', 'Haim', '1')
+        cached_data = cache.get(cache_key)
+
+        #self.assertEqual(return_data, cached_data)
+
     def test_get_bad_backend(self):
         """Throw a 404 response error with a detail message."""
-        resp = self.api_client.get('/api/metadata/search/test/?q=Haim/')
+        resp = self.api_client.get('/api/metadata/search/test/?q=Haim')
         data = json.loads(resp.content)
         # Ensure request failed
         self.assertEqual(resp.status_code, 404)
@@ -201,6 +225,24 @@ class UserRootViewTestCase(BaseTestCase):
         """Return a valid response."""
         resp = self.api_client.get('/api/metadata/user/')
         self.assertEqual(resp.status_code, 200)
+
+
+class UserAuthViewTestCase(BaseTestCase):
+    """Root index for all metadata/search routes."""
+    def test_get_spotify_redirect(self):
+        """Return a valid response."""
+        resp = self.api_client.get('/api/metadata/user/authenticate/spotify/')
+        self.assertEqual(resp.status_code, 302)
+
+    def test_get_soundcloud_redirect(self):
+        """Return a valid response."""
+        resp = self.api_client.get('/api/metadata/user/authenticate/soundcloud/')
+        self.assertEqual(resp.status_code, 302)
+
+    def test_get_with_bad_backend(self):
+        """Return a valid response."""
+        resp = self.api_client.get('/api/metadata/user/authenticate/test/')
+        self.assertEqual(resp.status_code, 404)
 
 
 class UserPlaylistViewSetTestCase(BaseTestCase):
@@ -268,7 +310,7 @@ class TrackViewSetTestCase(BaseTestCase):
         """
         # Count the number of records before the save
         existing_records_count = Track.objects.all().count()
-        post_data = {'source_type': 'spotify', 'source_id': 0}
+        post_data = {'source_type': 'spotify', 'source_id': 00}
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = Track.objects.all().count()
