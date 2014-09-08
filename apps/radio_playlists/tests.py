@@ -244,15 +244,12 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         """
         # Count the number of records before the save
         existing_records_count = PlaylistTrack.objects.filter(
-            playlist=2
-        ).count()
-        post_data = {
-            'track': 3,
-        }
+            playlist=1).count()
+        post_data = {'track': 3}
 
-        resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
+        resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
         data = json.loads(resp.content)
-        new_records_count = PlaylistTrack.objects.filter(playlist=2).count()
+        new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
         # Ensure a new record was created in the database
@@ -268,11 +265,10 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         """
         # Count the number of records before the save
         existing_records_count = PlaylistTrack.objects.filter(
-            playlist=1
-        ).count()
+            playlist=1).count()
         post_data = {'track': None}
 
-        resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
+        resp = self.api_client.post('/api/playlists/1/tracks/', data=post_data)
         data = json.loads(resp.content)
         new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
@@ -282,6 +278,29 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
         self.assertEqual(data['detail'], u'The record could not be saved.')
+
+    def test_create_on_private_playlist(self):
+        """Try to create a track, empty post variables.
+        Returns a 404 response with detail message.
+        """
+        # Count the number of records before the save
+        existing_records_count = PlaylistTrack.objects.filter(
+            playlist=2).count()
+        post_data = {'track': 3}
+
+        resp = self.api_client.post('/api/playlists/2/tracks/', data=post_data)
+        data = json.loads(resp.content)
+        new_records_count = PlaylistTrack.objects.filter(playlist=2).count()
+
+        # Ensure request failed
+        self.assertEqual(resp.status_code, 403)
+        # Ensure a new record was not added to the database
+        self.assertEqual(existing_records_count, new_records_count)
+        # Ensure validation flags where raised for each field
+        self.assertEqual(
+            data['detail'],
+            u'Could not save track. Playlist is marked private.'
+        )
 
     def test_retrieve(self):
         """Return a track json object of a given record."""

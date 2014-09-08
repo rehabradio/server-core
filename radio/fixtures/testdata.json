@@ -1020,7 +1020,7 @@
         "name": "Test Playlist (Private)",
         "created": "2014-09-02T16:14:03.890Z",
         "protection": "private",
-        "owner": 1,
+        "owner": 3,
         "description": "Private tester playlist"
     },
     "model": "radio_playlists.playlist",
