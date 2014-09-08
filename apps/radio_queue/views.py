@@ -218,6 +218,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         based on the mopidy playback status.
         """
         post_data = json.loads(request.DATA)
+
         try:
             queued_track = QueueTrack.objects.get(
                 queue_id=queue_id, position=1)
@@ -229,6 +230,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
                 queued_track.state = post_data['state']
             if 'time_position' in post_data:
                 queued_track.time_position = post_data['time_position']
+
             queued_track.save()
         except:
             raise RecordNotSaved
@@ -241,10 +243,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         """Updates the head track of a given queue,
         based on mopidy tracklist and playback events.
         """
-        try:
-            post_data = json.loads(request.DATA)
-        except:
-            return Response()
+        post_data = json.loads(request.DATA)
 
         try:
             queued_track = QueueTrack.objects.get(
@@ -252,18 +251,15 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotFound
 
-        if event == 'playback_state_changed':
-            queued_track.state = post_data['new_state']
-
-        if (event == 'track_playback_resumed'
-                or event == 'track_playback_started'
-                or event == 'seeked'):
-            queued_track.state = 'playing'
-
-        if 'time_position' in post_data:
-            queued_track.time_position = post_data['time_position']
-
         try:
+            if event == 'track_playback_paused':
+                queued_track.state = 'paused'
+            else:
+                queued_track.state = 'playing'
+
+            if 'time_position' in post_data:
+                queued_track.time_position = post_data['time_position']
+
             queued_track.save()
         except:
             raise RecordNotSaved

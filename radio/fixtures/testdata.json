@@ -1207,6 +1207,17 @@
 },
 {
     "fields": {
+        "owner": 1,
+        "updated": "2014-09-02T16:15:03.325Z",
+        "created": "2014-09-02T16:15:03.325Z",
+        "name": "Another Test queue",
+        "description": "Another Testing queue"
+    },
+    "model": "radio_queue.queue",
+    "pk": 2
+},
+{
+    "fields": {
         "updated": "2014-09-02T16:19:23.768Z",
         "created": "2014-09-02T16:19:23.767Z",
         "track": 1,
