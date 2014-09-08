@@ -109,9 +109,19 @@ class PlayerViewSetTestCase(BaseTestCase):
         # Ensure a new record was not created in the database
         self.assertEqual(existing_records_count, new_records_count)
 
-    def test_retrieve(self):
+    def test_retrieve_with_id(self):
         """Return a player json object of a given record."""
         resp = self.api_client.get('/api/players/1/')
+        data = json.loads(resp.content)
+
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.player_attrs) <= set(data))
+
+    def test_retrieve_with_token(self):
+        """Return a player json object of a given record."""
+        resp = self.api_client.get('/api/players/b41bac6b-72fe-47fe-a984-79555c600a64/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
