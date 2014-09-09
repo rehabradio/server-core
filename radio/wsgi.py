@@ -14,7 +14,8 @@ if environment == 'LOCAL':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'radio.settings.local')
 elif environment == 'LIVE':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'radio.settings.live')
-
+elif environment == 'TEST':
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'radio.settings.test')
 
 from django.core.wsgi import get_wsgi_application
 from dj_static import Cling
