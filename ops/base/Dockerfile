@@ -28,5 +28,12 @@ RUN virtualenv /opt/venv
 ADD ./requirements.txt /opt/venv/requirements.txt
 RUN /opt/venv/bin/pip install -r /opt/venv/requirements.txt
 
+# start supervisor to run our wsgi server
+CMD cd /opt/app/ && /opt/venv/bin/python manage.py makemigrations &&\
+/opt/venv/bin/coverage erase &&\
+/opt/venv/bin/coverage run --source='.' manage.py test apps &&\
+/opt/venv/bin/coverage report -m &&\
+/opt/venv/bin/coverage xml
+
 # expose port(s)
 EXPOSE 80
