@@ -1,6 +1,10 @@
 +rehabradio
 ===========
 
+![Docker](http://www.linux.com/news/galleries/image/docker?format=image&thumbnail=small)
+![Django](https://lh5.googleusercontent.com/-BjCviey1170/AAAAAAAAAAI/AAAAAAAAABQ/A9zxQUjc3C4/photo.jpg?sz=64)
+![Python](http://blog.magiksys.net/sites/default/files/pictures/python-logo-64.png)
+
 ***
 
 A collaborative, online playlist manager
@@ -28,25 +32,89 @@ Platform
 * Queueing/Asynchronous operation: RQ (via Django-RQ)
 
 
-Getting Started
-===============
+Installing Docker
+=================
 
 ***
 
-Requirements
-------------
+This application uses [Docker][docker] to provide a standard development
+environment for all developers on a project, this is the preferred method of
+installation/development.
 
-Before you can use this project, you'll need to install a few dependencies:
+Linux
+-----------------------------------------
 
-- [Foreman/Heroku-Toolbelt](https://toolbelt.heroku.com/)
-- [virtualenvWrapper](http://virtualenvwrapper.readthedocs.org/en/latest/install.html)
+Docker is best supported on Linux, you can probably find packages for your
+preferred distribution [here][docker_install].
+
+**Note:** Please don't run docker as root (or with sudo), it'll cause files
+created within the container to be owned by root on the host system. This will
+prevent you from editing/deleting the files using your regular user account.
+
+Adding your user to the `docker` group will allow to run docker without root
+privileges. Running `sudo gpasswd -a $USER docker` and logging out/in again
+should do the trick.
+
+You can now skip ahead to **"Getting the application"** below.
+
+OSX
+-----------------------------------------
+
+Installing and configuring Docker on OSX isn't quite as straightforward as it
+is on Linux (yet). The [boot2docker][boot2docker] project provides a
+lightweight Linux VM that acts as a (mostly) transparent way to run docker on
+OSX.
+
+First, install Docker and boot2docker following the instructions on
+[this page][docker_osx_install]. Once you've installed Docker and launched
+`boot2docker` for the first time, you need to stop it again so we can make
+further modifications: `$ boot2docker stop`.
+
+Since Docker on OSX is technically running inside a virtual machine and not
+directly on the host OS, any volumes mounted will be on the VM's filesystem
+and any bound ports will be exposed only to the boot2docker VM. We can work
+around these limitations with a few tweaks to our setup.
+
+In order to mount folders from your host OS into the boot2docker VM you'll
+need to download a version of the boot2docker iso with Virtualbox's Guest
+Additions installed:
+
+    $ mkdir -p ~/.boot2docker
+    $ curl http://static.dockerfiles.io/boot2docker-v1.2.0-virtualbox-guest-additions-v4.3.14.iso -o ~/.boot2docker/boot2docker.iso
+
+Next, you need to tell Virtualbox to mount your `/Users` directory inside the
+VM:
+
+    $ VBoxManage sharedfolder add boot2docker-vm -name home -hostpath /Users
+
+And that should be it. Letâ€™s verify:
+
+    $ boot2docker up
+    $ boot2docker ssh "ls /Users"
+
+You should see a list of all user's home folders from your host OS. Next, we
+need to forward the appropriate ports so that we can reach the running
+appengine development server directly from the host OS:
+
+    $ VBoxManage controlvm boot2docker-vm natpf1 "aesdk,tcp,127.0.0.1,8080,,8080"
+    $ VBoxManage controlvm boot2docker-vm natpf1 "aesdkadmin,tcp,127.0.0.1,8000,,8000"
+
+And you should be ready to go, just follow the rest of the setup guide.
+
+Windows
+-----------------------------------------
+
+![Tumbleweed](http://media.giphy.com/media/5x89XRx3sBZFC/giphy.gif)
+
 
 
 Foreman
 -----------------------------------------
-Foreman requires a `.env` file to work. Please ensure you create this file in the project root directory (same directory as manage.py), and ensure the following keys are listed
+Foreman requires a `.env` file to work. Please ensure you create this file
+in the project root directory (same directory as manage.py),
+and ensure the following keys are listed
 
-ENVIRONMENT=["LOCAL"/"LIVE"]
+ENVIRONMENT=[LOCAL/LIVE/TEST]
 
 SECRET_KEY=[django secret key]
 
@@ -69,37 +137,25 @@ LOCAL_DATABASE_URL=[url to local database server]
 REDIS_LOCATION=[url to redis server]
 
 
-Preparing your Python virtual environment
------------------------------------------
-
-Standard Python procedure is to install all dependencies in a virtualenv (both virtualenv and virtualenvwrapper should already be installed before this step), and so we shall:
-    vagrant@rehabradio:~/$ cd server-core
-    vagrant@rehabradio:~/server-core$ mkvirtualenv rehabradio
-
-virtualenvwrapper will create and activate your new virtualenv for you. You can now install the required dependencies; the simplest method is to use pip
-
-    (rehabradio)vagrant@rehabradio:~/server-core$ pip install -r requirements.txt
-
-To deactivate the virtualenv simply type `deactivate`, and to reactivate use `workon rehabradio`.
-
-
-**NOTE:** Throughout the following examples, all commands to be entered will be shown as though typed on a typical bash prompt. Where the command to be typed needs to be run inside the activated virtualenv, you will see the prompt prepended with `(rehabradio)`.
-
-
-Preparing your Django environment
----------------------------------
-
-Almost there... Before we can get started we need to complete a few final steps to set up our Django environment locally, such as creating database tables and a superuser.
-
-    (rehabradio)vagrant@rehabradio:~/server-core$ mkdir databases
-    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py migrate
-
-`migrate` will ask a few questions on the terminal, fill in the required details as appropriate. You should now be ready to start the application locally.
-
-    (rehabradio)vagrant@rehabradio:~/server-core$ python manage.py runserver
-
-You should now be able to access the running Django application in a browser at `http://localhost:8000/api/`
+Installing Docker
+=================
 
 ***
 
-**Important:** This guide is woefully incomplete, feel free to expand upon it or to automate some of the above steps :)
+To build your docker container run:
+
+    $ make run
+
+Once this is finished you will be in the docker container terminal.
+
+Run this project locally from the command line:
+
+   ```
+   $ source /opt/venv/bin/activate
+   $ cd /app/
+   $ make run
+   ```
+
+Visit the running application [http://localhost:8000](http://localhost:8000)
+
+Check out the `Makefile` in the `app/` folder for all available commands.
