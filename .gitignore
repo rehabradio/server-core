@@ -20,6 +20,7 @@ Thumbs.db
 *.pyc
 *.env
 
-/databases/*
-/staticfiles/*
-/htmlcov/*
+databases/*
+staticfiles/*
+htmlcov/*
+.coverage
