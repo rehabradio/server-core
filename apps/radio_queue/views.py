@@ -148,13 +148,12 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             try:
                 queued_track = QueueTrack.objects.custom_create(
                     track_id, queue_id, self.request.user)
-                queued_tracks.append(queued_track)
+                queued_tracks.append(QueueTrackSerializer(queued_track).data)
             except:
                 raise RecordNotSaved
 
         cache.delete(self._cache_key(queue_id))
-        serializer = QueueTrackSerializer(queued_tracks)
-        return Response(serializer.data)
+        return Response(queued_tracks)
 
     def partial_update(self, request, queue_id, pk, *args, **kwargs):
         """Update a queue track position.
