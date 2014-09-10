@@ -114,7 +114,6 @@ Foreman requires a `.env` file to work. Please ensure you create this file
 in the project root directory (same directory as manage.py),
 and ensure the following keys are listed
 
-    ```
     ENVIRONMENT=[LOCAL/LIVE/TEST]
 
     SECRET_KEY=[django secret key]
@@ -136,7 +135,6 @@ and ensure the following keys are listed
     LOCAL_DATABASE_URL=[url to local database server]
 
     REDIS_LOCATION=[url to redis server]
-    ```
 
 
 Running server through Docker
@@ -156,6 +154,6 @@ Run this project locally from the command line:
     $ cd /app/
     $ make run
 
-Visit the running application [http://localhost:8000](http://localhost:8000)
+Visit the running application [http://localhost:8000/api/](http://localhost:8000/api/)
 
 Check out the `Makefile` in the `app/` folder for all available commands.
