@@ -157,3 +157,13 @@ Run this project locally from the command line:
 Visit the running application [http://localhost:8000/api/](http://localhost:8000/api/)
 
 Check out the `Makefile` in the `app/` folder for all available commands.
+
+
+Deploying to Heroku
+=================
+
+***
+
+We just want to push up the "app" folder, so we can use the `git subtree` method to achieve this.
+
+    $ git subtree push --prefix app heroku <branch>:master
