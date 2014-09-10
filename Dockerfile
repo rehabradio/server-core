@@ -25,7 +25,7 @@ RUN apt-get build-dep -y python-imaging python-psycopg2
 
 # create a virtual environment and install all depsendecies from pypi
 RUN virtualenv /opt/venv
-ADD ./requirements.txt /opt/venv/requirements.txt
+ADD app/requirements.txt /opt/venv/requirements.txt
 RUN /opt/venv/bin/pip install -r /opt/venv/requirements.txt
 
 # start supervisor to run our wsgi server
