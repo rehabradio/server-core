@@ -25,15 +25,14 @@ RUN apt-get build-dep -y python-imaging python-psycopg2
 
 # create a virtual environment and install all depsendecies from pypi
 RUN virtualenv /opt/venv
-ADD app/requirements.txt /opt/venv/requirements.txt
+ADD ./app/requirements.txt /opt/venv/requirements.txt
 RUN /opt/venv/bin/pip install -r /opt/venv/requirements.txt
+RUN apt-get install -y wget
+RUN wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
 
-# start supervisor to run our wsgi server
-CMD cd /opt/app/ && /opt/venv/bin/python manage.py makemigrations &&\
-/opt/venv/bin/coverage erase &&\
-/opt/venv/bin/coverage run --source='.' manage.py test apps &&\
-/opt/venv/bin/coverage report -m &&\
-/opt/venv/bin/coverage xml
+# default run command
+CMD bash
 
 # expose port(s)
+EXPOSE 8000
 EXPOSE 80

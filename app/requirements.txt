@@ -1,12 +1,11 @@
-#Django==1.7c1
-#https://www.djangoproject.com/download/1.7c2/tarball/
+#Django==1.7c2
+https://www.djangoproject.com/download/1.7c2/tarball/
 Markdown==2.4.1
 argparse==1.2.1
 coverage==3.7.1
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-cors-headers==0.12
-#django-cors-headers==0.13
 django-debug-toolbar==1.2.1
 django-filter==0.7
 django-redis==3.7.1
