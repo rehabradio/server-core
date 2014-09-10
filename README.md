@@ -114,30 +114,32 @@ Foreman requires a `.env` file to work. Please ensure you create this file
 in the project root directory (same directory as manage.py),
 and ensure the following keys are listed
 
-ENVIRONMENT=[LOCAL/LIVE/TEST]
+    ```
+    ENVIRONMENT=[LOCAL/LIVE/TEST]
 
-SECRET_KEY=[django secret key]
+    SECRET_KEY=[django secret key]
 
-GOOGLE_OAUTH2_CLIENT_ID=[google client id]
-GOOGLE_OAUTH2_CLIENT_SECRET=[google client secret]
-GOOGLE_WHITE_LISTED_DOMAINS=[list of email domains that can access the api]
+    GOOGLE_OAUTH2_CLIENT_ID=[google client id]
+    GOOGLE_OAUTH2_CLIENT_SECRET=[google client secret]
+    GOOGLE_WHITE_LISTED_DOMAINS=[list of email domains that can access the api]
 
-SOUNDCLOUD_CLIENT_ID=[soundcloud client id]
-SOUNDCLOUD_CLIENT_SECRET=[soundcloud client secret]
+    SOUNDCLOUD_CLIENT_ID=[soundcloud client id]
+    SOUNDCLOUD_CLIENT_SECRET=[soundcloud client secret]
 
-SPOTIFY_CLIENT_ID=[soundcloud client id]
-SPOTIFY_CLIENT_SECRET=[soundcloud client secret]
+    SPOTIFY_CLIENT_ID=[soundcloud client id]
+    SPOTIFY_CLIENT_SECRET=[soundcloud client secret]
 
-TEST_USERNAME=[username for test login]
-TEST_PASSWORD=[password for test login]
+    TEST_USERNAME=[username for test login]
+    TEST_PASSWORD=[password for test login]
 
-DATABASE_URL=[url to live database server]
-LOCAL_DATABASE_URL=[url to local database server]
+    DATABASE_URL=[url to live database server]
+    LOCAL_DATABASE_URL=[url to local database server]
 
-REDIS_LOCATION=[url to redis server]
+    REDIS_LOCATION=[url to redis server]
+    ```
 
 
-Installing Docker
+Running server through Docker
 =================
 
 ***
@@ -150,11 +152,9 @@ Once this is finished you will be in the docker container terminal.
 
 Run this project locally from the command line:
 
-   ```
-   $ source /opt/venv/bin/activate
-   $ cd /app/
-   $ make run
-   ```
+    $ source /opt/venv/bin/activate
+    $ cd /app/
+    $ make run
 
 Visit the running application [http://localhost:8000](http://localhost:8000)
 
