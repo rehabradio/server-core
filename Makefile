@@ -11,4 +11,4 @@ build:
 	docker build -t="rehabstudio/$(PROJNAME)" .
 
 run: build
-	docker run -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME)
+	docker run -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 -p 0.0.0.0:5000:5000 rehabstudio/$(PROJNAME)

@@ -35,3 +35,4 @@ CMD bash
 
 # expose port(s)
 EXPOSE 8000
+EXPOSE 5000
