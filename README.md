@@ -161,6 +161,8 @@ Check out the `Makefile` in the `app/` folder for all available commands.
 
 
 ***
+Please be aware that any changes in the database will be destroyed when you stop your container.
+So if you need to make any permanent changes remember to dump your database before you stop the container
 
 Note that the database is created with some test data to get your started
 
