@@ -187,3 +187,9 @@ Add heroku to your local git repo
 Note you only want to push up the `app` folder, so you can use git subtree to achieve this.
 
     $ git subtree push --prefix app heroku master
+
+
+[boot2docker]: http://boot2docker.io/  "boot2docker"
+[docker]: https://docker.io  "Docker"
+[docker_install]: https://docs.docker.com/installation/  "Docker Installation"
+[docker_osx_install]: https://docs.docker.com/installation/mac/  "Docker Installation OSX"
