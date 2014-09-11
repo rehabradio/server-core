@@ -159,10 +159,10 @@ Visit the running application [http://localhost:8000/api/](http://localhost:8000
 Check out the `Makefile` in the `app/` folder for all available commands.
 
 
-**Note that a database is created with some test data to get your started
+***
 
-Admin login
------------
+Note that the database is created with some test data to get your started
+
 Username: admin
 Password: rehabradio
 
