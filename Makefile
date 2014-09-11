@@ -1,6 +1,5 @@
 help:
 	@echo "clean - remove build artifacts"
-	@echo "deploy - deploy the app to the development environment"
 	@echo "run - run the local development server for testing/debugging purposes"
 	@echo "test - run all of the app's tests and print a coverage report"
 
@@ -13,10 +12,6 @@ clean:
 	@-rm .coverage
 	@-rm coverage.xml
 	@-rm nosetests.xml
-
-deploy:
-	# deploy application to the default environment
-	#appcfg.py update . --oauth2
 
 run: clean
 	# Start the database server
