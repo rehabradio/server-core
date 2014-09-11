@@ -142,11 +142,20 @@ Running server through Docker
 
 ***
 
-To build your docker container run:
+To run your docker container run automatically run:
 
     $ make run
 
 Visit the running application [http://localhost:8000/api/](http://localhost:8000/api/)
+
+To have more controll over the server run:
+
+    $ make start
+
+This is start the container and start the containers terminal. From here use the app/Makefile to start your server
+
+    $ cd app
+    $ make run
 
 Check out the `Makefile` in the `app/` folder for all available commands.
 
