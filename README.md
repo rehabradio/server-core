@@ -163,7 +163,19 @@ Deploying to Heroku
 =================
 
 ***
+To push your app up to heroku, the recommended method with git. 
+Note all of the following commands shoud be run from outside of the docker container. 
 
-We just want to push up the "app" folder, so we can use the `git subtree` method to achieve this.
+Create your ssh key (or use existing key)
+
+    $ ssh-keygen -t rsa
+
+Add the contents of the new key to your heroku account under the "SSH Keys" tab. [https://dashboard.heroku.com/account](https://dashboard.heroku.com/account)
+
+Add heroku to your local git repo
+
+    $ git remote add heroku git@heroku.com:{heroku-app-name}.git
+
+Note you only want to push up the `app` folder, so you can use git subtree to achieve this.
 
     $ git subtree push --prefix app heroku master
