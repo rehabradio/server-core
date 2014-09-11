@@ -163,8 +163,8 @@ Check out the `Makefile` in the `app/` folder for all available commands.
 
 Note that the database is created with some test data to get your started
 
-Username: admin
-Password: rehabradio
+    Username: admin
+    Password: rehabradio
 
 
 Deploying to Heroku
