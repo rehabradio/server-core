@@ -19,6 +19,8 @@ deploy:
 	#appcfg.py update . --oauth2
 
 run: clean
+	# Start the database server
+	/etc/init.d/postgresql start
 	# run the development server
 	foreman run python manage.py makemigrations
 	foreman run python manage.py migrate
