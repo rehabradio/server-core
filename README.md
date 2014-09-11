@@ -146,14 +146,6 @@ To build your docker container run:
 
     $ make run
 
-Once this is finished you will be in the docker container terminal.
-
-Run this project locally from the command line:
-
-    $ source /opt/venv/bin/activate
-    $ cd /app/
-    $ make run
-
 Visit the running application [http://localhost:8000/api/](http://localhost:8000/api/)
 
 Check out the `Makefile` in the `app/` folder for all available commands.
