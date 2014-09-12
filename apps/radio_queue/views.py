@@ -9,7 +9,6 @@ import random
 from django.core.cache import cache
 from django.db.models import F
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import action, link
 from rest_framework.response import Response
 
 # local imports
@@ -199,8 +198,15 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
-    @link()
-    def head(self, request, queue_id, *args, **kwargs):
+
+class QueueHeadViewSet(viewsets.ModelViewSet):
+    """Mopidy client endpoints.
+    User must be staff to delete.
+    """
+    queryset = QueueTrack.objects.all()
+    serializer_class = QueueTrackSerializer
+
+    def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
             queued_track = QueueTrack.objects.select_related(
@@ -211,8 +217,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
-    @action()
-    def status(self, request, queue_id, *args, **kwargs):
+    def partial_update(self, request, queue_id, *args, **kwargs):
         """Updates the head track of a given queue,
         based on the mopidy playback status.
         """
@@ -237,37 +242,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
 
-    @action()
-    def event(self, request, queue_id, event, *args, **kwargs):
-        """Updates the head track of a given queue,
-        based on mopidy tracklist and playback events.
-        """
-        post_data = json.loads(request.DATA)
-
-        try:
-            queued_track = QueueTrack.objects.get(
-                queue_id=queue_id, position=1)
-        except:
-            raise RecordNotFound
-
-        try:
-            if event == 'track_playback_paused':
-                queued_track.state = 'paused'
-            else:
-                queued_track.state = 'playing'
-
-            if 'time_position' in post_data:
-                queued_track.time_position = post_data['time_position']
-
-            queued_track.save()
-        except:
-            raise RecordNotSaved
-
-        serializer = QueueTrackSerializer(queued_track)
-        return Response(serializer.data)
-
-    @action()
-    def pop(self, request, queue_id, *args, **kwargs):
+    def destroy(self, request, queue_id, *args, **kwargs):
         """Remove a track from the top of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
