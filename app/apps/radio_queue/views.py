@@ -25,25 +25,6 @@ from radio_metadata.models import Track
 from radio_playlists.models import PlaylistTrack
 
 
-def _add_random_track_to_queue(queue_id, user):
-    """Grabs a random track from the queues history,
-    and adds it back into the queue
-
-    returns track json object
-    """
-    track_ids = QueueTrackHistory.objects.filter(
-        queue_id=queue_id).values_list('track_id', flat=True)[:50]
-    if not track_ids:
-        track_ids = Track.objects.all().order_by(
-            'play_count').values_list('id', flat=True)[:50]
-    # Select a track ID at random
-    track_id = random.choice(track_ids)
-    # Add the track to the top of the queue
-    queue_track = QueueTrack.objects.custom_create(track_id, queue_id, user)
-    # Return the track instance
-    return queue_track
-
-
 class QueueViewSet(viewsets.ModelViewSet):
     """CRUD API endpoints that allow managing queue."""
     cache_key = build_key('queue-queryset')
@@ -206,6 +187,14 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
 
+    def _tracklist_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-tracks-queryset', queue_id)
+
+    def _head_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-head-track', queue_id)
+
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
@@ -213,7 +202,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 'track', 'track__album', 'track__owner', 'owner'
             ).get(queue_id=queue_id, position=1)
         except:
-            queued_track = _add_random_track_to_queue(queue_id, request.user)
+            queued_track = self._add_random_track(queue_id, request.user)
+
+        cache.set(self._head_cache_key(queue_id), queued_track.track, 86400)
+
         seralizer = QueueTrackSerializer(queued_track)
         return Response(seralizer.data)
 
@@ -261,9 +253,35 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         # reset the remaining tracks into their new positions
         QueueTrack.objects.reset_track_positions(queue_id)
-        cache.delete(self._cache_key(queue_id))
+        cache.delete(self._tracklist_cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
+
+    def _add_random_track(self, queue_id, user):
+        """Grabs a random track from the queues history,
+        and adds it back into the queue
+
+        returns track json object
+        """
+        track_id = 0
+        previous_track = cache.get(self._head_cache_key(queue_id))
+        if previous_track:
+            track_id = previous_track.id
+
+        track_ids = QueueTrackHistory.objects.filter(
+            queue_id=queue_id).exclude(track_id=track_id).order_by(
+            ).values_list('track_id', flat=True).distinct()[:50]
+        if not track_ids:
+            track_ids = Track.objects.all().order_by(
+                'play_count').values_list('id', flat=True)[:50]
+
+        # Select a track ID at random
+        track_id = random.choice(track_ids)
+        # Add the track to the top of the queue
+        queue_track = QueueTrack.objects.custom_create(
+            track_id, queue_id, user)
+        # Return the track instance
+        return queue_track
 
 
 class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
