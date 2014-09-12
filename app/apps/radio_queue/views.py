@@ -279,7 +279,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         track_id = random.choice(track_ids)
         # Add the track to the top of the queue
         queue_track = QueueTrack.objects.custom_create(
-            track_id, queue_id, user)
+            track_id, queue_id, user, record=False)
         # Return the track instance
         return queue_track
 
@@ -289,21 +289,14 @@ class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     queryset = QueueTrackHistory.objects.all()
     serializer_class = QueueTrackHistorySerializer
 
-    def _cache_key(self, queue_id):
-        """Build key used for caching the playlist tracks data."""
-        return build_key('queue-history-queryset', queue_id)
-
     def list(self, request, queue_id=None):
         """Return a paginated list of historic queue track json objects."""
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        queryset = cache.get(self._cache_key(queue_id))
-        if queryset is None:
-            queryset = QueueTrackHistory.objects.prefetch_related(
-                'track', 'track__artists', 'track__album',
-                'track__owner', 'owner'
-            ).filter(queue_id=queue_id)
-            cache.set(self._cache_key(queue_id), queryset, 86400)
+        queryset = QueueTrackHistory.objects.prefetch_related(
+            'track', 'track__artists', 'track__album',
+            'track__owner', 'owner'
+        ).filter(queue_id=queue_id)
 
         response = paginate_queryset(
             PaginatedQueueTrackHistorySerializer, request, queryset, page)

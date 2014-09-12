@@ -27,7 +27,7 @@ class QueueTrackManager(models.Manager):
             track.position = i+1
             track.save()
 
-    def custom_create(self, track_id, queue_id, owner):
+    def custom_create(self, track_id, queue_id, owner, record=True):
         """Create queue track."""
         track = Track.objects.get(id=track_id)
         queue = Queue.objects.get(id=queue_id)
@@ -36,8 +36,10 @@ class QueueTrackManager(models.Manager):
         queue_track = self.create(
             track=track, queue=queue,
             position=total_queue_records+1, owner=owner)
-        QueueTrackHistory.objects.create(
-            track=track, queue=queue, owner=owner)
+
+        if record:
+            QueueTrackHistory.objects.create(
+                track=track, queue=queue, owner=owner)
 
         return queue_track
 
