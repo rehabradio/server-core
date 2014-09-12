@@ -16,7 +16,7 @@ start: build
 	docker run --rm -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME)
 
 run: build
-	docker run --rm -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app run
+	docker run --rm -t -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app run
 
 test: build
-	docker run --rm -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app test
+	docker run --rm -t -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app test
