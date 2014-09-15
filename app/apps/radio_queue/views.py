@@ -195,6 +195,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-track', queue_id)
 
+    def _history_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-head-history', queue_id)
+
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
@@ -258,29 +262,37 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Track successfully removed from queue.'})
 
     def _add_random_track(self, queue_id, user):
-        """Grabs a random track from the queues history,
-        and adds it back into the queue
+        """Adds a random track from either the queue history or all tracks,
+        to a given queue.
 
-        returns track json object
+        Uses caching to list tracks and pops of each track as it is played.
+        Caching is reset when a track is manually added to the queue.
         """
-        track_id = 0
         previous_track = cache.get(self._head_cache_key(queue_id))
-        if previous_track:
-            track_id = previous_track.id
+        historic_tracks = cache.get(self._history_cache_key(queue_id))
 
-        track_ids = QueueTrackHistory.objects.filter(
-            queue_id=queue_id).exclude(track_id=track_id).order_by(
-            ).values_list('track_id', flat=True).distinct()[:50]
-        if not track_ids:
-            track_ids = Track.objects.all().order_by(
-                'play_count').values_list('id', flat=True)[:50]
+        if not historic_tracks:
+            historic_tracks = list(QueueTrackHistory.objects.filter(
+                queue_id=queue_id).order_by(
+                ).values_list('track_id', flat=True).distinct())
+
+            if not historic_tracks:
+                historic_tracks = list(Track.objects.all().order_by(
+                    'play_count').values_list('id', flat=True)[:50])
+
+        if historic_tracks.count > 1 and previous_track:
+            if previous_track.id in historic_tracks:
+                historic_tracks.remove(previous_track.id)
 
         # Select a track ID at random
-        track_id = random.choice(track_ids)
+        track_id = random.choice(historic_tracks)
+        # Remove track from list and cache remaining tracks
+        historic_tracks.remove(track_id)
+        cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
         # Add the track to the top of the queue
         queue_track = QueueTrack.objects.custom_create(
             track_id, queue_id, user, record=False)
-        # Return the track instance
+
         return queue_track
 
 
