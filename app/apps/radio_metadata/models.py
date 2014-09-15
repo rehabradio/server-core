@@ -93,6 +93,10 @@ class TrackManager(models.Manager):
                     source_type=track['source_type'],
                 )
             except:
+                if track['album']:
+                    album = Album.objects.cached_get_or_create(
+                        track['album'])
+
                 record = self.create(
                     source_id=track['source_id'],
                     source_type=track['source_type'],
@@ -101,12 +105,17 @@ class TrackManager(models.Manager):
                     preview_url=track['preview_url'],
                     uri=track['uri'],
                     track_number=track['track_number'],
-                    album=track['album'],
+                    album=album,
                     image_small=track['image_small'],
                     image_medium=track['image_medium'],
                     image_large=track['image_large'],
                     owner=owner
                 )
+
+                artists = Artist.objects.cached_get_or_create(track['artists'])
+                for artist in artists:
+                    record.artists.add(artist)
+
             cache.set(cache_key, record)
 
         return record
