@@ -1,7 +1,10 @@
 # third-party imports
+from django.core.cache import cache
 from django.db import models
+
 # local imports
 from radio_metadata.models import Track
+from radio.utils.cache import build_key
 
 
 class Queue(models.Model):
@@ -19,6 +22,11 @@ class Queue(models.Model):
 
 
 class QueueTrackManager(models.Manager):
+
+    def _history_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-head-history', queue_id)
+
     def reset_track_positions(self, queue_id):
         """Set positions of a given queue track list."""
         records = self.filter(queue_id=queue_id)
@@ -40,6 +48,9 @@ class QueueTrackManager(models.Manager):
         if record:
             QueueTrackHistory.objects.create(
                 track=track, queue=queue, owner=owner)
+            # Delete the historic track list,
+            # if a track is manually added to queue
+            cache.delete(self._history_cache_key(queue_id))
 
         return queue_track
 
