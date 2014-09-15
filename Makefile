@@ -5,9 +5,10 @@ PROJNAME = rehabradio
 
 help:
 	@echo "build - Build container"
-	@echo "start - Run container and start database server"
-	@echo "run - Run container and start database and web server"
-	@echo "test - Run container and run test suite"
+	@echo "start - Start container $(PROJNAME)"
+	@echo "resume - Resume container $(PROJNAME)"
+	@echo "run - Run container and start database and web server (non-interactive)"
+	@echo "test - Run container and run test suite (non-interactive)"
 
 build:
 	cd docker; docker build -t="rehabstudio/$(PROJNAME)" .
