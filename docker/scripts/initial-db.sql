@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.5
--- Started on 2014-09-11 10:23:21 BST
+-- Started on 2014-09-15 16:18:34 BST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,45 +12,6 @@ SET client_encoding = 'SQL_ASCII';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-
-DROP DATABASE rehabradio;
---
--- TOC entry 2242 (class 1262 OID 16385)
--- Name: rehabradio; Type: DATABASE; Schema: -; Owner: rehabradio
---
-
-CREATE DATABASE rehabradio WITH TEMPLATE = template0 ENCODING = 'SQL_ASCII' LC_COLLATE = 'C' LC_CTYPE = 'C';
-
-
-ALTER DATABASE rehabradio OWNER TO rehabradio;
-
-\connect rehabradio
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'SQL_ASCII';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- TOC entry 5 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
---
-
-CREATE SCHEMA public;
-
-
-ALTER SCHEMA public OWNER TO postgres;
-
---
--- TOC entry 2243 (class 0 OID 0)
--- Dependencies: 5
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
---
-
-COMMENT ON SCHEMA public IS 'standard public schema';
-
 
 --
 -- TOC entry 211 (class 3079 OID 11753)
@@ -76,7 +37,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 177 (class 1259 OID 24606)
+-- TOC entry 170 (class 1259 OID 16386)
 -- Name: auth_group; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -89,7 +50,7 @@ CREATE TABLE auth_group (
 ALTER TABLE public.auth_group OWNER TO rehabradio;
 
 --
--- TOC entry 176 (class 1259 OID 24604)
+-- TOC entry 171 (class 1259 OID 16389)
 -- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -105,7 +66,7 @@ ALTER TABLE public.auth_group_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2246 (class 0 OID 0)
--- Dependencies: 176
+-- Dependencies: 171
 -- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -113,7 +74,7 @@ ALTER SEQUENCE auth_group_id_seq OWNED BY auth_group.id;
 
 
 --
--- TOC entry 179 (class 1259 OID 24616)
+-- TOC entry 172 (class 1259 OID 16391)
 -- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -127,7 +88,7 @@ CREATE TABLE auth_group_permissions (
 ALTER TABLE public.auth_group_permissions OWNER TO rehabradio;
 
 --
--- TOC entry 178 (class 1259 OID 24614)
+-- TOC entry 173 (class 1259 OID 16394)
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -143,7 +104,7 @@ ALTER TABLE public.auth_group_permissions_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2247 (class 0 OID 0)
--- Dependencies: 178
+-- Dependencies: 173
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -151,7 +112,7 @@ ALTER SEQUENCE auth_group_permissions_id_seq OWNED BY auth_group_permissions.id;
 
 
 --
--- TOC entry 175 (class 1259 OID 24596)
+-- TOC entry 174 (class 1259 OID 16396)
 -- Name: auth_permission; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -166,7 +127,7 @@ CREATE TABLE auth_permission (
 ALTER TABLE public.auth_permission OWNER TO rehabradio;
 
 --
--- TOC entry 174 (class 1259 OID 24594)
+-- TOC entry 175 (class 1259 OID 16399)
 -- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -182,7 +143,7 @@ ALTER TABLE public.auth_permission_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2248 (class 0 OID 0)
--- Dependencies: 174
+-- Dependencies: 175
 -- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -190,7 +151,7 @@ ALTER SEQUENCE auth_permission_id_seq OWNED BY auth_permission.id;
 
 
 --
--- TOC entry 181 (class 1259 OID 24626)
+-- TOC entry 176 (class 1259 OID 16401)
 -- Name: auth_user; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -212,7 +173,7 @@ CREATE TABLE auth_user (
 ALTER TABLE public.auth_user OWNER TO rehabradio;
 
 --
--- TOC entry 183 (class 1259 OID 24636)
+-- TOC entry 177 (class 1259 OID 16404)
 -- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -226,7 +187,7 @@ CREATE TABLE auth_user_groups (
 ALTER TABLE public.auth_user_groups OWNER TO rehabradio;
 
 --
--- TOC entry 182 (class 1259 OID 24634)
+-- TOC entry 178 (class 1259 OID 16407)
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -242,7 +203,7 @@ ALTER TABLE public.auth_user_groups_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2249 (class 0 OID 0)
--- Dependencies: 182
+-- Dependencies: 178
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -250,7 +211,7 @@ ALTER SEQUENCE auth_user_groups_id_seq OWNED BY auth_user_groups.id;
 
 
 --
--- TOC entry 180 (class 1259 OID 24624)
+-- TOC entry 179 (class 1259 OID 16409)
 -- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -266,7 +227,7 @@ ALTER TABLE public.auth_user_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2250 (class 0 OID 0)
--- Dependencies: 180
+-- Dependencies: 179
 -- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -274,7 +235,7 @@ ALTER SEQUENCE auth_user_id_seq OWNED BY auth_user.id;
 
 
 --
--- TOC entry 185 (class 1259 OID 24646)
+-- TOC entry 180 (class 1259 OID 16411)
 -- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -288,7 +249,7 @@ CREATE TABLE auth_user_user_permissions (
 ALTER TABLE public.auth_user_user_permissions OWNER TO rehabradio;
 
 --
--- TOC entry 184 (class 1259 OID 24644)
+-- TOC entry 181 (class 1259 OID 16414)
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -304,7 +265,7 @@ ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2251 (class 0 OID 0)
--- Dependencies: 184
+-- Dependencies: 181
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -312,7 +273,7 @@ ALTER SEQUENCE auth_user_user_permissions_id_seq OWNED BY auth_user_user_permiss
 
 
 --
--- TOC entry 187 (class 1259 OID 24698)
+-- TOC entry 182 (class 1259 OID 16416)
 -- Name: django_admin_log; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -332,7 +293,7 @@ CREATE TABLE django_admin_log (
 ALTER TABLE public.django_admin_log OWNER TO rehabradio;
 
 --
--- TOC entry 186 (class 1259 OID 24696)
+-- TOC entry 183 (class 1259 OID 16423)
 -- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -348,7 +309,7 @@ ALTER TABLE public.django_admin_log_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2252 (class 0 OID 0)
--- Dependencies: 186
+-- Dependencies: 183
 -- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -356,7 +317,7 @@ ALTER SEQUENCE django_admin_log_id_seq OWNED BY django_admin_log.id;
 
 
 --
--- TOC entry 173 (class 1259 OID 24586)
+-- TOC entry 184 (class 1259 OID 16425)
 -- Name: django_content_type; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -371,7 +332,7 @@ CREATE TABLE django_content_type (
 ALTER TABLE public.django_content_type OWNER TO rehabradio;
 
 --
--- TOC entry 172 (class 1259 OID 24584)
+-- TOC entry 185 (class 1259 OID 16428)
 -- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -387,7 +348,7 @@ ALTER TABLE public.django_content_type_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2253 (class 0 OID 0)
--- Dependencies: 172
+-- Dependencies: 185
 -- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -395,7 +356,7 @@ ALTER SEQUENCE django_content_type_id_seq OWNED BY django_content_type.id;
 
 
 --
--- TOC entry 171 (class 1259 OID 24578)
+-- TOC entry 186 (class 1259 OID 16430)
 -- Name: django_migrations; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -410,7 +371,7 @@ CREATE TABLE django_migrations (
 ALTER TABLE public.django_migrations OWNER TO rehabradio;
 
 --
--- TOC entry 170 (class 1259 OID 24576)
+-- TOC entry 187 (class 1259 OID 16433)
 -- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -426,7 +387,7 @@ ALTER TABLE public.django_migrations_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2254 (class 0 OID 0)
--- Dependencies: 170
+-- Dependencies: 187
 -- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -434,7 +395,7 @@ ALTER SEQUENCE django_migrations_id_seq OWNED BY django_migrations.id;
 
 
 --
--- TOC entry 210 (class 1259 OID 25101)
+-- TOC entry 188 (class 1259 OID 16435)
 -- Name: django_session; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -448,7 +409,7 @@ CREATE TABLE django_session (
 ALTER TABLE public.django_session OWNER TO rehabradio;
 
 --
--- TOC entry 189 (class 1259 OID 24722)
+-- TOC entry 189 (class 1259 OID 16441)
 -- Name: radio_metadata_album; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -463,7 +424,7 @@ CREATE TABLE radio_metadata_album (
 ALTER TABLE public.radio_metadata_album OWNER TO rehabradio;
 
 --
--- TOC entry 188 (class 1259 OID 24720)
+-- TOC entry 190 (class 1259 OID 16444)
 -- Name: radio_metadata_album_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -479,7 +440,7 @@ ALTER TABLE public.radio_metadata_album_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2255 (class 0 OID 0)
--- Dependencies: 188
+-- Dependencies: 190
 -- Name: radio_metadata_album_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -487,7 +448,7 @@ ALTER SEQUENCE radio_metadata_album_id_seq OWNED BY radio_metadata_album.id;
 
 
 --
--- TOC entry 191 (class 1259 OID 24732)
+-- TOC entry 191 (class 1259 OID 16446)
 -- Name: radio_metadata_artist; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -502,7 +463,7 @@ CREATE TABLE radio_metadata_artist (
 ALTER TABLE public.radio_metadata_artist OWNER TO rehabradio;
 
 --
--- TOC entry 190 (class 1259 OID 24730)
+-- TOC entry 192 (class 1259 OID 16449)
 -- Name: radio_metadata_artist_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -518,7 +479,7 @@ ALTER TABLE public.radio_metadata_artist_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2256 (class 0 OID 0)
--- Dependencies: 190
+-- Dependencies: 192
 -- Name: radio_metadata_artist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -526,7 +487,7 @@ ALTER SEQUENCE radio_metadata_artist_id_seq OWNED BY radio_metadata_artist.id;
 
 
 --
--- TOC entry 193 (class 1259 OID 24742)
+-- TOC entry 193 (class 1259 OID 16451)
 -- Name: radio_metadata_track; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -553,7 +514,7 @@ CREATE TABLE radio_metadata_track (
 ALTER TABLE public.radio_metadata_track OWNER TO rehabradio;
 
 --
--- TOC entry 195 (class 1259 OID 24750)
+-- TOC entry 194 (class 1259 OID 16454)
 -- Name: radio_metadata_track_artists; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -567,7 +528,7 @@ CREATE TABLE radio_metadata_track_artists (
 ALTER TABLE public.radio_metadata_track_artists OWNER TO rehabradio;
 
 --
--- TOC entry 194 (class 1259 OID 24748)
+-- TOC entry 195 (class 1259 OID 16457)
 -- Name: radio_metadata_track_artists_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -583,7 +544,7 @@ ALTER TABLE public.radio_metadata_track_artists_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2257 (class 0 OID 0)
--- Dependencies: 194
+-- Dependencies: 195
 -- Name: radio_metadata_track_artists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -591,7 +552,7 @@ ALTER SEQUENCE radio_metadata_track_artists_id_seq OWNED BY radio_metadata_track
 
 
 --
--- TOC entry 192 (class 1259 OID 24740)
+-- TOC entry 196 (class 1259 OID 16459)
 -- Name: radio_metadata_track_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -607,7 +568,7 @@ ALTER TABLE public.radio_metadata_track_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2258 (class 0 OID 0)
--- Dependencies: 192
+-- Dependencies: 196
 -- Name: radio_metadata_track_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -615,7 +576,7 @@ ALTER SEQUENCE radio_metadata_track_id_seq OWNED BY radio_metadata_track.id;
 
 
 --
--- TOC entry 203 (class 1259 OID 24973)
+-- TOC entry 197 (class 1259 OID 16461)
 -- Name: radio_players_player; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -635,7 +596,7 @@ CREATE TABLE radio_players_player (
 ALTER TABLE public.radio_players_player OWNER TO rehabradio;
 
 --
--- TOC entry 202 (class 1259 OID 24971)
+-- TOC entry 198 (class 1259 OID 16464)
 -- Name: radio_players_player_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -651,7 +612,7 @@ ALTER TABLE public.radio_players_player_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2259 (class 0 OID 0)
--- Dependencies: 202
+-- Dependencies: 198
 -- Name: radio_players_player_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -659,7 +620,7 @@ ALTER SEQUENCE radio_players_player_id_seq OWNED BY radio_players_player.id;
 
 
 --
--- TOC entry 205 (class 1259 OID 25000)
+-- TOC entry 199 (class 1259 OID 16466)
 -- Name: radio_playlists_playlist; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -677,7 +638,7 @@ CREATE TABLE radio_playlists_playlist (
 ALTER TABLE public.radio_playlists_playlist OWNER TO rehabradio;
 
 --
--- TOC entry 204 (class 1259 OID 24998)
+-- TOC entry 200 (class 1259 OID 16469)
 -- Name: radio_playlists_playlist_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -693,7 +654,7 @@ ALTER TABLE public.radio_playlists_playlist_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2260 (class 0 OID 0)
--- Dependencies: 204
+-- Dependencies: 200
 -- Name: radio_playlists_playlist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -701,7 +662,7 @@ ALTER SEQUENCE radio_playlists_playlist_id_seq OWNED BY radio_playlists_playlist
 
 
 --
--- TOC entry 207 (class 1259 OID 25010)
+-- TOC entry 201 (class 1259 OID 16471)
 -- Name: radio_playlists_playlisttrack; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -720,7 +681,7 @@ CREATE TABLE radio_playlists_playlisttrack (
 ALTER TABLE public.radio_playlists_playlisttrack OWNER TO rehabradio;
 
 --
--- TOC entry 206 (class 1259 OID 25008)
+-- TOC entry 202 (class 1259 OID 16475)
 -- Name: radio_playlists_playlisttrack_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -736,7 +697,7 @@ ALTER TABLE public.radio_playlists_playlisttrack_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2261 (class 0 OID 0)
--- Dependencies: 206
+-- Dependencies: 202
 -- Name: radio_playlists_playlisttrack_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -744,7 +705,7 @@ ALTER SEQUENCE radio_playlists_playlisttrack_id_seq OWNED BY radio_playlists_pla
 
 
 --
--- TOC entry 197 (class 1259 OID 24873)
+-- TOC entry 203 (class 1259 OID 16477)
 -- Name: radio_queue_queue; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -761,7 +722,7 @@ CREATE TABLE radio_queue_queue (
 ALTER TABLE public.radio_queue_queue OWNER TO rehabradio;
 
 --
--- TOC entry 196 (class 1259 OID 24871)
+-- TOC entry 204 (class 1259 OID 16480)
 -- Name: radio_queue_queue_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -777,7 +738,7 @@ ALTER TABLE public.radio_queue_queue_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2262 (class 0 OID 0)
--- Dependencies: 196
+-- Dependencies: 204
 -- Name: radio_queue_queue_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -785,7 +746,7 @@ ALTER SEQUENCE radio_queue_queue_id_seq OWNED BY radio_queue_queue.id;
 
 
 --
--- TOC entry 199 (class 1259 OID 24887)
+-- TOC entry 205 (class 1259 OID 16482)
 -- Name: radio_queue_queuetrack; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -806,7 +767,7 @@ CREATE TABLE radio_queue_queuetrack (
 ALTER TABLE public.radio_queue_queuetrack OWNER TO rehabradio;
 
 --
--- TOC entry 198 (class 1259 OID 24885)
+-- TOC entry 206 (class 1259 OID 16486)
 -- Name: radio_queue_queuetrack_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -822,7 +783,7 @@ ALTER TABLE public.radio_queue_queuetrack_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2263 (class 0 OID 0)
--- Dependencies: 198
+-- Dependencies: 206
 -- Name: radio_queue_queuetrack_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -830,7 +791,7 @@ ALTER SEQUENCE radio_queue_queuetrack_id_seq OWNED BY radio_queue_queuetrack.id;
 
 
 --
--- TOC entry 201 (class 1259 OID 24896)
+-- TOC entry 207 (class 1259 OID 16488)
 -- Name: radio_queue_queuetrackhistory; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -846,7 +807,7 @@ CREATE TABLE radio_queue_queuetrackhistory (
 ALTER TABLE public.radio_queue_queuetrackhistory OWNER TO rehabradio;
 
 --
--- TOC entry 200 (class 1259 OID 24894)
+-- TOC entry 208 (class 1259 OID 16491)
 -- Name: radio_queue_queuetrackhistory_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -862,7 +823,7 @@ ALTER TABLE public.radio_queue_queuetrackhistory_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2264 (class 0 OID 0)
--- Dependencies: 200
+-- Dependencies: 208
 -- Name: radio_queue_queuetrackhistory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -870,7 +831,7 @@ ALTER SEQUENCE radio_queue_queuetrackhistory_id_seq OWNED BY radio_queue_queuetr
 
 
 --
--- TOC entry 209 (class 1259 OID 25088)
+-- TOC entry 209 (class 1259 OID 16493)
 -- Name: radio_users_profile; Type: TABLE; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -884,7 +845,7 @@ CREATE TABLE radio_users_profile (
 ALTER TABLE public.radio_users_profile OWNER TO rehabradio;
 
 --
--- TOC entry 208 (class 1259 OID 25086)
+-- TOC entry 210 (class 1259 OID 16496)
 -- Name: radio_users_profile_id_seq; Type: SEQUENCE; Schema: public; Owner: rehabradio
 --
 
@@ -900,7 +861,7 @@ ALTER TABLE public.radio_users_profile_id_seq OWNER TO rehabradio;
 
 --
 -- TOC entry 2265 (class 0 OID 0)
--- Dependencies: 208
+-- Dependencies: 210
 -- Name: radio_users_profile_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rehabradio
 --
 
@@ -908,7 +869,7 @@ ALTER SEQUENCE radio_users_profile_id_seq OWNED BY radio_users_profile.id;
 
 
 --
--- TOC entry 1948 (class 2604 OID 24609)
+-- TOC entry 1945 (class 2604 OID 16498)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -916,7 +877,7 @@ ALTER TABLE ONLY auth_group ALTER COLUMN id SET DEFAULT nextval('auth_group_id_s
 
 
 --
--- TOC entry 1949 (class 2604 OID 24619)
+-- TOC entry 1946 (class 2604 OID 16499)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -924,7 +885,7 @@ ALTER TABLE ONLY auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('aut
 
 
 --
--- TOC entry 1947 (class 2604 OID 24599)
+-- TOC entry 1947 (class 2604 OID 16500)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -932,7 +893,7 @@ ALTER TABLE ONLY auth_permission ALTER COLUMN id SET DEFAULT nextval('auth_permi
 
 
 --
--- TOC entry 1950 (class 2604 OID 24629)
+-- TOC entry 1948 (class 2604 OID 16501)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -940,7 +901,7 @@ ALTER TABLE ONLY auth_user ALTER COLUMN id SET DEFAULT nextval('auth_user_id_seq
 
 
 --
--- TOC entry 1951 (class 2604 OID 24639)
+-- TOC entry 1949 (class 2604 OID 16502)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -948,7 +909,7 @@ ALTER TABLE ONLY auth_user_groups ALTER COLUMN id SET DEFAULT nextval('auth_user
 
 
 --
--- TOC entry 1952 (class 2604 OID 24649)
+-- TOC entry 1950 (class 2604 OID 16503)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -956,7 +917,7 @@ ALTER TABLE ONLY auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 1953 (class 2604 OID 24701)
+-- TOC entry 1951 (class 2604 OID 16504)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -964,7 +925,7 @@ ALTER TABLE ONLY django_admin_log ALTER COLUMN id SET DEFAULT nextval('django_ad
 
 
 --
--- TOC entry 1946 (class 2604 OID 24589)
+-- TOC entry 1953 (class 2604 OID 16505)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -972,7 +933,7 @@ ALTER TABLE ONLY django_content_type ALTER COLUMN id SET DEFAULT nextval('django
 
 
 --
--- TOC entry 1945 (class 2604 OID 24581)
+-- TOC entry 1954 (class 2604 OID 16506)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -980,7 +941,7 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 
 
 --
--- TOC entry 1955 (class 2604 OID 24725)
+-- TOC entry 1955 (class 2604 OID 16507)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -988,7 +949,7 @@ ALTER TABLE ONLY radio_metadata_album ALTER COLUMN id SET DEFAULT nextval('radio
 
 
 --
--- TOC entry 1956 (class 2604 OID 24735)
+-- TOC entry 1956 (class 2604 OID 16508)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -996,7 +957,7 @@ ALTER TABLE ONLY radio_metadata_artist ALTER COLUMN id SET DEFAULT nextval('radi
 
 
 --
--- TOC entry 1957 (class 2604 OID 24745)
+-- TOC entry 1957 (class 2604 OID 16509)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1004,7 +965,7 @@ ALTER TABLE ONLY radio_metadata_track ALTER COLUMN id SET DEFAULT nextval('radio
 
 
 --
--- TOC entry 1958 (class 2604 OID 24753)
+-- TOC entry 1958 (class 2604 OID 16510)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1012,7 +973,7 @@ ALTER TABLE ONLY radio_metadata_track_artists ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- TOC entry 1963 (class 2604 OID 24976)
+-- TOC entry 1959 (class 2604 OID 16511)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1020,7 +981,7 @@ ALTER TABLE ONLY radio_players_player ALTER COLUMN id SET DEFAULT nextval('radio
 
 
 --
--- TOC entry 1964 (class 2604 OID 25003)
+-- TOC entry 1960 (class 2604 OID 16512)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1028,7 +989,7 @@ ALTER TABLE ONLY radio_playlists_playlist ALTER COLUMN id SET DEFAULT nextval('r
 
 
 --
--- TOC entry 1965 (class 2604 OID 25013)
+-- TOC entry 1961 (class 2604 OID 16513)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1036,7 +997,7 @@ ALTER TABLE ONLY radio_playlists_playlisttrack ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 1959 (class 2604 OID 24876)
+-- TOC entry 1963 (class 2604 OID 16514)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1044,7 +1005,7 @@ ALTER TABLE ONLY radio_queue_queue ALTER COLUMN id SET DEFAULT nextval('radio_qu
 
 
 --
--- TOC entry 1960 (class 2604 OID 24890)
+-- TOC entry 1964 (class 2604 OID 16515)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1052,7 +1013,7 @@ ALTER TABLE ONLY radio_queue_queuetrack ALTER COLUMN id SET DEFAULT nextval('rad
 
 
 --
--- TOC entry 1962 (class 2604 OID 24899)
+-- TOC entry 1966 (class 2604 OID 16516)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1060,7 +1021,7 @@ ALTER TABLE ONLY radio_queue_queuetrackhistory ALTER COLUMN id SET DEFAULT nextv
 
 
 --
--- TOC entry 1967 (class 2604 OID 25091)
+-- TOC entry 1967 (class 2604 OID 16517)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: rehabradio
 --
 
@@ -1068,8 +1029,8 @@ ALTER TABLE ONLY radio_users_profile ALTER COLUMN id SET DEFAULT nextval('radio_
 
 
 --
--- TOC entry 2204 (class 0 OID 24606)
--- Dependencies: 177
+-- TOC entry 2197 (class 0 OID 16386)
+-- Dependencies: 170
 -- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1079,7 +1040,7 @@ COPY auth_group (id, name) FROM stdin;
 
 --
 -- TOC entry 2266 (class 0 OID 0)
--- Dependencies: 176
+-- Dependencies: 171
 -- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1087,8 +1048,8 @@ SELECT pg_catalog.setval('auth_group_id_seq', 1, false);
 
 
 --
--- TOC entry 2206 (class 0 OID 24616)
--- Dependencies: 179
+-- TOC entry 2199 (class 0 OID 16391)
+-- Dependencies: 172
 -- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1098,7 +1059,7 @@ COPY auth_group_permissions (id, group_id, permission_id) FROM stdin;
 
 --
 -- TOC entry 2267 (class 0 OID 0)
--- Dependencies: 178
+-- Dependencies: 173
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1106,8 +1067,8 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 
 
 --
--- TOC entry 2202 (class 0 OID 24596)
--- Dependencies: 175
+-- TOC entry 2201 (class 0 OID 16396)
+-- Dependencies: 174
 -- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1165,7 +1126,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 
 --
 -- TOC entry 2268 (class 0 OID 0)
--- Dependencies: 174
+-- Dependencies: 175
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1173,22 +1134,22 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 48, true);
 
 
 --
--- TOC entry 2208 (class 0 OID 24626)
--- Dependencies: 181
+-- TOC entry 2203 (class 0 OID 16401)
+-- Dependencies: 176
 -- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=	2014-09-11 09:10:58.333357+00	t	admin				t	t	2014-09-11 09:10:27.036345+00
 2	pbkdf2_sha256$12000$xA3KCVhjG3oG$LElxCiX6DAu1Vphz9c0HswW6O8MlaY/iQosY16Mqi8E=	2014-09-11 09:13:25.246261+00	f	testuser				f	t	2014-09-11 09:13:25.246315+00
 3	4c7461d3-6faa-4db7-ad40-0c61cc42fac9	2014-09-11 09:14:51.523225+00	f	Test Player				t	t	2014-09-11 09:14:51.523317+00
 4	88b9c510-493c-42f1-b5d3-9c922d6d3554	2014-09-11 09:15:11.928315+00	f	Test Player 2				t	t	2014-09-11 09:15:11.928383+00
+1	pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=	2014-09-15 15:12:26.132049+00	t	admin				t	t	2014-09-11 09:10:27.036345+00
 \.
 
 
 --
--- TOC entry 2210 (class 0 OID 24636)
--- Dependencies: 183
+-- TOC entry 2204 (class 0 OID 16404)
+-- Dependencies: 177
 -- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1198,7 +1159,7 @@ COPY auth_user_groups (id, user_id, group_id) FROM stdin;
 
 --
 -- TOC entry 2269 (class 0 OID 0)
--- Dependencies: 182
+-- Dependencies: 178
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1207,7 +1168,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 
 --
 -- TOC entry 2270 (class 0 OID 0)
--- Dependencies: 180
+-- Dependencies: 179
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1215,8 +1176,8 @@ SELECT pg_catalog.setval('auth_user_id_seq', 4, true);
 
 
 --
--- TOC entry 2212 (class 0 OID 24646)
--- Dependencies: 185
+-- TOC entry 2207 (class 0 OID 16411)
+-- Dependencies: 180
 -- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1226,7 +1187,7 @@ COPY auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 
 --
 -- TOC entry 2271 (class 0 OID 0)
--- Dependencies: 184
+-- Dependencies: 181
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1234,8 +1195,8 @@ SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
 
 
 --
--- TOC entry 2214 (class 0 OID 24698)
--- Dependencies: 187
+-- TOC entry 2209 (class 0 OID 16416)
+-- Dependencies: 182
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1248,7 +1209,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 
 --
 -- TOC entry 2272 (class 0 OID 0)
--- Dependencies: 186
+-- Dependencies: 183
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1256,8 +1217,8 @@ SELECT pg_catalog.setval('django_admin_log_id_seq', 3, true);
 
 
 --
--- TOC entry 2200 (class 0 OID 24586)
--- Dependencies: 173
+-- TOC entry 2211 (class 0 OID 16425)
+-- Dependencies: 184
 -- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1283,7 +1244,7 @@ COPY django_content_type (id, name, app_label, model) FROM stdin;
 
 --
 -- TOC entry 2273 (class 0 OID 0)
--- Dependencies: 172
+-- Dependencies: 185
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1291,8 +1252,8 @@ SELECT pg_catalog.setval('django_content_type_id_seq', 16, true);
 
 
 --
--- TOC entry 2198 (class 0 OID 24578)
--- Dependencies: 171
+-- TOC entry 2213 (class 0 OID 16430)
+-- Dependencies: 186
 -- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1338,7 +1299,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 
 --
 -- TOC entry 2274 (class 0 OID 0)
--- Dependencies: 170
+-- Dependencies: 187
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1346,8 +1307,8 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 36, true);
 
 
 --
--- TOC entry 2237 (class 0 OID 25101)
--- Dependencies: 210
+-- TOC entry 2215 (class 0 OID 16435)
+-- Dependencies: 188
 -- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1356,7 +1317,7 @@ COPY django_session (session_key, session_data, expire_date) FROM stdin;
 
 
 --
--- TOC entry 2216 (class 0 OID 24722)
+-- TOC entry 2216 (class 0 OID 16441)
 -- Dependencies: 189
 -- Data for Name: radio_metadata_album; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
@@ -1370,7 +1331,7 @@ COPY radio_metadata_album (id, source_type, source_id, name) FROM stdin;
 
 --
 -- TOC entry 2275 (class 0 OID 0)
--- Dependencies: 188
+-- Dependencies: 190
 -- Name: radio_metadata_album_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1378,7 +1339,7 @@ SELECT pg_catalog.setval('radio_metadata_album_id_seq', 3, true);
 
 
 --
--- TOC entry 2218 (class 0 OID 24732)
+-- TOC entry 2218 (class 0 OID 16446)
 -- Dependencies: 191
 -- Data for Name: radio_metadata_artist; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
@@ -1395,7 +1356,7 @@ COPY radio_metadata_artist (id, source_type, source_id, name) FROM stdin;
 
 --
 -- TOC entry 2276 (class 0 OID 0)
--- Dependencies: 190
+-- Dependencies: 192
 -- Name: radio_metadata_artist_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1403,7 +1364,7 @@ SELECT pg_catalog.setval('radio_metadata_artist_id_seq', 6, true);
 
 
 --
--- TOC entry 2220 (class 0 OID 24742)
+-- TOC entry 2220 (class 0 OID 16451)
 -- Dependencies: 193
 -- Data for Name: radio_metadata_track; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
@@ -1419,27 +1380,32 @@ COPY radio_metadata_track (id, source_type, source_id, name, duration_ms, previe
 
 
 --
--- TOC entry 2222 (class 0 OID 24750)
--- Dependencies: 195
+-- TOC entry 2221 (class 0 OID 16454)
+-- Dependencies: 194
 -- Data for Name: radio_metadata_track_artists; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
 COPY radio_metadata_track_artists (id, track_id, artist_id) FROM stdin;
+1	1	1
+2	2	2
+3	3	3
+4	4	4
+5	5	5
 \.
 
 
 --
 -- TOC entry 2277 (class 0 OID 0)
--- Dependencies: 194
+-- Dependencies: 195
 -- Name: radio_metadata_track_artists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
-SELECT pg_catalog.setval('radio_metadata_track_artists_id_seq', 1, false);
+SELECT pg_catalog.setval('radio_metadata_track_artists_id_seq', 5, true);
 
 
 --
 -- TOC entry 2278 (class 0 OID 0)
--- Dependencies: 192
+-- Dependencies: 196
 -- Name: radio_metadata_track_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1447,8 +1413,8 @@ SELECT pg_catalog.setval('radio_metadata_track_id_seq', 6, true);
 
 
 --
--- TOC entry 2230 (class 0 OID 24973)
--- Dependencies: 203
+-- TOC entry 2224 (class 0 OID 16461)
+-- Dependencies: 197
 -- Data for Name: radio_players_player; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1460,7 +1426,7 @@ COPY radio_players_player (id, name, location, token, created, updated, active, 
 
 --
 -- TOC entry 2279 (class 0 OID 0)
--- Dependencies: 202
+-- Dependencies: 198
 -- Name: radio_players_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1468,8 +1434,8 @@ SELECT pg_catalog.setval('radio_players_player_id_seq', 2, true);
 
 
 --
--- TOC entry 2232 (class 0 OID 25000)
--- Dependencies: 205
+-- TOC entry 2226 (class 0 OID 16466)
+-- Dependencies: 199
 -- Data for Name: radio_playlists_playlist; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1481,7 +1447,7 @@ COPY radio_playlists_playlist (id, name, description, owner_id, created, updated
 
 --
 -- TOC entry 2280 (class 0 OID 0)
--- Dependencies: 204
+-- Dependencies: 200
 -- Name: radio_playlists_playlist_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1489,8 +1455,8 @@ SELECT pg_catalog.setval('radio_playlists_playlist_id_seq', 2, true);
 
 
 --
--- TOC entry 2234 (class 0 OID 25010)
--- Dependencies: 207
+-- TOC entry 2228 (class 0 OID 16471)
+-- Dependencies: 201
 -- Data for Name: radio_playlists_playlisttrack; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1509,7 +1475,7 @@ COPY radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track
 
 --
 -- TOC entry 2281 (class 0 OID 0)
--- Dependencies: 206
+-- Dependencies: 202
 -- Name: radio_playlists_playlisttrack_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1517,8 +1483,8 @@ SELECT pg_catalog.setval('radio_playlists_playlisttrack_id_seq', 9, true);
 
 
 --
--- TOC entry 2224 (class 0 OID 24873)
--- Dependencies: 197
+-- TOC entry 2230 (class 0 OID 16477)
+-- Dependencies: 203
 -- Data for Name: radio_queue_queue; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1530,7 +1496,7 @@ COPY radio_queue_queue (id, name, description, created, updated, owner_id) FROM 
 
 --
 -- TOC entry 2282 (class 0 OID 0)
--- Dependencies: 196
+-- Dependencies: 204
 -- Name: radio_queue_queue_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1538,8 +1504,8 @@ SELECT pg_catalog.setval('radio_queue_queue_id_seq', 2, true);
 
 
 --
--- TOC entry 2226 (class 0 OID 24887)
--- Dependencies: 199
+-- TOC entry 2232 (class 0 OID 16482)
+-- Dependencies: 205
 -- Data for Name: radio_queue_queuetrack; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1552,7 +1518,7 @@ COPY radio_queue_queuetrack (id, "position", owner_id, track_id, created, queue_
 
 --
 -- TOC entry 2283 (class 0 OID 0)
--- Dependencies: 198
+-- Dependencies: 206
 -- Name: radio_queue_queuetrack_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1560,8 +1526,8 @@ SELECT pg_catalog.setval('radio_queue_queuetrack_id_seq', 3, true);
 
 
 --
--- TOC entry 2228 (class 0 OID 24896)
--- Dependencies: 201
+-- TOC entry 2234 (class 0 OID 16488)
+-- Dependencies: 207
 -- Data for Name: radio_queue_queuetrackhistory; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
@@ -1574,7 +1540,7 @@ COPY radio_queue_queuetrackhistory (id, created, owner_id, track_id, queue_id) F
 
 --
 -- TOC entry 2284 (class 0 OID 0)
--- Dependencies: 200
+-- Dependencies: 208
 -- Name: radio_queue_queuetrackhistory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1582,7 +1548,7 @@ SELECT pg_catalog.setval('radio_queue_queuetrackhistory_id_seq', 3, true);
 
 
 --
--- TOC entry 2236 (class 0 OID 25088)
+-- TOC entry 2236 (class 0 OID 16493)
 -- Dependencies: 209
 -- Data for Name: radio_users_profile; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
@@ -1597,7 +1563,7 @@ COPY radio_users_profile (id, avatar, user_id) FROM stdin;
 
 --
 -- TOC entry 2285 (class 0 OID 0)
--- Dependencies: 208
+-- Dependencies: 210
 -- Name: radio_users_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
@@ -1605,7 +1571,7 @@ SELECT pg_catalog.setval('radio_users_profile_id_seq', 4, true);
 
 
 --
--- TOC entry 1980 (class 2606 OID 24613)
+-- TOC entry 1969 (class 2606 OID 16519)
 -- Name: auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1614,7 +1580,7 @@ ALTER TABLE ONLY auth_group
 
 
 --
--- TOC entry 1986 (class 2606 OID 24623)
+-- TOC entry 1975 (class 2606 OID 16521)
 -- Name: auth_group_permissions_group_id_permission_id_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1623,7 +1589,7 @@ ALTER TABLE ONLY auth_group_permissions
 
 
 --
--- TOC entry 1988 (class 2606 OID 24621)
+-- TOC entry 1977 (class 2606 OID 16523)
 -- Name: auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1632,7 +1598,7 @@ ALTER TABLE ONLY auth_group_permissions
 
 
 --
--- TOC entry 1982 (class 2606 OID 24611)
+-- TOC entry 1971 (class 2606 OID 16525)
 -- Name: auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1641,7 +1607,7 @@ ALTER TABLE ONLY auth_group
 
 
 --
--- TOC entry 1976 (class 2606 OID 24603)
+-- TOC entry 1980 (class 2606 OID 16527)
 -- Name: auth_permission_content_type_id_codename_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1650,7 +1616,7 @@ ALTER TABLE ONLY auth_permission
 
 
 --
--- TOC entry 1978 (class 2606 OID 24601)
+-- TOC entry 1982 (class 2606 OID 16529)
 -- Name: auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1659,7 +1625,7 @@ ALTER TABLE ONLY auth_permission
 
 
 --
--- TOC entry 1996 (class 2606 OID 24641)
+-- TOC entry 1990 (class 2606 OID 16531)
 -- Name: auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1668,7 +1634,7 @@ ALTER TABLE ONLY auth_user_groups
 
 
 --
--- TOC entry 1998 (class 2606 OID 24643)
+-- TOC entry 1992 (class 2606 OID 16533)
 -- Name: auth_user_groups_user_id_group_id_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1677,7 +1643,7 @@ ALTER TABLE ONLY auth_user_groups
 
 
 --
--- TOC entry 1990 (class 2606 OID 24631)
+-- TOC entry 1984 (class 2606 OID 16535)
 -- Name: auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1686,7 +1652,7 @@ ALTER TABLE ONLY auth_user
 
 
 --
--- TOC entry 2002 (class 2606 OID 24651)
+-- TOC entry 1996 (class 2606 OID 16537)
 -- Name: auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1695,7 +1661,7 @@ ALTER TABLE ONLY auth_user_user_permissions
 
 
 --
--- TOC entry 2004 (class 2606 OID 24653)
+-- TOC entry 1998 (class 2606 OID 16539)
 -- Name: auth_user_user_permissions_user_id_permission_id_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1704,7 +1670,7 @@ ALTER TABLE ONLY auth_user_user_permissions
 
 
 --
--- TOC entry 1992 (class 2606 OID 24633)
+-- TOC entry 1986 (class 2606 OID 16541)
 -- Name: auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1713,7 +1679,7 @@ ALTER TABLE ONLY auth_user
 
 
 --
--- TOC entry 2008 (class 2606 OID 24707)
+-- TOC entry 2002 (class 2606 OID 16543)
 -- Name: django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1722,7 +1688,7 @@ ALTER TABLE ONLY django_admin_log
 
 
 --
--- TOC entry 1971 (class 2606 OID 24593)
+-- TOC entry 2004 (class 2606 OID 16545)
 -- Name: django_content_type_app_label_45f3b1d93ec8c61c_uniq; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1731,7 +1697,7 @@ ALTER TABLE ONLY django_content_type
 
 
 --
--- TOC entry 1973 (class 2606 OID 24591)
+-- TOC entry 2006 (class 2606 OID 16547)
 -- Name: django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1740,7 +1706,7 @@ ALTER TABLE ONLY django_content_type
 
 
 --
--- TOC entry 1969 (class 2606 OID 24583)
+-- TOC entry 2008 (class 2606 OID 16549)
 -- Name: django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1749,7 +1715,7 @@ ALTER TABLE ONLY django_migrations
 
 
 --
--- TOC entry 2062 (class 2606 OID 25108)
+-- TOC entry 2011 (class 2606 OID 16551)
 -- Name: django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1758,7 +1724,7 @@ ALTER TABLE ONLY django_session
 
 
 --
--- TOC entry 2010 (class 2606 OID 24727)
+-- TOC entry 2013 (class 2606 OID 16553)
 -- Name: radio_metadata_album_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1767,7 +1733,7 @@ ALTER TABLE ONLY radio_metadata_album
 
 
 --
--- TOC entry 2012 (class 2606 OID 24729)
+-- TOC entry 2015 (class 2606 OID 16555)
 -- Name: radio_metadata_album_source_type_2b78c835a32ff94e_uniq; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1776,7 +1742,7 @@ ALTER TABLE ONLY radio_metadata_album
 
 
 --
--- TOC entry 2014 (class 2606 OID 24737)
+-- TOC entry 2017 (class 2606 OID 16557)
 -- Name: radio_metadata_artist_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1785,7 +1751,7 @@ ALTER TABLE ONLY radio_metadata_artist
 
 
 --
--- TOC entry 2016 (class 2606 OID 24739)
+-- TOC entry 2019 (class 2606 OID 16559)
 -- Name: radio_metadata_artist_source_type_2d2e5c661b70c74d_uniq; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1794,7 +1760,7 @@ ALTER TABLE ONLY radio_metadata_artist
 
 
 --
--- TOC entry 2026 (class 2606 OID 24755)
+-- TOC entry 2029 (class 2606 OID 16561)
 -- Name: radio_metadata_track_artists_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1803,7 +1769,7 @@ ALTER TABLE ONLY radio_metadata_track_artists
 
 
 --
--- TOC entry 2028 (class 2606 OID 24757)
+-- TOC entry 2031 (class 2606 OID 16563)
 -- Name: radio_metadata_track_artists_track_id_artist_id_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1812,7 +1778,7 @@ ALTER TABLE ONLY radio_metadata_track_artists
 
 
 --
--- TOC entry 2020 (class 2606 OID 24747)
+-- TOC entry 2023 (class 2606 OID 16565)
 -- Name: radio_metadata_track_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1821,7 +1787,7 @@ ALTER TABLE ONLY radio_metadata_track
 
 
 --
--- TOC entry 2022 (class 2606 OID 24759)
+-- TOC entry 2025 (class 2606 OID 16567)
 -- Name: radio_metadata_track_source_type_73d9b759f2b914a2_uniq; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1830,7 +1796,7 @@ ALTER TABLE ONLY radio_metadata_track
 
 
 --
--- TOC entry 2045 (class 2606 OID 24978)
+-- TOC entry 2035 (class 2606 OID 16569)
 -- Name: radio_players_player_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1839,7 +1805,7 @@ ALTER TABLE ONLY radio_players_player
 
 
 --
--- TOC entry 2048 (class 2606 OID 25007)
+-- TOC entry 2038 (class 2606 OID 16571)
 -- Name: radio_playlists_playlist_name_3996c384d7358e6a_uniq; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1848,7 +1814,7 @@ ALTER TABLE ONLY radio_playlists_playlist
 
 
 --
--- TOC entry 2050 (class 2606 OID 25005)
+-- TOC entry 2040 (class 2606 OID 16573)
 -- Name: radio_playlists_playlist_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1857,7 +1823,7 @@ ALTER TABLE ONLY radio_playlists_playlist
 
 
 --
--- TOC entry 2055 (class 2606 OID 25016)
+-- TOC entry 2045 (class 2606 OID 16575)
 -- Name: radio_playlists_playlisttrack_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1866,7 +1832,7 @@ ALTER TABLE ONLY radio_playlists_playlisttrack
 
 
 --
--- TOC entry 2031 (class 2606 OID 24878)
+-- TOC entry 2048 (class 2606 OID 16577)
 -- Name: radio_queue_queue_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1875,7 +1841,7 @@ ALTER TABLE ONLY radio_queue_queue
 
 
 --
--- TOC entry 2036 (class 2606 OID 24893)
+-- TOC entry 2053 (class 2606 OID 16579)
 -- Name: radio_queue_queuetrack_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1884,7 +1850,7 @@ ALTER TABLE ONLY radio_queue_queuetrack
 
 
 --
--- TOC entry 2041 (class 2606 OID 24901)
+-- TOC entry 2058 (class 2606 OID 16581)
 -- Name: radio_queue_queuetrackhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1893,7 +1859,7 @@ ALTER TABLE ONLY radio_queue_queuetrackhistory
 
 
 --
--- TOC entry 2057 (class 2606 OID 25093)
+-- TOC entry 2060 (class 2606 OID 16583)
 -- Name: radio_users_profile_pkey; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1902,7 +1868,7 @@ ALTER TABLE ONLY radio_users_profile
 
 
 --
--- TOC entry 2059 (class 2606 OID 25095)
+-- TOC entry 2062 (class 2606 OID 16585)
 -- Name: radio_users_profile_user_id_key; Type: CONSTRAINT; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1911,7 +1877,7 @@ ALTER TABLE ONLY radio_users_profile
 
 
 --
--- TOC entry 1983 (class 1259 OID 24660)
+-- TOC entry 1972 (class 1259 OID 16586)
 -- Name: auth_group_permissions_0e939a4f; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1919,7 +1885,7 @@ CREATE INDEX auth_group_permissions_0e939a4f ON auth_group_permissions USING btr
 
 
 --
--- TOC entry 1984 (class 1259 OID 24666)
+-- TOC entry 1973 (class 1259 OID 16587)
 -- Name: auth_group_permissions_8373b171; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1927,7 +1893,7 @@ CREATE INDEX auth_group_permissions_8373b171 ON auth_group_permissions USING btr
 
 
 --
--- TOC entry 1974 (class 1259 OID 24654)
+-- TOC entry 1978 (class 1259 OID 16588)
 -- Name: auth_permission_417f1b1c; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1935,7 +1901,7 @@ CREATE INDEX auth_permission_417f1b1c ON auth_permission USING btree (content_ty
 
 
 --
--- TOC entry 1993 (class 1259 OID 24678)
+-- TOC entry 1987 (class 1259 OID 16589)
 -- Name: auth_user_groups_0e939a4f; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1943,7 +1909,7 @@ CREATE INDEX auth_user_groups_0e939a4f ON auth_user_groups USING btree (group_id
 
 
 --
--- TOC entry 1994 (class 1259 OID 24672)
+-- TOC entry 1988 (class 1259 OID 16590)
 -- Name: auth_user_groups_e8701ad4; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1951,7 +1917,7 @@ CREATE INDEX auth_user_groups_e8701ad4 ON auth_user_groups USING btree (user_id)
 
 
 --
--- TOC entry 1999 (class 1259 OID 24690)
+-- TOC entry 1993 (class 1259 OID 16591)
 -- Name: auth_user_user_permissions_8373b171; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1959,7 +1925,7 @@ CREATE INDEX auth_user_user_permissions_8373b171 ON auth_user_user_permissions U
 
 
 --
--- TOC entry 2000 (class 1259 OID 24684)
+-- TOC entry 1994 (class 1259 OID 16592)
 -- Name: auth_user_user_permissions_e8701ad4; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1967,7 +1933,7 @@ CREATE INDEX auth_user_user_permissions_e8701ad4 ON auth_user_user_permissions U
 
 
 --
--- TOC entry 2005 (class 1259 OID 24708)
+-- TOC entry 1999 (class 1259 OID 16593)
 -- Name: django_admin_log_417f1b1c; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1975,7 +1941,7 @@ CREATE INDEX django_admin_log_417f1b1c ON django_admin_log USING btree (content_
 
 
 --
--- TOC entry 2006 (class 1259 OID 24714)
+-- TOC entry 2000 (class 1259 OID 16594)
 -- Name: django_admin_log_e8701ad4; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1983,7 +1949,7 @@ CREATE INDEX django_admin_log_e8701ad4 ON django_admin_log USING btree (user_id)
 
 
 --
--- TOC entry 2060 (class 1259 OID 25109)
+-- TOC entry 2009 (class 1259 OID 16595)
 -- Name: django_session_de54fa62; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1991,7 +1957,7 @@ CREATE INDEX django_session_de54fa62 ON django_session USING btree (expire_date)
 
 
 --
--- TOC entry 2017 (class 1259 OID 24766)
+-- TOC entry 2020 (class 1259 OID 16596)
 -- Name: radio_metadata_track_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -1999,7 +1965,7 @@ CREATE INDEX radio_metadata_track_5e7b1936 ON radio_metadata_track USING btree (
 
 
 --
--- TOC entry 2018 (class 1259 OID 24760)
+-- TOC entry 2021 (class 1259 OID 16597)
 -- Name: radio_metadata_track_95c3b9df; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2007,7 +1973,7 @@ CREATE INDEX radio_metadata_track_95c3b9df ON radio_metadata_track USING btree (
 
 
 --
--- TOC entry 2023 (class 1259 OID 24772)
+-- TOC entry 2026 (class 1259 OID 16598)
 -- Name: radio_metadata_track_artists_2edb7cf7; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2015,7 +1981,7 @@ CREATE INDEX radio_metadata_track_artists_2edb7cf7 ON radio_metadata_track_artis
 
 
 --
--- TOC entry 2024 (class 1259 OID 24778)
+-- TOC entry 2027 (class 1259 OID 16599)
 -- Name: radio_metadata_track_artists_ca949605; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2023,7 +1989,7 @@ CREATE INDEX radio_metadata_track_artists_ca949605 ON radio_metadata_track_artis
 
 
 --
--- TOC entry 2042 (class 1259 OID 24992)
+-- TOC entry 2032 (class 1259 OID 16600)
 -- Name: radio_players_player_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2031,7 +1997,7 @@ CREATE INDEX radio_players_player_5e7b1936 ON radio_players_player USING btree (
 
 
 --
--- TOC entry 2043 (class 1259 OID 24984)
+-- TOC entry 2033 (class 1259 OID 16601)
 -- Name: radio_players_player_75249aa1; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2039,7 +2005,7 @@ CREATE INDEX radio_players_player_75249aa1 ON radio_players_player USING btree (
 
 
 --
--- TOC entry 2046 (class 1259 OID 25017)
+-- TOC entry 2036 (class 1259 OID 16602)
 -- Name: radio_playlists_playlist_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2047,7 +2013,7 @@ CREATE INDEX radio_playlists_playlist_5e7b1936 ON radio_playlists_playlist USING
 
 
 --
--- TOC entry 2051 (class 1259 OID 25035)
+-- TOC entry 2041 (class 1259 OID 16603)
 -- Name: radio_playlists_playlisttrack_2edb7cf7; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2055,7 +2021,7 @@ CREATE INDEX radio_playlists_playlisttrack_2edb7cf7 ON radio_playlists_playlistt
 
 
 --
--- TOC entry 2052 (class 1259 OID 25029)
+-- TOC entry 2042 (class 1259 OID 16604)
 -- Name: radio_playlists_playlisttrack_5d3a6442; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2063,7 +2029,7 @@ CREATE INDEX radio_playlists_playlisttrack_5d3a6442 ON radio_playlists_playlistt
 
 
 --
--- TOC entry 2053 (class 1259 OID 25023)
+-- TOC entry 2043 (class 1259 OID 16605)
 -- Name: radio_playlists_playlisttrack_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2071,7 +2037,7 @@ CREATE INDEX radio_playlists_playlisttrack_5e7b1936 ON radio_playlists_playlistt
 
 
 --
--- TOC entry 2029 (class 1259 OID 24879)
+-- TOC entry 2046 (class 1259 OID 16606)
 -- Name: radio_queue_queue_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2079,7 +2045,7 @@ CREATE INDEX radio_queue_queue_5e7b1936 ON radio_queue_queue USING btree (owner_
 
 
 --
--- TOC entry 2032 (class 1259 OID 24908)
+-- TOC entry 2049 (class 1259 OID 16607)
 -- Name: radio_queue_queuetrack_2edb7cf7; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2087,7 +2053,7 @@ CREATE INDEX radio_queue_queuetrack_2edb7cf7 ON radio_queue_queuetrack USING btr
 
 
 --
--- TOC entry 2033 (class 1259 OID 24902)
+-- TOC entry 2050 (class 1259 OID 16608)
 -- Name: radio_queue_queuetrack_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2095,7 +2061,7 @@ CREATE INDEX radio_queue_queuetrack_5e7b1936 ON radio_queue_queuetrack USING btr
 
 
 --
--- TOC entry 2034 (class 1259 OID 24960)
+-- TOC entry 2051 (class 1259 OID 16609)
 -- Name: radio_queue_queuetrack_75249aa1; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2103,7 +2069,7 @@ CREATE INDEX radio_queue_queuetrack_75249aa1 ON radio_queue_queuetrack USING btr
 
 
 --
--- TOC entry 2037 (class 1259 OID 24920)
+-- TOC entry 2054 (class 1259 OID 16610)
 -- Name: radio_queue_queuetrackhistory_2edb7cf7; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2111,7 +2077,7 @@ CREATE INDEX radio_queue_queuetrackhistory_2edb7cf7 ON radio_queue_queuetrackhis
 
 
 --
--- TOC entry 2038 (class 1259 OID 24914)
+-- TOC entry 2055 (class 1259 OID 16611)
 -- Name: radio_queue_queuetrackhistory_5e7b1936; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2119,7 +2085,7 @@ CREATE INDEX radio_queue_queuetrackhistory_5e7b1936 ON radio_queue_queuetrackhis
 
 
 --
--- TOC entry 2039 (class 1259 OID 24933)
+-- TOC entry 2056 (class 1259 OID 16612)
 -- Name: radio_queue_queuetrackhistory_75249aa1; Type: INDEX; Schema: public; Owner: rehabradio; Tablespace: 
 --
 
@@ -2127,7 +2093,7 @@ CREATE INDEX radio_queue_queuetrackhistory_75249aa1 ON radio_queue_queuetrackhis
 
 
 --
--- TOC entry 2063 (class 2606 OID 24655)
+-- TOC entry 2065 (class 2606 OID 16613)
 -- Name: auth_content_type_id_508cf46651277a81_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2136,7 +2102,7 @@ ALTER TABLE ONLY auth_permission
 
 
 --
--- TOC entry 2064 (class 2606 OID 24661)
+-- TOC entry 2063 (class 2606 OID 16618)
 -- Name: auth_group_permissio_group_id_689710a9a73b7457_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2145,7 +2111,7 @@ ALTER TABLE ONLY auth_group_permissions
 
 
 --
--- TOC entry 2065 (class 2606 OID 24667)
+-- TOC entry 2064 (class 2606 OID 16623)
 -- Name: auth_group_permission_id_1f49ccbbdc69d2fc_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2154,7 +2120,7 @@ ALTER TABLE ONLY auth_group_permissions
 
 
 --
--- TOC entry 2069 (class 2606 OID 24691)
+-- TOC entry 2068 (class 2606 OID 16628)
 -- Name: auth_user__permission_id_384b62483d7071f0_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2163,7 +2129,7 @@ ALTER TABLE ONLY auth_user_user_permissions
 
 
 --
--- TOC entry 2067 (class 2606 OID 24679)
+-- TOC entry 2066 (class 2606 OID 16633)
 -- Name: auth_user_groups_group_id_33ac548dcf5f8e37_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2172,7 +2138,7 @@ ALTER TABLE ONLY auth_user_groups
 
 
 --
--- TOC entry 2066 (class 2606 OID 24673)
+-- TOC entry 2067 (class 2606 OID 16638)
 -- Name: auth_user_groups_user_id_4b5ed4ffdb8fd9b0_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2181,7 +2147,7 @@ ALTER TABLE ONLY auth_user_groups
 
 
 --
--- TOC entry 2068 (class 2606 OID 24685)
+-- TOC entry 2069 (class 2606 OID 16643)
 -- Name: auth_user_user_permiss_user_id_7f0938558328534a_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2190,7 +2156,7 @@ ALTER TABLE ONLY auth_user_user_permissions
 
 
 --
--- TOC entry 2070 (class 2606 OID 24709)
+-- TOC entry 2070 (class 2606 OID 16648)
 -- Name: djan_content_type_id_697914295151027a_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2199,7 +2165,7 @@ ALTER TABLE ONLY django_admin_log
 
 
 --
--- TOC entry 2071 (class 2606 OID 24715)
+-- TOC entry 2071 (class 2606 OID 16653)
 -- Name: django_admin_log_user_id_52fdd58701c5f563_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2208,7 +2174,7 @@ ALTER TABLE ONLY django_admin_log
 
 
 --
--- TOC entry 2087 (class 2606 OID 25030)
+-- TOC entry 2079 (class 2606 OID 16658)
 -- Name: rad_playlist_id_293960e4a7610afa_fk_radio_playlists_playlist_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2217,7 +2183,7 @@ ALTER TABLE ONLY radio_playlists_playlisttrack
 
 
 --
--- TOC entry 2075 (class 2606 OID 24797)
+-- TOC entry 2074 (class 2606 OID 16663)
 -- Name: radio_me_artist_id_1c7fa56da04145b9_fk_radio_metadata_artist_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2226,7 +2192,7 @@ ALTER TABLE ONLY radio_metadata_track_artists
 
 
 --
--- TOC entry 2072 (class 2606 OID 24761)
+-- TOC entry 2072 (class 2606 OID 16668)
 -- Name: radio_metad_album_id_e787f2cbfce76ed_fk_radio_metadata_album_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2235,7 +2201,7 @@ ALTER TABLE ONLY radio_metadata_track
 
 
 --
--- TOC entry 2074 (class 2606 OID 24773)
+-- TOC entry 2075 (class 2606 OID 16673)
 -- Name: radio_metad_track_id_9427a190c200ea0_fk_radio_metadata_track_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2244,7 +2210,7 @@ ALTER TABLE ONLY radio_metadata_track_artists
 
 
 --
--- TOC entry 2073 (class 2606 OID 24784)
+-- TOC entry 2073 (class 2606 OID 16678)
 -- Name: radio_metadata_track_owner_id_4d1c2cd98ba47dd5_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2253,7 +2219,7 @@ ALTER TABLE ONLY radio_metadata_track
 
 
 --
--- TOC entry 2088 (class 2606 OID 25036)
+-- TOC entry 2080 (class 2606 OID 16683)
 -- Name: radio_play_track_id_375780d036d0b49c_fk_radio_metadata_track_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2262,7 +2228,7 @@ ALTER TABLE ONLY radio_playlists_playlisttrack
 
 
 --
--- TOC entry 2084 (class 2606 OID 24993)
+-- TOC entry 2076 (class 2606 OID 16688)
 -- Name: radio_players_player_owner_id_6fb709a4adbe47b8_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2271,7 +2237,7 @@ ALTER TABLE ONLY radio_players_player
 
 
 --
--- TOC entry 2083 (class 2606 OID 24985)
+-- TOC entry 2077 (class 2606 OID 16693)
 -- Name: radio_players_queue_id_4458c2538e252a40_fk_radio_queue_queue_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2280,7 +2246,7 @@ ALTER TABLE ONLY radio_players_player
 
 
 --
--- TOC entry 2086 (class 2606 OID 25024)
+-- TOC entry 2081 (class 2606 OID 16698)
 -- Name: radio_playlists_playl_owner_id_1410b62c3d9ab434_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2289,7 +2255,7 @@ ALTER TABLE ONLY radio_playlists_playlisttrack
 
 
 --
--- TOC entry 2085 (class 2606 OID 25018)
+-- TOC entry 2078 (class 2606 OID 16703)
 -- Name: radio_playlists_playl_owner_id_59675cfb9398e044_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2298,7 +2264,7 @@ ALTER TABLE ONLY radio_playlists_playlist
 
 
 --
--- TOC entry 2077 (class 2606 OID 24909)
+-- TOC entry 2083 (class 2606 OID 16708)
 -- Name: radio_queu_track_id_212c3b13d9aec83a_fk_radio_metadata_track_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2307,7 +2273,7 @@ ALTER TABLE ONLY radio_queue_queuetrack
 
 
 --
--- TOC entry 2078 (class 2606 OID 24961)
+-- TOC entry 2084 (class 2606 OID 16713)
 -- Name: radio_queue_q_queue_id_41f3cc4846f1c9de_fk_radio_queue_queue_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2316,7 +2282,7 @@ ALTER TABLE ONLY radio_queue_queuetrack
 
 
 --
--- TOC entry 2082 (class 2606 OID 24934)
+-- TOC entry 2086 (class 2606 OID 16718)
 -- Name: radio_queue_q_queue_id_69779aebd073c161_fk_radio_queue_queue_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2325,7 +2291,7 @@ ALTER TABLE ONLY radio_queue_queuetrackhistory
 
 
 --
--- TOC entry 2076 (class 2606 OID 24880)
+-- TOC entry 2082 (class 2606 OID 16723)
 -- Name: radio_queue_queue_owner_id_6e80fd6eb376bf0a_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2334,7 +2300,7 @@ ALTER TABLE ONLY radio_queue_queue
 
 
 --
--- TOC entry 2079 (class 2606 OID 24966)
+-- TOC entry 2085 (class 2606 OID 16728)
 -- Name: radio_queue_queuetrac_owner_id_20a9382f9301736a_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2343,7 +2309,7 @@ ALTER TABLE ONLY radio_queue_queuetrack
 
 
 --
--- TOC entry 2080 (class 2606 OID 24915)
+-- TOC entry 2087 (class 2606 OID 16733)
 -- Name: radio_queue_queuetrac_owner_id_4359582ba94651d9_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2352,7 +2318,7 @@ ALTER TABLE ONLY radio_queue_queuetrackhistory
 
 
 --
--- TOC entry 2081 (class 2606 OID 24921)
+-- TOC entry 2088 (class 2606 OID 16738)
 -- Name: radio_queue_track_id_d0597694ddfdf09_fk_radio_metadata_track_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2361,7 +2327,7 @@ ALTER TABLE ONLY radio_queue_queuetrackhistory
 
 
 --
--- TOC entry 2089 (class 2606 OID 25096)
+-- TOC entry 2089 (class 2606 OID 16743)
 -- Name: radio_users_profile_user_id_3c36936e2e6f82a6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: rehabradio
 --
 
@@ -2371,7 +2337,7 @@ ALTER TABLE ONLY radio_users_profile
 
 --
 -- TOC entry 2244 (class 0 OID 0)
--- Dependencies: 5
+-- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
@@ -2381,7 +2347,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2014-09-11 10:23:21 BST
+-- Completed on 2014-09-15 16:18:35 BST
 
 --
 -- PostgreSQL database dump complete
