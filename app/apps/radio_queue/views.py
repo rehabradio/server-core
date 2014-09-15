@@ -124,7 +124,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         else:
             track_ids = (request.DATA['track'],)
 
-        for (i, track_id) in enumerate(track_ids):
+        for track_id in track_ids:
             try:
                 queued_track = QueueTrack.objects.custom_create(
                     track_id, queue_id, self.request.user)

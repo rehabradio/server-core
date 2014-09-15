@@ -13,7 +13,10 @@ build:
 	cd docker; docker build -t="rehabstudio/$(PROJNAME)" .
 
 start: build
-	docker run --rm -t -i -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME)
+	docker run -t -i --workdir="/app" --name="$(PROJNAME)" -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME)
+
+resume:
+	docker start -i $(PROJNAME)
 
 run: build
 	docker run --rm -t -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app run
