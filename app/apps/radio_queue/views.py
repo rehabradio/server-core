@@ -206,7 +206,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 'track', 'track__album', 'track__owner', 'owner'
             ).get(queue_id=queue_id, position=1)
         except:
-            queued_track = self._add_random_track(queue_id, request.user)
+            queued_track = self._add_random_track(queue_id)
 
         cache.set(self._head_cache_key(queue_id), queued_track.track, 86400)
 
@@ -261,7 +261,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
-    def _add_random_track(self, queue_id, user):
+    def _add_random_track(self, queue_id):
         """Adds a random track from either the queue history or all tracks,
         to a given queue.
 
@@ -280,7 +280,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 historic_tracks = list(Track.objects.all().order_by(
                     'play_count').values_list('id', flat=True)[:50])
 
-        if historic_tracks.count > 1 and previous_track:
+        if len(historic_tracks) > 1 and previous_track:
             if previous_track.id in historic_tracks:
                 historic_tracks.remove(previous_track.id)
 
@@ -291,7 +291,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
         # Add the track to the top of the queue
         queue_track = QueueTrack.objects.custom_create(
-            track_id, queue_id, user, record=False)
+            track_id, queue_id, self.request.user, record=False)
 
         return queue_track
 
