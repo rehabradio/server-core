@@ -142,10 +142,10 @@ class SoundcloudClient(object):
 
         return [_transform_track(x.obj) for x in tracks]
 
-    def fetch_associated_track(self, artist):
+    def fetch_associated_track(self, track):
         """Fetch a random associated track, using the soundcloud API.
         """
-        url = 'tracks/{0}/related'.format(artist['source_id'])
+        url = 'tracks/{0}/related'.format(track['source_id'])
         tracks = self.client.get(url)
 
         track = random_pick(tracks)
