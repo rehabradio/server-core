@@ -268,7 +268,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         Caching is reset when a track is manually added to the queue.
         """
-        # List of possible tracks to be used to find next track
+        # Tracklist to be used to find next track
         historic_tracks = cache.get(self._history_cache_key(queue_id))
 
         # Build tracklist from queue history
