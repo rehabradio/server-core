@@ -918,7 +918,7 @@
         "name": "Test Playlist (Private)",
         "created": "2014-09-11T09:15:48.763Z",
         "protection": "private",
-        "owner": 1,
+        "owner": 2,
         "description": "Private playlist"
     },
     "model": "radio_playlists.playlist",
@@ -1125,38 +1125,6 @@
     },
     "model": "radio_queue.queuetrackhistory",
     "pk": 3
-},
-{
-    "fields": {
-        "user": 1,
-        "avatar": null
-    },
-    "model": "radio_users.profile",
-    "pk": 1
-},
-{
-    "fields": {
-        "user": 2,
-        "avatar": null
-    },
-    "model": "radio_users.profile",
-    "pk": 2
-},
-{
-    "fields": {
-        "user": 3,
-        "avatar": null
-    },
-    "model": "radio_users.profile",
-    "pk": 3
-},
-{
-    "fields": {
-        "user": 4,
-        "avatar": null
-    },
-    "model": "radio_users.profile",
-    "pk": 4
 },
 {
     "fields": {
