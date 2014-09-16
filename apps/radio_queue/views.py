@@ -211,9 +211,9 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             except:
                 queued_track = self._add_random_track(queue_id)
 
-        cache.set(self._head_cache_key(queue_id), queued_track.track, 86400)
-
         seralizer = QueueTrackSerializer(queued_track)
+        cache.set(self._head_cache_key(queue_id), seralizer.data, 86400)
+
         return Response(seralizer.data)
 
     def partial_update(self, request, queue_id, *args, **kwargs):
@@ -284,8 +284,8 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                     'play_count').values_list('id', flat=True)[:50])
 
         if len(historic_tracks) > 1 and previous_track:
-            if previous_track.id in historic_tracks:
-                historic_tracks.remove(previous_track.id)
+            if previous_track['track']['id'] in historic_tracks:
+                historic_tracks.remove(previous_track['track']['id'])
 
         # Select a track ID at random
         track_id = random.choice(historic_tracks)
@@ -303,8 +303,8 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         source_type = 'spotify'
         previous_track = cache.get(self._head_cache_key(queue_id))
         if previous_track:
-            if previous_track.source_type == source_type:
-                artist = previous_track.track.artists[0]
+            if previous_track['track']['source_type'] == source_type:
+                artist = previous_track['track']['artists'][0]
 
         if artist is None:
             historic_tracks = QueueTrackHistory.objects.filter(
