@@ -17,11 +17,11 @@ from .serializers import (
     QueueSerializer, PaginatedQueueSerializer,
     QueueTrackSerializer, PaginatedQueueTrackSerializer,
     QueueTrackHistorySerializer, PaginatedQueueTrackHistorySerializer)
-from radio.exceptions import RecordDeleteFailed, RecordNotFound, RecordNotSaved
+from radio.exceptions import (
+    RecordDeleteFailed, RecordNotFound, RecordNotSaved, QueueEmpty)
 from radio.permissions import IsStaffOrOwnerToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
-from radio_metadata.models import Track
 from radio_metadata.views import get_associated_track
 from radio_playlists.models import PlaylistTrack
 
@@ -188,13 +188,9 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
     queryset = QueueTrack.objects.all()
     serializer_class = QueueTrackSerializer
 
-    def _tracklist_cache_key(self, queue_id):
-        """Build key used for caching the playlist tracks data."""
+    def _cache_key(self, queue_id):
+        """Build key used for caching the queue tracks data."""
         return build_key('queue-tracks-queryset', queue_id)
-
-    def _head_cache_key(self, queue_id):
-        """Build key used for caching the playlist tracks data."""
-        return build_key('queue-head-track', queue_id)
 
     def _history_cache_key(self, queue_id):
         """Build key used for caching the playlist tracks data."""
@@ -209,10 +205,9 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             try:
                 queued_track = self._queue_radio(queue_id)
             except:
-                queued_track = self._add_random_track(queue_id)
+                raise QueueEmpty
 
         seralizer = QueueTrackSerializer(queued_track)
-        cache.set(self._head_cache_key(queue_id), seralizer.data, 86400)
 
         return Response(seralizer.data)
 
@@ -260,54 +255,44 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         # reset the remaining tracks into their new positions
         QueueTrack.objects.reset_track_positions(queue_id)
-        cache.delete(self._tracklist_cache_key(queue_id))
+        cache.delete(self._cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
-    def _add_random_track(self, queue_id):
-        """Adds a random track from either the queue history or all tracks,
-        to a given queue.
+    def _queue_radio(self, queue_id):
+        """Add an associated track to a given queue,
+        using the queues track history.
 
-        Uses caching to list tracks and pops of each track as it is played.
+        Uses caching to create a tracklist of tracks,
+        to use as a base to find new songs.
+
         Caching is reset when a track is manually added to the queue.
         """
-        previous_track = cache.get(self._head_cache_key(queue_id))
+        # List of possible tracks to be used to find next track
         historic_tracks = cache.get(self._history_cache_key(queue_id))
 
-        if not historic_tracks:
-            historic_tracks = list(QueueTrackHistory.objects.filter(
-                queue_id=queue_id).order_by(
-                ).values_list('track_id', flat=True).distinct())
+        # Build tracklist from queue history
+        if historic_tracks is None:
+            historic_tracks = []
+            queryset = QueueTrackHistory.objects.filter(
+                queue_id=queue_id).order_by().distinct('track_id')
+            for track in queryset:
+                serializer = QueueTrackHistorySerializer(track)
+                historic_tracks.append(serializer.data['track'])
 
-            if not historic_tracks:
-                historic_tracks = list(Track.objects.all().order_by(
-                    'play_count').values_list('id', flat=True)[:50])
-
-        if len(historic_tracks) > 1 and previous_track:
-            if previous_track['track']['id'] in historic_tracks:
-                historic_tracks.remove(previous_track['track']['id'])
-
-        # Select a track ID at random
-        track_id = random.choice(historic_tracks)
-        # Remove track from list and cache remaining tracks
-        historic_tracks.remove(track_id)
-        cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
-        # Add the track to the top of the queue
-        queue_track = QueueTrack.objects.custom_create(
-            track_id, queue_id, self.request.user, record=False)
-
-        return queue_track
-
-    def _queue_radio(self, queue_id):
-        historic_tracks = list(QueueTrackHistory.objects.filter(
-            queue_id=queue_id).order_by().distinct('track_id'))
+        # Pick a track from the tracklist at random,
+        # and remove it from the tracklist
         track = random.choice(historic_tracks)
+        historic_tracks.remove(track)
 
-        r_track = QueueTrackHistorySerializer(track).data
-        artist = r_track['track']['artists'][0]
+        # Use the tracks main artist to fetch new track
+        track = get_associated_track(track['artists'][0], self.request.user)
 
-        track = get_associated_track(artist, self.request.user)
+        # Update the tracklist with the newly fetched track
+        historic_tracks.append(track)
+        cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
 
+        # Add the new track to the queue
         queue_track = QueueTrack.objects.custom_create(
             track['id'], queue_id, self.request.user, record=False)
 
