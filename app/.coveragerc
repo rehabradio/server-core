@@ -10,6 +10,11 @@ exclude_lines =
     if self\.debug
 
     # Don't complain if tests don't hit defensive assertion code:
+    except:
+    raise RecordNotSaved
+    raise RecordNotFound
+    raise RecordDeleteFailed
+
     raise AssertionError
     raise NotImplementedError
 
