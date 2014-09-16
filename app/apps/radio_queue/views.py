@@ -22,6 +22,7 @@ from radio.permissions import IsStaffOrOwnerToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
 from radio_metadata.models import Track
+from radio_metadata.views import get_associated_track
 from radio_playlists.models import PlaylistTrack
 
 
@@ -202,11 +203,13 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
-            queued_track = QueueTrack.objects.select_related(
-                'track', 'track__album', 'track__owner', 'owner'
-            ).get(queue_id=queue_id, position=1)
+            queued_track = QueueTrack.objects.get(
+                queue_id=queue_id, position=1)
         except:
-            queued_track = self._add_random_track(queue_id)
+            try:
+                queued_track = self._artist_radio(queue_id)
+            except:
+                queued_track = self._add_random_track(queue_id)
 
         cache.set(self._head_cache_key(queue_id), queued_track.track, 86400)
 
@@ -292,6 +295,32 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         # Add the track to the top of the queue
         queue_track = QueueTrack.objects.custom_create(
             track_id, queue_id, self.request.user, record=False)
+
+        return queue_track
+
+    def _artist_radio(self, queue_id):
+        artist = None
+        source_type = 'spotify'
+        previous_track = cache.get(self._head_cache_key(queue_id))
+        if previous_track:
+            if previous_track.source_type == source_type:
+                artist = previous_track.track.artists[0]
+
+        if artist is None:
+            historic_tracks = QueueTrackHistory.objects.filter(
+                queue_id=queue_id, track__source_type=source_type).order_by(
+                '?')[0]
+            previous_track = QueueTrackHistorySerializer(historic_tracks).data
+
+            if previous_track:
+                artist = previous_track['track']['artists'][0]
+            else:
+                raise RecordNotFound
+
+        track = get_associated_track(artist, self.request.user)
+
+        queue_track = QueueTrack.objects.custom_create(
+            track['id'], queue_id, self.request.user, record=False)
 
         return queue_track
 

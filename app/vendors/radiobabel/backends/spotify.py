@@ -11,6 +11,7 @@ import requests
 
 # local imports
 from radiobabel.errors import TrackNotFound, PlaylistNotFound
+from .utils import random_pick
 
 
 logger = logging.getLogger('radiobabel.backends.spotify')
@@ -198,6 +199,24 @@ class SpotifyClient(object):
 
         return tracks
 
+    def fetch_associated_track(self, artist):
+        base_url = 'https://api.spotify.com/v1/artists/'
+
+        # Fetch all the related artists for a given artist
+        artists_url = base_url + '{0}/related-artists'.format(
+            artist['source_id'])
+
+        related_artists = _make_request(artists_url)
+
+        artist = random_pick(related_artists['artists'], 5)
+
+        # Fetch the top 10 tracks for a given artist
+        track_url = base_url + '{0}/top-tracks?country=gb'.format(artist['id'])
+        top_tracks = _make_request(track_url)
+        track = random_pick(top_tracks['tracks'])
+
+        return _transform_track(track)
+
     def playlists(self, user_id, token):
         """Lookup user playlists using the Spotify Web API
 
@@ -238,10 +257,3 @@ class SpotifyClient(object):
         tracks = _transform_playlist_response(response, offset)
 
         return tracks
-
-    def favorites(self, user_id, token, limit=20, offset=0):
-        """Lookup user starred tracks using the Spotify Web API.
-
-        Returns standard radiobabel track list response.
-        """
-        pass

@@ -55,6 +55,19 @@ def _get_track_data(source_type, source_id):
     return track_data
 
 
+def get_associated_track(artist, user):
+    source_client = _build_client(artist['source_type'])
+    track = source_client.fetch_associated_track(artist)
+
+    try:
+        track = Track.objects.cached_get_or_create(track, user)
+        serializer = TrackSerializer(track)
+    except:
+        raise RecordNotSaved
+
+    return serializer.data
+
+
 class MetadataAPIRootView(APIView):
     """The metadata API allows for both search and lookup
     from supported source_types.
