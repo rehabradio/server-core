@@ -207,7 +207,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 queue_id=queue_id, position=1)
         except:
             try:
-                queued_track = self._artist_radio(queue_id)
+                queued_track = self._queue_radio(queue_id)
             except:
                 queued_track = self._add_random_track(queue_id)
 
@@ -298,24 +298,13 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         return queue_track
 
-    def _artist_radio(self, queue_id):
-        artist = None
-        source_type = 'spotify'
-        previous_track = cache.get(self._head_cache_key(queue_id))
-        if previous_track:
-            if previous_track['track']['source_type'] == source_type:
-                artist = previous_track['track']['artists'][0]
+    def _queue_radio(self, queue_id):
+        historic_tracks = list(QueueTrackHistory.objects.filter(
+            queue_id=queue_id).order_by().distinct('track_id'))
+        track = random.choice(historic_tracks)
 
-        if artist is None:
-            historic_tracks = QueueTrackHistory.objects.filter(
-                queue_id=queue_id, track__source_type=source_type).order_by(
-                '?')[0]
-            previous_track = QueueTrackHistorySerializer(historic_tracks).data
-
-            if previous_track:
-                artist = previous_track['track']['artists'][0]
-            else:
-                raise RecordNotFound
+        r_track = QueueTrackHistorySerializer(track).data
+        artist = r_track['track']['artists'][0]
 
         track = get_associated_track(artist, self.request.user)
 
