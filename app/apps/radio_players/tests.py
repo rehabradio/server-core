@@ -121,7 +121,7 @@ class PlayerViewSetTestCase(BaseTestCase):
 
     def test_retrieve_with_token(self):
         """Return a player json object of a given record."""
-        resp = self.api_client.get('/api/players/b41bac6b-72fe-47fe-a984-79555c600a64/')
+        resp = self.api_client.get('/api/players/4c7461d3-6faa-4db7-ad40-0c61cc42fac9/')
         data = json.loads(resp.content)
 
         # Ensure request was successful
