@@ -42,3 +42,10 @@ class RecordNotSaved(APIException):
     """Simple exception used to show record could not be saved to database"""
     status_code = 400
     default_detail = 'The record could not be saved.'
+
+
+class QueueEmpty(APIException):
+    """Simple exception used to show queue has no records (historic or active).
+    """
+    status_code = 400
+    default_detail = 'This queue has no tracks.'

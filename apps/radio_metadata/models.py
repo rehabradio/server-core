@@ -94,7 +94,7 @@ class TrackManager(models.Manager):
                 )
             except:
                 if track['album']:
-                    album = Album.objects.cached_get_or_create(
+                    track['album'] = Album.objects.cached_get_or_create(
                         track['album'])
 
                 record = self.create(
@@ -105,7 +105,7 @@ class TrackManager(models.Manager):
                     preview_url=track['preview_url'],
                     uri=track['uri'],
                     track_number=track['track_number'],
-                    album=album,
+                    album=track['album'],
                     image_small=track['image_small'],
                     image_medium=track['image_medium'],
                     image_large=track['image_large'],

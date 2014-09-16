@@ -61,10 +61,10 @@ def get_associated_track(artist, user):
 
     try:
         track = Track.objects.cached_get_or_create(track, user)
-        serializer = TrackSerializer(track)
     except:
         raise RecordNotSaved
 
+    serializer = TrackSerializer(track)
     return serializer.data
 
 
