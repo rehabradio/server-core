@@ -11,6 +11,7 @@ import soundcloud
 
 # local imports
 from radiobabel.errors import TrackNotFound, PlaylistNotFound
+from .utils import random_pick
 
 
 logger = logging.getLogger('radiobabel.backends.soundcloud')
@@ -141,8 +142,18 @@ class SoundcloudClient(object):
 
         return [_transform_track(x.obj) for x in tracks]
 
+    def fetch_associated_track(self, artist):
+        """Fetch a random associated track, using the soundcloud API.
+        """
+        url = 'tracks/{0}/related'.format(artist['source_id'])
+        tracks = self.client.get(url)
+
+        track = random_pick(tracks)
+
+        return _transform_track(track.obj)
+
     def playlists(self, user_id, token):
-        """Lookup user playlists using the Spotify Web API
+        """Lookup user playlists using the soundcloud Web API
 
         Returns standard radiobabel playlist list response.
         """
