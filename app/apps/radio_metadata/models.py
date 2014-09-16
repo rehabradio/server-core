@@ -23,9 +23,6 @@ class MetadataBase(models.Model):
         abstract = True
         unique_together = (('source_type', 'source_id'),)
 
-    def __unicode__(self):
-        return self.name
-
 
 class AlbumManager(models.Manager):
     def cached_get_or_create(self, album):
