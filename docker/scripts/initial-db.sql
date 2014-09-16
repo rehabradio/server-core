@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.5
--- Started on 2014-09-15 16:18:34 BST
+-- Started on 2014-09-16 15:47:58 BST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1034,8 +1034,6 @@ ALTER TABLE ONLY radio_users_profile ALTER COLUMN id SET DEFAULT nextval('radio_
 -- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_group (id, name) FROM stdin;
-\.
 
 
 --
@@ -1053,8 +1051,6 @@ SELECT pg_catalog.setval('auth_group_id_seq', 1, false);
 -- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_group_permissions (id, group_id, permission_id) FROM stdin;
-\.
 
 
 --
@@ -1072,56 +1068,54 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 -- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
-1	Can add log entry	1	add_logentry
-2	Can change log entry	1	change_logentry
-3	Can delete log entry	1	delete_logentry
-4	Can add permission	2	add_permission
-5	Can change permission	2	change_permission
-6	Can delete permission	2	delete_permission
-7	Can add group	3	add_group
-8	Can change group	3	change_group
-9	Can delete group	3	delete_group
-10	Can add user	4	add_user
-11	Can change user	4	change_user
-12	Can delete user	4	delete_user
-13	Can add content type	5	add_contenttype
-14	Can change content type	5	change_contenttype
-15	Can delete content type	5	delete_contenttype
-16	Can add session	6	add_session
-17	Can change session	6	change_session
-18	Can delete session	6	delete_session
-19	Can add album	7	add_album
-20	Can change album	7	change_album
-21	Can delete album	7	delete_album
-22	Can add artist	8	add_artist
-23	Can change artist	8	change_artist
-24	Can delete artist	8	delete_artist
-25	Can add track	9	add_track
-26	Can change track	9	change_track
-27	Can delete track	9	delete_track
-28	Can add player	10	add_player
-29	Can change player	10	change_player
-30	Can delete player	10	delete_player
-31	Can add playlist	11	add_playlist
-32	Can change playlist	11	change_playlist
-33	Can delete playlist	11	delete_playlist
-34	Can add playlist track	12	add_playlisttrack
-35	Can change playlist track	12	change_playlisttrack
-36	Can delete playlist track	12	delete_playlisttrack
-37	Can add queue	13	add_queue
-38	Can change queue	13	change_queue
-39	Can delete queue	13	delete_queue
-40	Can add queue track	14	add_queuetrack
-41	Can change queue track	14	change_queuetrack
-42	Can delete queue track	14	delete_queuetrack
-43	Can add queue track history	15	add_queuetrackhistory
-44	Can change queue track history	15	change_queuetrackhistory
-45	Can delete queue track history	15	delete_queuetrackhistory
-46	Can add profile	16	add_profile
-47	Can change profile	16	change_profile
-48	Can delete profile	16	delete_profile
-\.
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (1, 'Can add log entry', 1, 'add_logentry');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (2, 'Can change log entry', 1, 'change_logentry');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (3, 'Can delete log entry', 1, 'delete_logentry');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (4, 'Can add permission', 2, 'add_permission');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (5, 'Can change permission', 2, 'change_permission');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (6, 'Can delete permission', 2, 'delete_permission');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (7, 'Can add group', 3, 'add_group');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (8, 'Can change group', 3, 'change_group');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (9, 'Can delete group', 3, 'delete_group');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (10, 'Can add user', 4, 'add_user');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (11, 'Can change user', 4, 'change_user');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (12, 'Can delete user', 4, 'delete_user');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (13, 'Can add content type', 5, 'add_contenttype');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (14, 'Can change content type', 5, 'change_contenttype');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (15, 'Can delete content type', 5, 'delete_contenttype');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (16, 'Can add session', 6, 'add_session');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (17, 'Can change session', 6, 'change_session');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (18, 'Can delete session', 6, 'delete_session');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (19, 'Can add album', 7, 'add_album');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (20, 'Can change album', 7, 'change_album');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (21, 'Can delete album', 7, 'delete_album');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (22, 'Can add artist', 8, 'add_artist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (23, 'Can change artist', 8, 'change_artist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (24, 'Can delete artist', 8, 'delete_artist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (25, 'Can add track', 9, 'add_track');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (26, 'Can change track', 9, 'change_track');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (27, 'Can delete track', 9, 'delete_track');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (28, 'Can add player', 10, 'add_player');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (29, 'Can change player', 10, 'change_player');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (30, 'Can delete player', 10, 'delete_player');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (31, 'Can add playlist', 11, 'add_playlist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (32, 'Can change playlist', 11, 'change_playlist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (33, 'Can delete playlist', 11, 'delete_playlist');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (34, 'Can add playlist track', 12, 'add_playlisttrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (35, 'Can change playlist track', 12, 'change_playlisttrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (36, 'Can delete playlist track', 12, 'delete_playlisttrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (37, 'Can add queue', 13, 'add_queue');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (38, 'Can change queue', 13, 'change_queue');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (39, 'Can delete queue', 13, 'delete_queue');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (40, 'Can add queue track', 14, 'add_queuetrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (41, 'Can change queue track', 14, 'change_queuetrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (42, 'Can delete queue track', 14, 'delete_queuetrack');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (43, 'Can add queue track history', 15, 'add_queuetrackhistory');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (44, 'Can change queue track history', 15, 'change_queuetrackhistory');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (45, 'Can delete queue track history', 15, 'delete_queuetrackhistory');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (46, 'Can add profile', 16, 'add_profile');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (47, 'Can change profile', 16, 'change_profile');
+INSERT INTO auth_permission (id, name, content_type_id, codename) VALUES (48, 'Can delete profile', 16, 'delete_profile');
 
 
 --
@@ -1139,12 +1133,10 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 48, true);
 -- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-2	pbkdf2_sha256$12000$xA3KCVhjG3oG$LElxCiX6DAu1Vphz9c0HswW6O8MlaY/iQosY16Mqi8E=	2014-09-11 09:13:25.246261+00	f	testuser				f	t	2014-09-11 09:13:25.246315+00
-3	4c7461d3-6faa-4db7-ad40-0c61cc42fac9	2014-09-11 09:14:51.523225+00	f	Test Player				t	t	2014-09-11 09:14:51.523317+00
-4	88b9c510-493c-42f1-b5d3-9c922d6d3554	2014-09-11 09:15:11.928315+00	f	Test Player 2				t	t	2014-09-11 09:15:11.928383+00
-1	pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=	2014-09-15 15:12:26.132049+00	t	admin				t	t	2014-09-11 09:10:27.036345+00
-\.
+INSERT INTO auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES (2, 'pbkdf2_sha256$12000$xA3KCVhjG3oG$LElxCiX6DAu1Vphz9c0HswW6O8MlaY/iQosY16Mqi8E=', '2014-09-11 09:13:25.246261+00', false, 'testuser', '', '', '', false, true, '2014-09-11 09:13:25.246315+00');
+INSERT INTO auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES (3, '4c7461d3-6faa-4db7-ad40-0c61cc42fac9', '2014-09-11 09:14:51.523225+00', false, 'Test Player', '', '', '', true, true, '2014-09-11 09:14:51.523317+00');
+INSERT INTO auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES (4, '88b9c510-493c-42f1-b5d3-9c922d6d3554', '2014-09-11 09:15:11.928315+00', false, 'Test Player 2', '', '', '', true, true, '2014-09-11 09:15:11.928383+00');
+INSERT INTO auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES (1, 'pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=', '2014-09-16 14:45:02.583737+00', true, 'admin', '', '', '', true, true, '2014-09-11 09:10:27.036345+00');
 
 
 --
@@ -1153,8 +1145,6 @@ COPY auth_user (id, password, last_login, is_superuser, username, first_name, la
 -- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_user_groups (id, user_id, group_id) FROM stdin;
-\.
 
 
 --
@@ -1181,8 +1171,6 @@ SELECT pg_catalog.setval('auth_user_id_seq', 4, true);
 -- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
-\.
 
 
 --
@@ -1200,11 +1188,9 @@ SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
-1	2014-09-11 09:13:25.343424+00	2	testuser	1		4	1
-2	2014-09-11 09:14:51.584045+00	1	Belfast - Test Player	1		10	1
-3	2014-09-11 09:15:11.960556+00	2	London - Test Player 2	1		10	1
-\.
+INSERT INTO django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) VALUES (1, '2014-09-11 09:13:25.343424+00', '2', 'testuser', 1, '', 4, 1);
+INSERT INTO django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) VALUES (2, '2014-09-11 09:14:51.584045+00', '1', 'Belfast - Test Player', 1, '', 10, 1);
+INSERT INTO django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) VALUES (3, '2014-09-11 09:15:11.960556+00', '2', 'London - Test Player 2', 1, '', 10, 1);
 
 
 --
@@ -1222,24 +1208,22 @@ SELECT pg_catalog.setval('django_admin_log_id_seq', 3, true);
 -- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY django_content_type (id, name, app_label, model) FROM stdin;
-1	log entry	admin	logentry
-2	permission	auth	permission
-3	group	auth	group
-4	user	auth	user
-5	content type	contenttypes	contenttype
-6	session	sessions	session
-7	album	radio_metadata	album
-8	artist	radio_metadata	artist
-9	track	radio_metadata	track
-10	player	radio_players	player
-11	playlist	radio_playlists	playlist
-12	playlist track	radio_playlists	playlisttrack
-13	queue	radio_queue	queue
-14	queue track	radio_queue	queuetrack
-15	queue track history	radio_queue	queuetrackhistory
-16	profile	radio_users	profile
-\.
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (1, 'log entry', 'admin', 'logentry');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (2, 'permission', 'auth', 'permission');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (3, 'group', 'auth', 'group');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (4, 'user', 'auth', 'user');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (5, 'content type', 'contenttypes', 'contenttype');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (6, 'session', 'sessions', 'session');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (7, 'album', 'radio_metadata', 'album');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (8, 'artist', 'radio_metadata', 'artist');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (9, 'track', 'radio_metadata', 'track');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (10, 'player', 'radio_players', 'player');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (11, 'playlist', 'radio_playlists', 'playlist');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (12, 'playlist track', 'radio_playlists', 'playlisttrack');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (13, 'queue', 'radio_queue', 'queue');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (14, 'queue track', 'radio_queue', 'queuetrack');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (15, 'queue track history', 'radio_queue', 'queuetrackhistory');
+INSERT INTO django_content_type (id, name, app_label, model) VALUES (16, 'profile', 'radio_users', 'profile');
 
 
 --
@@ -1257,44 +1241,42 @@ SELECT pg_catalog.setval('django_content_type_id_seq', 16, true);
 -- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2014-09-11 09:05:36.292952+00
-2	auth	0001_initial	2014-09-11 09:05:37.077714+00
-3	admin	0001_initial	2014-09-11 09:05:37.280259+00
-4	radio_metadata	0001_initial	2014-09-11 09:05:37.987163+00
-5	radio_metadata	0002_auto_20140801_1527	2014-09-11 09:05:38.137851+00
-6	radio_metadata	0003_remove_track_vote_count	2014-09-11 09:05:38.213046+00
-7	radio_metadata	0004_auto_20140808_1103	2014-09-11 09:05:38.379333+00
-8	radio_metadata	0005_auto_20140808_1304	2014-09-11 09:05:38.479667+00
-9	radio_metadata	0006_track_uri	2014-09-11 09:05:38.772634+00
-10	radio_metadata	0007_auto_20140909_1141	2014-09-11 09:05:38.92158+00
-11	radio_queue	0001_initial	2014-09-11 09:05:39.430197+00
-12	radio_queue	0002_queuedtrack_alive	2014-09-11 09:05:39.681428+00
-13	radio_queue	0003_auto_20140804_1342	2014-09-11 09:05:39.839298+00
-14	radio_queue	0004_auto_20140808_1303	2014-09-11 09:05:40.19174+00
-15	radio_queue	0005_auto_20140808_1332	2014-09-11 09:05:40.897785+00
-16	radio_queue	0006_queuetrackhistory_queue	2014-09-11 09:05:41.242205+00
-17	radio_queue	0007_auto_20140811_0814	2014-09-11 09:05:41.956207+00
-18	radio_queue	0008_auto_20140811_0915	2014-09-11 09:05:42.315253+00
-19	radio_players	0001_initial	2014-09-11 09:05:42.383108+00
-20	radio_players	0002_auto_20140813_0846	2014-09-11 09:05:42.74186+00
-21	radio_players	0003_auto_20140813_1009	2014-09-11 09:05:43.025405+00
-22	radio_players	0004_auto_20140826_0856	2014-09-11 09:05:43.282782+00
-23	radio_players	0005_player_owner	2014-09-11 09:05:43.593019+00
-24	radio_players	0006_auto_20140827_1651	2014-09-11 09:05:43.891617+00
-25	radio_playlists	0001_initial	2014-09-11 09:05:44.298997+00
-26	radio_playlists	0002_remove_playlist_protected	2014-09-11 09:05:44.383816+00
-27	radio_playlists	0003_auto_20140808_1114	2014-09-11 09:05:45.207979+00
-28	radio_playlists	0004_auto_20140811_0915	2014-09-11 09:05:45.342856+00
-29	radio_playlists	0005_auto_20140826_0856	2014-09-11 09:05:45.498544+00
-30	radio_playlists	0006_playlist_public	2014-09-11 09:05:45.785982+00
-31	radio_queue	0009_auto_20140826_0856	2014-09-11 09:05:45.946606+00
-32	radio_queue	0010_auto_20140826_1415	2014-09-11 09:05:46.192618+00
-33	radio_users	0001_initial	2014-09-11 09:05:46.252941+00
-34	radio_users	0002_auto_20140814_1426	2014-09-11 09:05:46.402284+00
-35	radio_users	0003_auto_20140814_1520	2014-09-11 09:05:46.559511+00
-36	sessions	0001_initial	2014-09-11 09:05:46.68471+00
-\.
+INSERT INTO django_migrations (id, app, name, applied) VALUES (1, 'contenttypes', '0001_initial', '2014-09-11 09:05:36.292952+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (2, 'auth', '0001_initial', '2014-09-11 09:05:37.077714+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (3, 'admin', '0001_initial', '2014-09-11 09:05:37.280259+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (4, 'radio_metadata', '0001_initial', '2014-09-11 09:05:37.987163+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (5, 'radio_metadata', '0002_auto_20140801_1527', '2014-09-11 09:05:38.137851+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (6, 'radio_metadata', '0003_remove_track_vote_count', '2014-09-11 09:05:38.213046+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (7, 'radio_metadata', '0004_auto_20140808_1103', '2014-09-11 09:05:38.379333+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (8, 'radio_metadata', '0005_auto_20140808_1304', '2014-09-11 09:05:38.479667+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (9, 'radio_metadata', '0006_track_uri', '2014-09-11 09:05:38.772634+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (10, 'radio_metadata', '0007_auto_20140909_1141', '2014-09-11 09:05:38.92158+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (11, 'radio_queue', '0001_initial', '2014-09-11 09:05:39.430197+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (12, 'radio_queue', '0002_queuedtrack_alive', '2014-09-11 09:05:39.681428+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (13, 'radio_queue', '0003_auto_20140804_1342', '2014-09-11 09:05:39.839298+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (14, 'radio_queue', '0004_auto_20140808_1303', '2014-09-11 09:05:40.19174+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (15, 'radio_queue', '0005_auto_20140808_1332', '2014-09-11 09:05:40.897785+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (16, 'radio_queue', '0006_queuetrackhistory_queue', '2014-09-11 09:05:41.242205+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (17, 'radio_queue', '0007_auto_20140811_0814', '2014-09-11 09:05:41.956207+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (18, 'radio_queue', '0008_auto_20140811_0915', '2014-09-11 09:05:42.315253+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (19, 'radio_players', '0001_initial', '2014-09-11 09:05:42.383108+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (20, 'radio_players', '0002_auto_20140813_0846', '2014-09-11 09:05:42.74186+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (21, 'radio_players', '0003_auto_20140813_1009', '2014-09-11 09:05:43.025405+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (22, 'radio_players', '0004_auto_20140826_0856', '2014-09-11 09:05:43.282782+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (23, 'radio_players', '0005_player_owner', '2014-09-11 09:05:43.593019+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (24, 'radio_players', '0006_auto_20140827_1651', '2014-09-11 09:05:43.891617+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (25, 'radio_playlists', '0001_initial', '2014-09-11 09:05:44.298997+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (26, 'radio_playlists', '0002_remove_playlist_protected', '2014-09-11 09:05:44.383816+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (27, 'radio_playlists', '0003_auto_20140808_1114', '2014-09-11 09:05:45.207979+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (28, 'radio_playlists', '0004_auto_20140811_0915', '2014-09-11 09:05:45.342856+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (29, 'radio_playlists', '0005_auto_20140826_0856', '2014-09-11 09:05:45.498544+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (30, 'radio_playlists', '0006_playlist_public', '2014-09-11 09:05:45.785982+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (31, 'radio_queue', '0009_auto_20140826_0856', '2014-09-11 09:05:45.946606+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (32, 'radio_queue', '0010_auto_20140826_1415', '2014-09-11 09:05:46.192618+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (33, 'radio_users', '0001_initial', '2014-09-11 09:05:46.252941+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (34, 'radio_users', '0002_auto_20140814_1426', '2014-09-11 09:05:46.402284+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (35, 'radio_users', '0003_auto_20140814_1520', '2014-09-11 09:05:46.559511+00');
+INSERT INTO django_migrations (id, app, name, applied) VALUES (36, 'sessions', '0001_initial', '2014-09-11 09:05:46.68471+00');
 
 
 --
@@ -1312,8 +1294,6 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 36, true);
 -- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY django_session (session_key, session_data, expire_date) FROM stdin;
-\.
 
 
 --
@@ -1322,11 +1302,9 @@ COPY django_session (session_key, session_data, expire_date) FROM stdin;
 -- Data for Name: radio_metadata_album; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_metadata_album (id, source_type, source_id, name) FROM stdin;
-1	spotify	7CzrzGbCwqT8Y43tvIUPBX	Days Are Gone (Deluxe Edition)
-2	spotify	2gMWwDIxxGIiblnv1pQHyd	Here And Now
-3	spotify	4dt9zkhCdk7AwpYDSlyVyW	The Lego® Movie: Original Motion Picture Soundtrack
-\.
+INSERT INTO radio_metadata_album (id, source_type, source_id, name) VALUES (1, 'spotify', '7CzrzGbCwqT8Y43tvIUPBX', 'Days Are Gone (Deluxe Edition)');
+INSERT INTO radio_metadata_album (id, source_type, source_id, name) VALUES (2, 'spotify', '2gMWwDIxxGIiblnv1pQHyd', 'Here And Now');
+INSERT INTO radio_metadata_album (id, source_type, source_id, name) VALUES (3, 'spotify', '4dt9zkhCdk7AwpYDSlyVyW', 'The Lego® Movie: Original Motion Picture Soundtrack');
 
 
 --
@@ -1344,14 +1322,12 @@ SELECT pg_catalog.setval('radio_metadata_album_id_seq', 3, true);
 -- Data for Name: radio_metadata_artist; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_metadata_artist (id, source_type, source_id, name) FROM stdin;
-1	soundcloud	50707660	MightyGuitarSmith
-2	soundcloud	61123	NARSTI
-3	soundcloud	2097360	Foo Fighters
-4	spotify	4Ui2kfOqGujY81UcPrb5KE	Haim
-5	spotify	6deZN1bslXzeGvOLaLMOIF	Nickelback
-6	spotify	60TpWrVUOupMgyDaMnp0tM	Joli
-\.
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (1, 'soundcloud', '50707660', 'MightyGuitarSmith');
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (2, 'soundcloud', '61123', 'NARSTI');
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (3, 'soundcloud', '2097360', 'Foo Fighters');
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (4, 'spotify', '4Ui2kfOqGujY81UcPrb5KE', 'Haim');
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (5, 'spotify', '6deZN1bslXzeGvOLaLMOIF', 'Nickelback');
+INSERT INTO radio_metadata_artist (id, source_type, source_id, name) VALUES (6, 'spotify', '60TpWrVUOupMgyDaMnp0tM', 'Joli');
 
 
 --
@@ -1369,14 +1345,12 @@ SELECT pg_catalog.setval('radio_metadata_artist_id_seq', 6, true);
 -- Data for Name: radio_metadata_track; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) FROM stdin;
-1	soundcloud	106574135	Avenge Sevenfold Shepard Of Fire	270470	https://api.soundcloud.com/tracks/106574135/stream	0	0	2014-09-11 09:16:37.983133+00	2014-09-11 09:16:37.983182+00	\N	1	\N	\N	\N	soundcloud:song/Avenge Sevenfold Shepard Of Fire.106574135
-2	soundcloud	191424	Not As Strong As The Machines	302680	https://api.soundcloud.com/tracks/191424/stream	0	0	2014-09-11 09:16:51.240401+00	2014-09-11 09:16:51.240446+00	\N	1	https://i1.sndcdn.com/artworks-000024344257-2srbjh-t500x500.jpg?e76cf77	https://i1.sndcdn.com/artworks-000024344257-2srbjh-t300x300.jpg?e76cf77	https://i1.sndcdn.com/artworks-000024344257-2srbjh-t67x67.jpg?e76cf77	soundcloud:song/Not As Strong As The Machines.191424
-3	soundcloud	117723710	The Pretender	269060	https://api.soundcloud.com/tracks/117723710/stream	0	0	2014-09-11 09:17:15.458813+00	2014-09-11 09:17:15.458865+00	\N	1	https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t500x500.jpg?e76cf77	https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t300x300.jpg?e76cf77	https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t67x67.jpg?e76cf77	soundcloud:song/The Pretender.117723710
-4	spotify	7KdF7Zac5eC9jutk9Qret4	The Wire	245800	https://p.scdn.co/mp3-preview/5e1176683ae66ca683ca718d26a097484ec4c3db	3	0	2014-09-11 09:17:29.544785+00	2014-09-11 09:17:29.544858+00	1	1	https://i.scdn.co/image/b83e4011e9b0ae87b0c4913c296f94155a76c159	https://i.scdn.co/image/8fa6077324d497f3cbb83dbc16cf298552863e9e	https://i.scdn.co/image/4164e5082af9f77dcc81329b1894f71d9eba47a2	spotify:track:7KdF7Zac5eC9jutk9Qret4
-5	spotify	4bCOAuhvjsxbVBM5MM8oik	When We Stand Together	190786	https://p.scdn.co/mp3-preview/e933a6298574b05bde6d90dee4b5422241777429	3	0	2014-09-11 09:18:04.194821+00	2014-09-11 09:18:04.194871+00	2	1	https://i.scdn.co/image/0be39442eb4d2af9fa6216ca901c8631f7d56a3c	https://i.scdn.co/image/4963e311c6436bcb368ee79645b7d23a4ef585d6	https://i.scdn.co/image/f779ec05fb26d8ce43ae677c40403ac784ef31c2	spotify:track:4bCOAuhvjsxbVBM5MM8oik
-6	spotify	3zGaTyI4qNQ3b9IA6hjNpC	Everything is AWESOME!!!	86735	https://p.scdn.co/mp3-preview/581023243070e237d8c273224c215a2e5f9d8d7b	25	0	2014-09-11 09:18:15.807126+00	2014-09-11 09:18:15.807174+00	3	1	https://i.scdn.co/image/a78a0c21745c15f6114602b7c9008d7abb90a8bf	https://i.scdn.co/image/dda5b6587fe090b84c5789c5bcee299fed8a9aaa	https://i.scdn.co/image/1fbdcc7c4464d74bcac3b3b400e4024a056984e9	spotify:track:3zGaTyI4qNQ3b9IA6hjNpC
-\.
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (1, 'soundcloud', '106574135', 'Avenge Sevenfold Shepard Of Fire', 270470, 'https://api.soundcloud.com/tracks/106574135/stream', 0, 0, '2014-09-11 09:16:37.983133+00', '2014-09-11 09:16:37.983182+00', NULL, 1, NULL, NULL, NULL, 'soundcloud:song/Avenge Sevenfold Shepard Of Fire.106574135');
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (2, 'soundcloud', '191424', 'Not As Strong As The Machines', 302680, 'https://api.soundcloud.com/tracks/191424/stream', 0, 0, '2014-09-11 09:16:51.240401+00', '2014-09-11 09:16:51.240446+00', NULL, 1, 'https://i1.sndcdn.com/artworks-000024344257-2srbjh-t500x500.jpg?e76cf77', 'https://i1.sndcdn.com/artworks-000024344257-2srbjh-t300x300.jpg?e76cf77', 'https://i1.sndcdn.com/artworks-000024344257-2srbjh-t67x67.jpg?e76cf77', 'soundcloud:song/Not As Strong As The Machines.191424');
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (3, 'soundcloud', '117723710', 'The Pretender', 269060, 'https://api.soundcloud.com/tracks/117723710/stream', 0, 0, '2014-09-11 09:17:15.458813+00', '2014-09-11 09:17:15.458865+00', NULL, 1, 'https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t500x500.jpg?e76cf77', 'https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t300x300.jpg?e76cf77', 'https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t67x67.jpg?e76cf77', 'soundcloud:song/The Pretender.117723710');
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (4, 'spotify', '7KdF7Zac5eC9jutk9Qret4', 'The Wire', 245800, 'https://p.scdn.co/mp3-preview/5e1176683ae66ca683ca718d26a097484ec4c3db', 3, 0, '2014-09-11 09:17:29.544785+00', '2014-09-11 09:17:29.544858+00', 1, 1, 'https://i.scdn.co/image/b83e4011e9b0ae87b0c4913c296f94155a76c159', 'https://i.scdn.co/image/8fa6077324d497f3cbb83dbc16cf298552863e9e', 'https://i.scdn.co/image/4164e5082af9f77dcc81329b1894f71d9eba47a2', 'spotify:track:7KdF7Zac5eC9jutk9Qret4');
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (5, 'spotify', '4bCOAuhvjsxbVBM5MM8oik', 'When We Stand Together', 190786, 'https://p.scdn.co/mp3-preview/e933a6298574b05bde6d90dee4b5422241777429', 3, 0, '2014-09-11 09:18:04.194821+00', '2014-09-11 09:18:04.194871+00', 2, 1, 'https://i.scdn.co/image/0be39442eb4d2af9fa6216ca901c8631f7d56a3c', 'https://i.scdn.co/image/4963e311c6436bcb368ee79645b7d23a4ef585d6', 'https://i.scdn.co/image/f779ec05fb26d8ce43ae677c40403ac784ef31c2', 'spotify:track:4bCOAuhvjsxbVBM5MM8oik');
+INSERT INTO radio_metadata_track (id, source_type, source_id, name, duration_ms, preview_url, track_number, play_count, created, updated, album_id, owner_id, image_large, image_medium, image_small, uri) VALUES (6, 'spotify', '3zGaTyI4qNQ3b9IA6hjNpC', 'Everything is AWESOME!!!', 86735, 'https://p.scdn.co/mp3-preview/581023243070e237d8c273224c215a2e5f9d8d7b', 25, 0, '2014-09-11 09:18:15.807126+00', '2014-09-11 09:18:15.807174+00', 3, 1, 'https://i.scdn.co/image/a78a0c21745c15f6114602b7c9008d7abb90a8bf', 'https://i.scdn.co/image/dda5b6587fe090b84c5789c5bcee299fed8a9aaa', 'https://i.scdn.co/image/1fbdcc7c4464d74bcac3b3b400e4024a056984e9', 'spotify:track:3zGaTyI4qNQ3b9IA6hjNpC');
 
 
 --
@@ -1385,13 +1359,12 @@ COPY radio_metadata_track (id, source_type, source_id, name, duration_ms, previe
 -- Data for Name: radio_metadata_track_artists; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_metadata_track_artists (id, track_id, artist_id) FROM stdin;
-1	1	1
-2	2	2
-3	3	3
-4	4	4
-5	5	5
-\.
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (1, 1, 1);
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (2, 2, 2);
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (3, 3, 3);
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (4, 4, 4);
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (5, 5, 5);
+INSERT INTO radio_metadata_track_artists (id, track_id, artist_id) VALUES (6, 6, 6);
 
 
 --
@@ -1400,7 +1373,7 @@ COPY radio_metadata_track_artists (id, track_id, artist_id) FROM stdin;
 -- Name: radio_metadata_track_artists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rehabradio
 --
 
-SELECT pg_catalog.setval('radio_metadata_track_artists_id_seq', 5, true);
+SELECT pg_catalog.setval('radio_metadata_track_artists_id_seq', 6, true);
 
 
 --
@@ -1418,10 +1391,8 @@ SELECT pg_catalog.setval('radio_metadata_track_id_seq', 6, true);
 -- Data for Name: radio_players_player; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_players_player (id, name, location, token, created, updated, active, queue_id, owner_id) FROM stdin;
-1	Test Player	Belfast	4c7461d3-6faa-4db7-ad40-0c61cc42fac9	2014-09-11 09:14:51.572396+00	2014-09-11 09:14:51.572456+00	t	1	3
-2	Test Player 2	London	88b9c510-493c-42f1-b5d3-9c922d6d3554	2014-09-11 09:15:11.948212+00	2014-09-11 09:15:11.948272+00	f	1	4
-\.
+INSERT INTO radio_players_player (id, name, location, token, created, updated, active, queue_id, owner_id) VALUES (1, 'Test Player', 'Belfast', '4c7461d3-6faa-4db7-ad40-0c61cc42fac9', '2014-09-11 09:14:51.572396+00', '2014-09-11 09:14:51.572456+00', true, 1, 3);
+INSERT INTO radio_players_player (id, name, location, token, created, updated, active, queue_id, owner_id) VALUES (2, 'Test Player 2', 'London', '88b9c510-493c-42f1-b5d3-9c922d6d3554', '2014-09-11 09:15:11.948212+00', '2014-09-11 09:15:11.948272+00', false, 1, 4);
 
 
 --
@@ -1439,10 +1410,8 @@ SELECT pg_catalog.setval('radio_players_player_id_seq', 2, true);
 -- Data for Name: radio_playlists_playlist; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_playlists_playlist (id, name, description, owner_id, created, updated, protection) FROM stdin;
-1	Test Playlist (Public)	Public playlist	1	2014-09-11 09:15:35.761592+00	2014-09-11 09:15:35.761639+00	public
-2	Test Playlist (Private)	Private playlist	1	2014-09-11 09:15:48.763125+00	2014-09-11 09:15:48.763174+00	private
-\.
+INSERT INTO radio_playlists_playlist (id, name, description, owner_id, created, updated, protection) VALUES (1, 'Test Playlist (Public)', 'Public playlist', 1, '2014-09-11 09:15:35.761592+00', '2014-09-11 09:15:35.761639+00', 'public');
+INSERT INTO radio_playlists_playlist (id, name, description, owner_id, created, updated, protection) VALUES (2, 'Test Playlist (Private)', 'Private playlist', 1, '2014-09-11 09:15:48.763125+00', '2014-09-11 09:15:48.763174+00', 'private');
 
 
 --
@@ -1460,17 +1429,15 @@ SELECT pg_catalog.setval('radio_playlists_playlist_id_seq', 2, true);
 -- Data for Name: radio_playlists_playlisttrack; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) FROM stdin;
-1	1	1	1	1	2014-09-11 09:18:33.028029+00	2014-09-11 09:18:33.028076+00
-2	2	1	1	2	2014-09-11 09:18:36.461229+00	2014-09-11 09:18:36.461281+00
-3	3	1	1	3	2014-09-11 09:18:39.529364+00	2014-09-11 09:18:39.529417+00
-4	4	1	1	4	2014-09-11 09:18:43.245517+00	2014-09-11 09:18:43.245567+00
-5	5	1	1	5	2014-09-11 09:18:47.118916+00	2014-09-11 09:18:47.118964+00
-6	6	1	1	6	2014-09-11 09:18:50.667064+00	2014-09-11 09:18:50.667117+00
-7	1	1	2	3	2014-09-11 09:18:58.784567+00	2014-09-11 09:18:58.784614+00
-8	2	1	2	5	2014-09-11 09:19:03.222629+00	2014-09-11 09:19:03.222723+00
-9	3	1	2	6	2014-09-11 09:19:08.763363+00	2014-09-11 09:19:08.763412+00
-\.
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (1, 1, 1, 1, 1, '2014-09-11 09:18:33.028029+00', '2014-09-11 09:18:33.028076+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (2, 2, 1, 1, 2, '2014-09-11 09:18:36.461229+00', '2014-09-11 09:18:36.461281+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (3, 3, 1, 1, 3, '2014-09-11 09:18:39.529364+00', '2014-09-11 09:18:39.529417+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (4, 4, 1, 1, 4, '2014-09-11 09:18:43.245517+00', '2014-09-11 09:18:43.245567+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (5, 5, 1, 1, 5, '2014-09-11 09:18:47.118916+00', '2014-09-11 09:18:47.118964+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (6, 6, 1, 1, 6, '2014-09-11 09:18:50.667064+00', '2014-09-11 09:18:50.667117+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (7, 1, 1, 2, 3, '2014-09-11 09:18:58.784567+00', '2014-09-11 09:18:58.784614+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (8, 2, 1, 2, 5, '2014-09-11 09:19:03.222629+00', '2014-09-11 09:19:03.222723+00');
+INSERT INTO radio_playlists_playlisttrack (id, "position", owner_id, playlist_id, track_id, created, updated) VALUES (9, 3, 1, 2, 6, '2014-09-11 09:19:08.763363+00', '2014-09-11 09:19:08.763412+00');
 
 
 --
@@ -1488,10 +1455,8 @@ SELECT pg_catalog.setval('radio_playlists_playlisttrack_id_seq', 9, true);
 -- Data for Name: radio_queue_queue; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_queue_queue (id, name, description, created, updated, owner_id) FROM stdin;
-1	Test Queue	Example queue	2014-09-11 09:14:28.770008+00	2014-09-11 09:14:28.770061+00	1
-2	Test Queue (empty)	An empty queue	2014-09-11 09:20:07.616951+00	2014-09-11 09:20:07.617001+00	1
-\.
+INSERT INTO radio_queue_queue (id, name, description, created, updated, owner_id) VALUES (1, 'Test Queue', 'Example queue', '2014-09-11 09:14:28.770008+00', '2014-09-11 09:14:28.770061+00', 1);
+INSERT INTO radio_queue_queue (id, name, description, created, updated, owner_id) VALUES (2, 'Test Queue (empty)', 'An empty queue', '2014-09-11 09:20:07.616951+00', '2014-09-11 09:20:07.617001+00', 1);
 
 
 --
@@ -1509,11 +1474,9 @@ SELECT pg_catalog.setval('radio_queue_queue_id_seq', 2, true);
 -- Data for Name: radio_queue_queuetrack; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_queue_queuetrack (id, "position", owner_id, track_id, created, queue_id, updated, state, time_position) FROM stdin;
-1	1	1	3	2014-09-11 09:19:32.51588+00	1	2014-09-11 09:19:32.51593+00	\N	\N
-2	2	1	5	2014-09-11 09:19:32.627549+00	1	2014-09-11 09:19:32.627615+00	\N	\N
-3	3	1	6	2014-09-11 09:19:32.708775+00	1	2014-09-11 09:19:32.708825+00	\N	\N
-\.
+INSERT INTO radio_queue_queuetrack (id, "position", owner_id, track_id, created, queue_id, updated, state, time_position) VALUES (1, 1, 1, 3, '2014-09-11 09:19:32.51588+00', 1, '2014-09-11 09:19:32.51593+00', NULL, NULL);
+INSERT INTO radio_queue_queuetrack (id, "position", owner_id, track_id, created, queue_id, updated, state, time_position) VALUES (2, 2, 1, 5, '2014-09-11 09:19:32.627549+00', 1, '2014-09-11 09:19:32.627615+00', NULL, NULL);
+INSERT INTO radio_queue_queuetrack (id, "position", owner_id, track_id, created, queue_id, updated, state, time_position) VALUES (3, 3, 1, 6, '2014-09-11 09:19:32.708775+00', 1, '2014-09-11 09:19:32.708825+00', NULL, NULL);
 
 
 --
@@ -1531,11 +1494,9 @@ SELECT pg_catalog.setval('radio_queue_queuetrack_id_seq', 3, true);
 -- Data for Name: radio_queue_queuetrackhistory; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_queue_queuetrackhistory (id, created, owner_id, track_id, queue_id) FROM stdin;
-1	2014-09-11 09:19:32.536304+00	1	3	1
-2	2014-09-11 09:19:32.644687+00	1	5	1
-3	2014-09-11 09:19:32.71974+00	1	6	1
-\.
+INSERT INTO radio_queue_queuetrackhistory (id, created, owner_id, track_id, queue_id) VALUES (1, '2014-09-11 09:19:32.536304+00', 1, 3, 1);
+INSERT INTO radio_queue_queuetrackhistory (id, created, owner_id, track_id, queue_id) VALUES (2, '2014-09-11 09:19:32.644687+00', 1, 5, 1);
+INSERT INTO radio_queue_queuetrackhistory (id, created, owner_id, track_id, queue_id) VALUES (3, '2014-09-11 09:19:32.71974+00', 1, 6, 1);
 
 
 --
@@ -1553,12 +1514,10 @@ SELECT pg_catalog.setval('radio_queue_queuetrackhistory_id_seq', 3, true);
 -- Data for Name: radio_users_profile; Type: TABLE DATA; Schema: public; Owner: rehabradio
 --
 
-COPY radio_users_profile (id, avatar, user_id) FROM stdin;
-1	\N	1
-2	\N	2
-3	\N	3
-4	\N	4
-\.
+INSERT INTO radio_users_profile (id, avatar, user_id) VALUES (1, NULL, 1);
+INSERT INTO radio_users_profile (id, avatar, user_id) VALUES (2, NULL, 2);
+INSERT INTO radio_users_profile (id, avatar, user_id) VALUES (3, NULL, 3);
+INSERT INTO radio_users_profile (id, avatar, user_id) VALUES (4, NULL, 4);
 
 
 --
@@ -2347,7 +2306,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2014-09-15 16:18:35 BST
+-- Completed on 2014-09-16 15:47:58 BST
 
 --
 -- PostgreSQL database dump complete

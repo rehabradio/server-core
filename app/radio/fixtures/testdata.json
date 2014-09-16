@@ -154,27 +154,27 @@
 },
 {
     "fields": {
-        "source_id": "5he3sVMKD72Jv59nNtOGLQ",
+        "source_id": "2gMWwDIxxGIiblnv1pQHyd",
         "source_type": "spotify",
-        "name": "This Is Alphabeat"
+        "name": "Here And Now"
     },
     "model": "radio_metadata.album",
     "pk": 2
 },
 {
     "fields": {
-        "source_id": "19dqa2yIehtaN4kBwpSEvP",
+        "source_id": "4dt9zkhCdk7AwpYDSlyVyW",
         "source_type": "spotify",
-        "name": "Frozen (Original Motion Picture Soundtrack)"
+        "name": "The Lego\u00ae Movie: Original Motion Picture Soundtrack"
     },
     "model": "radio_metadata.album",
     "pk": 3
 },
 {
     "fields": {
-        "source_id": "902158",
+        "source_id": "50707660",
         "source_type": "soundcloud",
-        "name": "dale hooks"
+        "name": "MightyGuitarSmith"
     },
     "model": "radio_metadata.artist",
     "pk": 1
@@ -190,93 +190,39 @@
 },
 {
     "fields": {
-        "source_id": "4Ui2kfOqGujY81UcPrb5KE",
-        "source_type": "spotify",
-        "name": "Haim"
+        "source_id": "2097360",
+        "source_type": "soundcloud",
+        "name": "Foo Fighters"
     },
     "model": "radio_metadata.artist",
     "pk": 3
 },
 {
     "fields": {
-        "source_id": "7Defmv25Kj9knpobhHIghm",
+        "source_id": "4Ui2kfOqGujY81UcPrb5KE",
         "source_type": "spotify",
-        "name": "Alphabeat"
+        "name": "Haim"
     },
     "model": "radio_metadata.artist",
     "pk": 4
 },
 {
     "fields": {
-        "source_id": "2097360",
-        "source_type": "soundcloud",
-        "name": "Foo Fighters"
+        "source_id": "6deZN1bslXzeGvOLaLMOIF",
+        "source_type": "spotify",
+        "name": "Nickelback"
     },
     "model": "radio_metadata.artist",
     "pk": 5
 },
 {
     "fields": {
-        "source_id": "2OZsw4C2nujSgVUfpuOTWL",
+        "source_id": "60TpWrVUOupMgyDaMnp0tM",
         "source_type": "spotify",
-        "name": "Cast - Frozen"
+        "name": "Joli"
     },
     "model": "radio_metadata.artist",
     "pk": 6
-},
-{
-    "fields": {
-        "source_id": "6dN5CHba8uE3KUZtgzDjGa",
-        "source_type": "spotify",
-        "name": "Frode Fjellheim"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 7
-},
-{
-    "fields": {
-        "source_id": "1GjWNGbMtHDQ7CNYf2d7cw",
-        "source_type": "spotify",
-        "name": "Christophe Beck"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 8
-},
-{
-    "fields": {
-        "source_id": "0QV48B9786oULHQapfrYZM",
-        "source_type": "spotify",
-        "name": "Cantus"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 9
-},
-{
-    "fields": {
-        "source_id": "73Np75Wv2tju61Eo9Zw4IR",
-        "source_type": "spotify",
-        "name": "Idina Menzel"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 10
-},
-{
-    "fields": {
-        "source_id": "2kHxkdiKCSnHMkhIgFBZaI",
-        "source_type": "spotify",
-        "name": "Kristen Bell"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 11
-},
-{
-    "fields": {
-        "source_id": "47NluEnhJda2gsnjuvcoob",
-        "source_type": "spotify",
-        "name": "Santino Fontana"
-    },
-    "model": "radio_metadata.artist",
-    "pk": 12
 },
 {
     "fields": {
@@ -718,15 +664,33 @@
         "is_active": true,
         "is_superuser": true,
         "is_staff": true,
-        "last_login": "2014-09-02T16:23:22.617Z",
+        "last_login": "2014-09-16T14:49:03.373Z",
         "groups": [],
         "user_permissions": [],
-        "password": "pbkdf2_sha256$12000$E5Z8w6qK3h5l$YkudbzZpXb8ZTFBqtgdzX/7v3FbnsBqK76b6Ehb2oCM=",
-        "email": "admin@rehabradio.com",
-        "date_joined": "2014-09-02T16:12:12.232Z"
+        "password": "pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=",
+        "email": "",
+        "date_joined": "2014-09-11T09:10:27.036Z"
     },
     "model": "auth.user",
     "pk": 1
+},
+{
+    "fields": {
+        "username": "testuser",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "last_login": "2014-09-11T09:13:25.246Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$12000$xA3KCVhjG3oG$LElxCiX6DAu1Vphz9c0HswW6O8MlaY/iQosY16Mqi8E=",
+        "email": "",
+        "date_joined": "2014-09-11T09:13:25.246Z"
+    },
+    "model": "auth.user",
+    "pk": 2
 },
 {
     "fields": {
@@ -736,30 +700,30 @@
         "is_active": true,
         "is_superuser": false,
         "is_staff": true,
-        "last_login": "2014-09-02T16:22:05.202Z",
+        "last_login": "2014-09-11T09:14:51.523Z",
         "groups": [],
         "user_permissions": [],
-        "password": "b41bac6b-72fe-47fe-a984-79555c600a64",
+        "password": "4c7461d3-6faa-4db7-ad40-0c61cc42fac9",
         "email": "",
-        "date_joined": "2014-09-02T16:22:05.203Z"
+        "date_joined": "2014-09-11T09:14:51.523Z"
     },
     "model": "auth.user",
     "pk": 3
 },
 {
     "fields": {
-        "username": "Passive Player",
+        "username": "Test Player 2",
         "first_name": "",
         "last_name": "",
         "is_active": true,
         "is_superuser": false,
         "is_staff": true,
-        "last_login": "2014-09-02T16:23:44.648Z",
+        "last_login": "2014-09-11T09:15:11.928Z",
         "groups": [],
         "user_permissions": [],
-        "password": "63203407-ba72-4639-9a60-ef415db945aa",
+        "password": "88b9c510-493c-42f1-b5d3-9c922d6d3554",
         "email": "",
-        "date_joined": "2014-09-02T16:23:44.648Z"
+        "date_joined": "2014-09-11T09:15:11.928Z"
     },
     "model": "auth.user",
     "pk": 4
@@ -767,20 +731,23 @@
 {
     "fields": {
         "album": null,
-        "image_large": "https://i1.sndcdn.com/artworks-000074007615-gr5sza-t500x500.jpg?e76cf77",
-        "updated": "2014-09-02T16:15:55.052Z",
-        "image_medium": "https://i1.sndcdn.com/artworks-000074007615-gr5sza-t300x300.jpg?e76cf77",
-        "duration_ms": 190083,
-        "name": "Dale Hooks & Frederick Fringe pres. Ubblahkan - Supa Crack (UlyBug Records)",
-        "created": "2014-09-02T16:15:55.052Z",
-        "image_small": "https://i1.sndcdn.com/artworks-000074007615-gr5sza-t67x67.jpg?e76cf77",
-        "preview_url": "https://api.soundcloud.com/tracks/140404639/stream",
+        "image_large": null,
+        "updated": "2014-09-11T09:16:37.983Z",
+        "image_medium": null,
+        "duration_ms": 270470,
+        "name": "Avenge Sevenfold Shepard Of Fire",
+        "created": "2014-09-11T09:16:37.983Z",
+        "image_small": null,
+        "preview_url": "https://api.soundcloud.com/tracks/106574135/stream",
         "owner": 1,
-        "track_number": 0,
+        "uri": "soundcloud:song/Avenge Sevenfold Shepard Of Fire.106574135",
         "play_count": 0,
         "source_type": "soundcloud",
-        "artists": [],
-        "source_id": "140404639"
+        "artists": [
+            1
+        ],
+        "source_id": "106574135",
+        "track_number": 0
     },
     "model": "radio_metadata.track",
     "pk": 1
@@ -789,199 +756,130 @@
     "fields": {
         "album": null,
         "image_large": "https://i1.sndcdn.com/artworks-000024344257-2srbjh-t500x500.jpg?e76cf77",
-        "updated": "2014-09-02T16:16:04.054Z",
+        "updated": "2014-09-11T09:16:51.240Z",
         "image_medium": "https://i1.sndcdn.com/artworks-000024344257-2srbjh-t300x300.jpg?e76cf77",
         "duration_ms": 302680,
         "name": "Not As Strong As The Machines",
-        "created": "2014-09-02T16:16:04.054Z",
+        "created": "2014-09-11T09:16:51.240Z",
         "image_small": "https://i1.sndcdn.com/artworks-000024344257-2srbjh-t67x67.jpg?e76cf77",
         "preview_url": "https://api.soundcloud.com/tracks/191424/stream",
         "owner": 1,
-        "track_number": 0,
+        "uri": "soundcloud:song/Not As Strong As The Machines.191424",
         "play_count": 0,
         "source_type": "soundcloud",
-        "artists": [],
-        "source_id": "191424"
+        "artists": [
+            2
+        ],
+        "source_id": "191424",
+        "track_number": 0
     },
     "model": "radio_metadata.track",
     "pk": 2
 },
 {
     "fields": {
-        "album": 1,
-        "image_large": "https://i.scdn.co/image/b83e4011e9b0ae87b0c4913c296f94155a76c159",
-        "updated": "2014-09-02T16:16:14.588Z",
-        "image_medium": "https://i.scdn.co/image/8fa6077324d497f3cbb83dbc16cf298552863e9e",
-        "duration_ms": 245800,
-        "name": "The Wire",
-        "created": "2014-09-02T16:16:14.588Z",
-        "image_small": "https://i.scdn.co/image/4164e5082af9f77dcc81329b1894f71d9eba47a2",
-        "preview_url": "https://p.scdn.co/mp3-preview/5e1176683ae66ca683ca718d26a097484ec4c3db",
+        "album": null,
+        "image_large": "https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t500x500.jpg?e76cf77",
+        "updated": "2014-09-11T09:17:15.458Z",
+        "image_medium": "https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t300x300.jpg?e76cf77",
+        "duration_ms": 269060,
+        "name": "The Pretender",
+        "created": "2014-09-11T09:17:15.458Z",
+        "image_small": "https://i1.sndcdn.com/artworks-000061422649-n1ngsr-t67x67.jpg?e76cf77",
+        "preview_url": "https://api.soundcloud.com/tracks/117723710/stream",
         "owner": 1,
-        "track_number": 3,
+        "uri": "soundcloud:song/The Pretender.117723710",
         "play_count": 0,
-        "source_type": "spotify",
-        "artists": [],
-        "source_id": "7KdF7Zac5eC9jutk9Qret4"
+        "source_type": "soundcloud",
+        "artists": [
+            3
+        ],
+        "source_id": "117723710",
+        "track_number": 0
     },
     "model": "radio_metadata.track",
     "pk": 3
 },
 {
     "fields": {
-        "album": 2,
-        "image_large": "https://i.scdn.co/image/a89cf80f3b39c5561e68235b9aec48c0b2fe8792",
-        "updated": "2014-09-02T16:16:22.639Z",
-        "image_medium": "https://i.scdn.co/image/913ad25ff9f4fa6082ec98ec1677a87bcaf01160",
-        "duration_ms": 183626,
-        "name": "Fascination",
-        "created": "2014-09-02T16:16:22.639Z",
-        "image_small": "https://i.scdn.co/image/4552d45fdf081be2a8218d3cb31ce5272e7527f8",
-        "preview_url": "https://p.scdn.co/mp3-preview/a814b5d7ba944990198cd41c9eafcf3900b67a6a",
+        "album": 1,
+        "image_large": "https://i.scdn.co/image/b83e4011e9b0ae87b0c4913c296f94155a76c159",
+        "updated": "2014-09-11T09:17:29.544Z",
+        "image_medium": "https://i.scdn.co/image/8fa6077324d497f3cbb83dbc16cf298552863e9e",
+        "duration_ms": 245800,
+        "name": "The Wire",
+        "created": "2014-09-11T09:17:29.544Z",
+        "image_small": "https://i.scdn.co/image/4164e5082af9f77dcc81329b1894f71d9eba47a2",
+        "preview_url": "https://p.scdn.co/mp3-preview/5e1176683ae66ca683ca718d26a097484ec4c3db",
         "owner": 1,
-        "track_number": 2,
+        "uri": "spotify:track:7KdF7Zac5eC9jutk9Qret4",
         "play_count": 0,
         "source_type": "spotify",
-        "artists": [],
-        "source_id": "4uqNn56KFQ7NtJ35xWZKvf"
+        "artists": [
+            4
+        ],
+        "source_id": "7KdF7Zac5eC9jutk9Qret4",
+        "track_number": 3
     },
     "model": "radio_metadata.track",
     "pk": 4
 },
 {
     "fields": {
-        "album": null,
-        "image_large": "https://i1.sndcdn.com/artworks-000079984264-e8xxju-t500x500.jpg?e76cf77",
-        "updated": "2014-09-02T16:17:13.727Z",
-        "image_medium": "https://i1.sndcdn.com/artworks-000079984264-e8xxju-t300x300.jpg?e76cf77",
-        "duration_ms": 250250,
-        "name": "Everlong",
-        "created": "2014-09-02T16:17:13.727Z",
-        "image_small": "https://i1.sndcdn.com/artworks-000079984264-e8xxju-t67x67.jpg?e76cf77",
-        "preview_url": "https://api.soundcloud.com/tracks/150438358/stream",
+        "album": 2,
+        "image_large": "https://i.scdn.co/image/0be39442eb4d2af9fa6216ca901c8631f7d56a3c",
+        "updated": "2014-09-11T09:18:04.194Z",
+        "image_medium": "https://i.scdn.co/image/4963e311c6436bcb368ee79645b7d23a4ef585d6",
+        "duration_ms": 190786,
+        "name": "When We Stand Together",
+        "created": "2014-09-11T09:18:04.194Z",
+        "image_small": "https://i.scdn.co/image/f779ec05fb26d8ce43ae677c40403ac784ef31c2",
+        "preview_url": "https://p.scdn.co/mp3-preview/e933a6298574b05bde6d90dee4b5422241777429",
         "owner": 1,
-        "track_number": 0,
+        "uri": "spotify:track:4bCOAuhvjsxbVBM5MM8oik",
         "play_count": 0,
-        "source_type": "soundcloud",
-        "artists": [],
-        "source_id": "150438358"
+        "source_type": "spotify",
+        "artists": [
+            5
+        ],
+        "source_id": "4bCOAuhvjsxbVBM5MM8oik",
+        "track_number": 3
     },
     "model": "radio_metadata.track",
     "pk": 5
 },
 {
     "fields": {
-        "album": null,
-        "image_large": "https://i1.sndcdn.com/artworks-000061423618-8230fz-t500x500.jpg?e76cf77",
-        "updated": "2014-09-02T16:17:26.988Z",
-        "image_medium": "https://i1.sndcdn.com/artworks-000061423618-8230fz-t300x300.jpg?e76cf77",
-        "duration_ms": 264357,
-        "name": "All My Life",
-        "created": "2014-09-02T16:17:26.988Z",
-        "image_small": "https://i1.sndcdn.com/artworks-000061423618-8230fz-t67x67.jpg?e76cf77",
-        "preview_url": "https://api.soundcloud.com/tracks/117725249/stream",
+        "album": 3,
+        "image_large": "https://i.scdn.co/image/a78a0c21745c15f6114602b7c9008d7abb90a8bf",
+        "updated": "2014-09-11T09:18:15.807Z",
+        "image_medium": "https://i.scdn.co/image/dda5b6587fe090b84c5789c5bcee299fed8a9aaa",
+        "duration_ms": 86735,
+        "name": "Everything is AWESOME!!!",
+        "created": "2014-09-11T09:18:15.807Z",
+        "image_small": "https://i.scdn.co/image/1fbdcc7c4464d74bcac3b3b400e4024a056984e9",
+        "preview_url": "https://p.scdn.co/mp3-preview/581023243070e237d8c273224c215a2e5f9d8d7b",
         "owner": 1,
-        "track_number": 0,
+        "uri": "spotify:track:3zGaTyI4qNQ3b9IA6hjNpC",
         "play_count": 0,
-        "source_type": "soundcloud",
-        "artists": [],
-        "source_id": "117725249"
+        "source_type": "spotify",
+        "artists": [
+            6
+        ],
+        "source_id": "3zGaTyI4qNQ3b9IA6hjNpC",
+        "track_number": 25
     },
     "model": "radio_metadata.track",
     "pk": 6
 },
 {
     "fields": {
-        "album": 3,
-        "image_large": "https://i.scdn.co/image/6885bc64100c07ec425b6902eeb88c6c0fde6f89",
-        "updated": "2014-09-02T16:17:47.543Z",
-        "image_medium": "https://i.scdn.co/image/1d7d61949ae26f58ad37b1072b275db347893330",
-        "duration_ms": 105293,
-        "name": "Frozen Heart",
-        "created": "2014-09-02T16:17:47.543Z",
-        "image_small": "https://i.scdn.co/image/beb7351e372d9e208e48d7d8621a57bde06fdbc7",
-        "preview_url": "https://p.scdn.co/mp3-preview/57b2680c4f1d48b67ab7218ac95f6d6f04ac027d",
-        "owner": 1,
-        "track_number": 1,
-        "play_count": 0,
-        "source_type": "spotify",
-        "artists": [],
-        "source_id": "0pLvr6YsKHnu8HmHKfrKOa"
-    },
-    "model": "radio_metadata.track",
-    "pk": 7
-},
-{
-    "fields": {
-        "album": 3,
-        "image_large": "https://i.scdn.co/image/6885bc64100c07ec425b6902eeb88c6c0fde6f89",
-        "updated": "2014-09-02T16:17:55.007Z",
-        "image_medium": "https://i.scdn.co/image/1d7d61949ae26f58ad37b1072b275db347893330",
-        "duration_ms": 95986,
-        "name": "Vuelie",
-        "created": "2014-09-02T16:17:55.007Z",
-        "image_small": "https://i.scdn.co/image/beb7351e372d9e208e48d7d8621a57bde06fdbc7",
-        "preview_url": "https://p.scdn.co/mp3-preview/fa2e332c590d1599dd88df8e91f23af82a1740df",
-        "owner": 1,
-        "track_number": 11,
-        "play_count": 0,
-        "source_type": "spotify",
-        "artists": [],
-        "source_id": "0qnj9ufJJM6Xk4xuoyvHZp"
-    },
-    "model": "radio_metadata.track",
-    "pk": 8
-},
-{
-    "fields": {
-        "album": 3,
-        "image_large": "https://i.scdn.co/image/6885bc64100c07ec425b6902eeb88c6c0fde6f89",
-        "updated": "2014-09-02T16:18:03.981Z",
-        "image_medium": "https://i.scdn.co/image/1d7d61949ae26f58ad37b1072b275db347893330",
-        "duration_ms": 223840,
-        "name": "Let It Go",
-        "created": "2014-09-02T16:18:03.981Z",
-        "image_small": "https://i.scdn.co/image/beb7351e372d9e208e48d7d8621a57bde06fdbc7",
-        "preview_url": "https://p.scdn.co/mp3-preview/8bd835a7e6ada78dce36ef9a7c0a3c08e6603e35",
-        "owner": 1,
-        "track_number": 5,
-        "play_count": 0,
-        "source_type": "spotify",
-        "artists": [],
-        "source_id": "600HVBpzF1WfBdaRwbEvLz"
-    },
-    "model": "radio_metadata.track",
-    "pk": 9
-},
-{
-    "fields": {
-        "album": 3,
-        "image_large": "https://i.scdn.co/image/6885bc64100c07ec425b6902eeb88c6c0fde6f89",
-        "updated": "2014-09-02T16:18:11.289Z",
-        "image_medium": "https://i.scdn.co/image/1d7d61949ae26f58ad37b1072b275db347893330",
-        "duration_ms": 124733,
-        "name": "Love Is an Open Door",
-        "created": "2014-09-02T16:18:11.289Z",
-        "image_small": "https://i.scdn.co/image/beb7351e372d9e208e48d7d8621a57bde06fdbc7",
-        "preview_url": "https://p.scdn.co/mp3-preview/00199b22149af523273632fb539b159db4a084ae",
-        "owner": 1,
-        "track_number": 4,
-        "play_count": 0,
-        "source_type": "spotify",
-        "artists": [],
-        "source_id": "6PlHaDiKonFXoKz1Lbdn53"
-    },
-    "model": "radio_metadata.track",
-    "pk": 10
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:22:05.237Z",
+        "updated": "2014-09-11T09:14:51.572Z",
         "name": "Test Player",
-        "created": "2014-09-02T16:22:05.237Z",
+        "created": "2014-09-11T09:14:51.572Z",
         "queue": 1,
         "owner": 3,
-        "token": "b41bac6b-72fe-47fe-a984-79555c600a64",
+        "token": "4c7461d3-6faa-4db7-ad40-0c61cc42fac9",
         "location": "Belfast",
         "active": true
     },
@@ -990,13 +888,13 @@
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:23:44.664Z",
-        "name": "Passive Player",
-        "created": "2014-09-02T16:23:44.664Z",
+        "updated": "2014-09-11T09:15:11.948Z",
+        "name": "Test Player 2",
+        "created": "2014-09-11T09:15:11.948Z",
         "queue": 1,
         "owner": 4,
-        "token": "63203407-ba72-4639-9a60-ef415db945aa",
-        "location": "Bangor",
+        "token": "88b9c510-493c-42f1-b5d3-9c922d6d3554",
+        "location": "London",
         "active": false
     },
     "model": "radio_players.player",
@@ -1004,24 +902,24 @@
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:14:22.652Z",
+        "updated": "2014-09-11T09:15:35.761Z",
         "name": "Test Playlist (Public)",
-        "created": "2014-09-02T16:13:43.806Z",
+        "created": "2014-09-11T09:15:35.761Z",
         "protection": "public",
         "owner": 1,
-        "description": "Public tester playlist"
+        "description": "Public playlist"
     },
     "model": "radio_playlists.playlist",
     "pk": 1
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:14:03.890Z",
+        "updated": "2014-09-11T09:15:48.763Z",
         "name": "Test Playlist (Private)",
-        "created": "2014-09-02T16:14:03.890Z",
+        "created": "2014-09-11T09:15:48.763Z",
         "protection": "private",
-        "owner": 3,
-        "description": "Private tester playlist"
+        "owner": 1,
+        "description": "Private playlist"
     },
     "model": "radio_playlists.playlist",
     "pk": 2
@@ -1029,9 +927,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:16.715Z",
+        "created": "2014-09-11T09:18:33.028Z",
         "track": 1,
-        "updated": "2014-09-02T16:18:16.715Z",
+        "updated": "2014-09-11T09:18:33.028Z",
         "owner": 1,
         "position": 1
     },
@@ -1041,9 +939,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:20.214Z",
+        "created": "2014-09-11T09:18:36.461Z",
         "track": 2,
-        "updated": "2014-09-02T16:18:20.214Z",
+        "updated": "2014-09-11T09:18:36.461Z",
         "owner": 1,
         "position": 2
     },
@@ -1053,9 +951,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:24.149Z",
+        "created": "2014-09-11T09:18:39.529Z",
         "track": 3,
-        "updated": "2014-09-02T16:18:24.150Z",
+        "updated": "2014-09-11T09:18:39.529Z",
         "owner": 1,
         "position": 3
     },
@@ -1065,9 +963,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:28.124Z",
+        "created": "2014-09-11T09:18:43.245Z",
         "track": 4,
-        "updated": "2014-09-02T16:18:28.124Z",
+        "updated": "2014-09-11T09:18:43.245Z",
         "owner": 1,
         "position": 4
     },
@@ -1077,9 +975,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:32.217Z",
+        "created": "2014-09-11T09:18:47.118Z",
         "track": 5,
-        "updated": "2014-09-02T16:18:32.217Z",
+        "updated": "2014-09-11T09:18:47.118Z",
         "owner": 1,
         "position": 5
     },
@@ -1089,9 +987,9 @@
 {
     "fields": {
         "playlist": 1,
-        "created": "2014-09-02T16:18:46.167Z",
+        "created": "2014-09-11T09:18:50.667Z",
         "track": 6,
-        "updated": "2014-09-02T16:18:46.167Z",
+        "updated": "2014-09-11T09:18:50.667Z",
         "owner": 1,
         "position": 6
     },
@@ -1100,107 +998,47 @@
 },
 {
     "fields": {
-        "playlist": 1,
-        "created": "2014-09-02T16:18:49.417Z",
-        "track": 7,
-        "updated": "2014-09-02T16:18:49.417Z",
+        "playlist": 2,
+        "created": "2014-09-11T09:18:58.784Z",
+        "track": 3,
+        "updated": "2014-09-11T09:18:58.784Z",
         "owner": 1,
-        "position": 7
+        "position": 1
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 7
 },
 {
     "fields": {
-        "playlist": 1,
-        "created": "2014-09-02T16:18:52.651Z",
-        "track": 8,
-        "updated": "2014-09-02T16:18:52.651Z",
+        "playlist": 2,
+        "created": "2014-09-11T09:19:03.222Z",
+        "track": 5,
+        "updated": "2014-09-11T09:19:03.222Z",
         "owner": 1,
-        "position": 8
+        "position": 2
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 8
 },
 {
     "fields": {
-        "playlist": 1,
-        "created": "2014-09-02T16:18:55.629Z",
-        "track": 9,
-        "updated": "2014-09-02T16:18:55.629Z",
+        "playlist": 2,
+        "created": "2014-09-11T09:19:08.763Z",
+        "track": 6,
+        "updated": "2014-09-11T09:19:08.763Z",
         "owner": 1,
-        "position": 9
+        "position": 3
     },
     "model": "radio_playlists.playlisttrack",
     "pk": 9
 },
 {
     "fields": {
-        "playlist": 1,
-        "created": "2014-09-02T16:19:01.212Z",
-        "track": 10,
-        "updated": "2014-09-02T16:19:01.212Z",
         "owner": 1,
-        "position": 10
-    },
-    "model": "radio_playlists.playlisttrack",
-    "pk": 10
-},
-{
-    "fields": {
-        "playlist": 2,
-        "created": "2014-09-02T16:20:01.802Z",
-        "track": 1,
-        "updated": "2014-09-02T16:20:01.802Z",
-        "owner": 1,
-        "position": 1
-    },
-    "model": "radio_playlists.playlisttrack",
-    "pk": 11
-},
-{
-    "fields": {
-        "playlist": 2,
-        "created": "2014-09-02T16:20:05.210Z",
-        "track": 2,
-        "updated": "2014-09-02T16:20:05.210Z",
-        "owner": 1,
-        "position": 2
-    },
-    "model": "radio_playlists.playlisttrack",
-    "pk": 12
-},
-{
-    "fields": {
-        "playlist": 2,
-        "created": "2014-09-02T16:20:08.424Z",
-        "track": 3,
-        "updated": "2014-09-02T16:20:08.424Z",
-        "owner": 1,
-        "position": 3
-    },
-    "model": "radio_playlists.playlisttrack",
-    "pk": 13
-},
-{
-    "fields": {
-        "playlist": 2,
-        "created": "2014-09-02T16:20:11.714Z",
-        "track": 4,
-        "updated": "2014-09-02T16:20:11.714Z",
-        "owner": 1,
-        "position": 4
-    },
-    "model": "radio_playlists.playlisttrack",
-    "pk": 14
-},
-{
-    "fields": {
-        "owner": 1,
-        "updated": "2014-09-02T16:15:03.325Z",
-        "created": "2014-09-02T16:15:03.325Z",
-        "name": "Test queue",
-        "description": "Testing queue"
+        "updated": "2014-09-11T09:14:28.770Z",
+        "created": "2014-09-11T09:14:28.770Z",
+        "name": "Test Queue",
+        "description": "Example queue"
     },
     "model": "radio_queue.queue",
     "pk": 1
@@ -1208,19 +1046,19 @@
 {
     "fields": {
         "owner": 1,
-        "updated": "2014-09-02T16:15:03.325Z",
-        "created": "2014-09-02T16:15:03.325Z",
-        "name": "Another Test queue",
-        "description": "Another Testing queue"
+        "updated": "2014-09-11T09:20:07.617Z",
+        "created": "2014-09-11T09:20:07.616Z",
+        "name": "Test Queue (empty)",
+        "description": "An empty queue"
     },
     "model": "radio_queue.queue",
     "pk": 2
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:19:23.768Z",
-        "created": "2014-09-02T16:19:23.767Z",
-        "track": 1,
+        "updated": "2014-09-11T09:19:32.515Z",
+        "created": "2014-09-11T09:19:32.515Z",
+        "track": 3,
         "time_position": null,
         "queue": 1,
         "state": null,
@@ -1232,9 +1070,9 @@
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:19:23.851Z",
-        "created": "2014-09-02T16:19:23.851Z",
-        "track": 2,
+        "updated": "2014-09-11T09:19:32.627Z",
+        "created": "2014-09-11T09:19:32.627Z",
+        "track": 5,
         "time_position": null,
         "queue": 1,
         "state": null,
@@ -1246,9 +1084,9 @@
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:19:23.910Z",
-        "created": "2014-09-02T16:19:23.910Z",
-        "track": 3,
+        "updated": "2014-09-11T09:19:32.708Z",
+        "created": "2014-09-11T09:19:32.708Z",
+        "track": 6,
         "time_position": null,
         "queue": 1,
         "state": null,
@@ -1260,206 +1098,83 @@
 },
 {
     "fields": {
-        "updated": "2014-09-02T16:19:23.957Z",
-        "created": "2014-09-02T16:19:23.957Z",
-        "track": 4,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 4
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 4
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.013Z",
-        "created": "2014-09-02T16:19:24.013Z",
-        "track": 5,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 5
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 5
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.060Z",
-        "created": "2014-09-02T16:19:24.060Z",
-        "track": 6,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 6
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 6
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.114Z",
-        "created": "2014-09-02T16:19:24.114Z",
-        "track": 7,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 7
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 7
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.198Z",
-        "created": "2014-09-02T16:19:24.198Z",
-        "track": 8,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 8
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 8
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.247Z",
-        "created": "2014-09-02T16:19:24.247Z",
-        "track": 9,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 9
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 9
-},
-{
-    "fields": {
-        "updated": "2014-09-02T16:19:24.331Z",
-        "created": "2014-09-02T16:19:24.330Z",
-        "track": 10,
-        "time_position": null,
-        "queue": 1,
-        "state": null,
-        "owner": 1,
-        "position": 10
-    },
-    "model": "radio_queue.queuetrack",
-    "pk": 10
-},
-{
-    "fields": {
-        "track": 1,
+        "track": 3,
         "queue": 1,
         "owner": 1,
-        "created": "2014-09-02T16:19:23.800Z"
+        "created": "2014-09-11T09:19:32.536Z"
     },
     "model": "radio_queue.queuetrackhistory",
     "pk": 1
 },
 {
     "fields": {
-        "track": 2,
+        "track": 5,
         "queue": 1,
         "owner": 1,
-        "created": "2014-09-02T16:19:23.866Z"
+        "created": "2014-09-11T09:19:32.644Z"
     },
     "model": "radio_queue.queuetrackhistory",
     "pk": 2
 },
 {
     "fields": {
-        "track": 3,
+        "track": 6,
         "queue": 1,
         "owner": 1,
-        "created": "2014-09-02T16:19:23.924Z"
+        "created": "2014-09-11T09:19:32.719Z"
     },
     "model": "radio_queue.queuetrackhistory",
     "pk": 3
 },
 {
     "fields": {
-        "track": 4,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:23.966Z"
+        "user": 1,
+        "avatar": null
     },
-    "model": "radio_queue.queuetrackhistory",
+    "model": "radio_users.profile",
+    "pk": 1
+},
+{
+    "fields": {
+        "user": 2,
+        "avatar": null
+    },
+    "model": "radio_users.profile",
+    "pk": 2
+},
+{
+    "fields": {
+        "user": 3,
+        "avatar": null
+    },
+    "model": "radio_users.profile",
+    "pk": 3
+},
+{
+    "fields": {
+        "user": 4,
+        "avatar": null
+    },
+    "model": "radio_users.profile",
     "pk": 4
-},
-{
-    "fields": {
-        "track": 5,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.025Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 5
-},
-{
-    "fields": {
-        "track": 6,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.074Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 6
-},
-{
-    "fields": {
-        "track": 7,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.125Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 7
-},
-{
-    "fields": {
-        "track": 8,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.208Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 8
-},
-{
-    "fields": {
-        "track": 9,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.266Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 9
-},
-{
-    "fields": {
-        "track": 10,
-        "queue": 1,
-        "owner": 1,
-        "created": "2014-09-02T16:19:24.341Z"
-    },
-    "model": "radio_queue.queuetrackhistory",
-    "pk": 10
 },
 {
     "fields": {
         "action_flag": 1,
-        "action_time": "2014-09-02T16:22:05.247Z",
+        "action_time": "2014-09-11T09:13:25.343Z",
+        "object_repr": "testuser",
+        "object_id": "2",
+        "change_message": "",
+        "user": 1,
+        "content_type": 4
+    },
+    "model": "admin.logentry",
+    "pk": 1
+},
+{
+    "fields": {
+        "action_flag": 1,
+        "action_time": "2014-09-11T09:14:51.584Z",
         "object_repr": "Belfast - Test Player",
         "object_id": "1",
         "change_message": "",
@@ -1467,19 +1182,19 @@
         "content_type": 10
     },
     "model": "admin.logentry",
-    "pk": 1
+    "pk": 2
 },
 {
     "fields": {
         "action_flag": 1,
-        "action_time": "2014-09-02T16:23:44.671Z",
-        "object_repr": "Bangor - Passive Player",
+        "action_time": "2014-09-11T09:15:11.960Z",
+        "object_repr": "London - Test Player 2",
         "object_id": "2",
         "change_message": "",
         "user": 1,
         "content_type": 10
     },
     "model": "admin.logentry",
-    "pk": 2
+    "pk": 3
 }
 ]
