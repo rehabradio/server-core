@@ -199,7 +199,8 @@ class SpotifyClient(object):
 
         return tracks
 
-    def fetch_associated_track(self, artist):
+    def fetch_associated_track(self, track):
+        artist = track['artists'][0]
         base_url = 'https://api.spotify.com/v1/artists/'
 
         # Fetch all the related artists for a given artist
