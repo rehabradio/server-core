@@ -664,7 +664,7 @@
         "is_active": true,
         "is_superuser": true,
         "is_staff": true,
-        "last_login": "2014-09-17T15:05:59.421Z",
+        "last_login": "2014-09-17T16:37:26.618Z",
         "groups": [],
         "user_permissions": [],
         "password": "pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=",
@@ -694,18 +694,36 @@
 },
 {
     "fields": {
-        "username": "",
+        "username": "Bangor (Active) (Player)",
         "first_name": "",
         "last_name": "",
         "is_active": true,
         "is_superuser": false,
         "is_staff": false,
-        "last_login": "2014-09-17T13:45:16.575Z",
+        "last_login": "2014-09-17T16:34:24.279Z",
         "groups": [],
         "user_permissions": [],
         "password": "",
         "email": "",
-        "date_joined": "2014-09-17T13:45:16.575Z"
+        "date_joined": "2014-09-17T16:34:24.279Z"
+    },
+    "model": "auth.user",
+    "pk": 5
+},
+{
+    "fields": {
+        "username": "Belfast (Passive) (Player)",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "last_login": "2014-09-17T16:34:45.945Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "",
+        "email": "",
+        "date_joined": "2014-09-17T16:34:45.945Z"
     },
     "model": "auth.user",
     "pk": 6
@@ -856,13 +874,26 @@
 },
 {
     "fields": {
-        "name": "Test player",
+        "name": "Bangor (Active)",
         "queue": 1,
         "user_permissions": [],
-        "token": "1d0fe980-3a97-40f7-9406-64f937766f29",
-        "location": "Belfast",
+        "token": "8a5b353d-cf76-4f1c-b874-3a64eb8836fe",
+        "location": "Bangor",
         "groups": [],
         "active": true
+    },
+    "model": "radio_players.player",
+    "pk": 5
+},
+{
+    "fields": {
+        "name": "Belfast (Passive)",
+        "queue": 1,
+        "user_permissions": [],
+        "token": "415c2b2c-4709-4d7a-a7d4-3bce4c37d45a",
+        "location": "Belfast",
+        "groups": [],
+        "active": false
     },
     "model": "radio_players.player",
     "pk": 6
@@ -1023,12 +1054,12 @@
 },
 {
     "fields": {
-        "updated": "2014-09-17T15:22:22.124Z",
+        "updated": "2014-09-11T09:19:32.515Z",
         "created": "2014-09-11T09:19:32.515Z",
         "track": 3,
-        "time_position": 87804,
+        "time_position": null,
         "queue": 1,
-        "state": "stopped",
+        "state": null,
         "owner": 1,
         "position": 1
     },
@@ -1135,8 +1166,8 @@
 {
     "fields": {
         "action_flag": 1,
-        "action_time": "2014-09-17T13:42:58.157Z",
-        "object_repr": "Belfast - Test player",
+        "action_time": "2014-09-17T16:34:24.350Z",
+        "object_repr": "Bangor - Bangor (Active)",
         "object_id": "5",
         "change_message": "",
         "user": 1,
@@ -1147,28 +1178,15 @@
 },
 {
     "fields": {
-        "action_flag": 3,
-        "action_time": "2014-09-17T13:45:06.132Z",
-        "object_repr": "Belfast - Test player",
-        "object_id": "5",
-        "change_message": "",
-        "user": 1,
-        "content_type": 10
-    },
-    "model": "admin.logentry",
-    "pk": 5
-},
-{
-    "fields": {
         "action_flag": 1,
-        "action_time": "2014-09-17T13:45:16.635Z",
-        "object_repr": "Belfast - Test player",
+        "action_time": "2014-09-17T16:34:45.995Z",
+        "object_repr": "Belfast - Belfast (Passive)",
         "object_id": "6",
         "change_message": "",
         "user": 1,
         "content_type": 10
     },
     "model": "admin.logentry",
-    "pk": 6
+    "pk": 5
 }
 ]
