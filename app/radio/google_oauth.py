@@ -1,17 +1,18 @@
-# import the User object
+# Std-lib imports
 import re
 import os
 import requests
-import datetime
 
+# Third part imports
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.core.cache import cache
-
 from rest_framework import authentication
 from rest_framework import exceptions
 
+# Local imports
 from radio_users.models import Profile
+from radio.utils.cache import build_key
 
 
 class GoogleOauthBackend(authentication.BaseAuthentication):
@@ -24,11 +25,8 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
         access_token = request.META.get('HTTP_X_GOOGLE_AUTH_TOKEN')
 
         if access_token:
-            cache_key = 'usertoken-{0}-{1}'.format(
-                access_token, datetime.datetime.utcnow().strftime('%Y%m%d'),
-            )
+            cache_key = build_key('usertoken', access_token)
             user = cache.get(cache_key)
-
             if user is None:
                 # Validated the token and pull down the user details
                 params = {'alt': 'json', 'access_token': access_token}
@@ -52,25 +50,18 @@ class GoogleOauthBackend(authentication.BaseAuthentication):
                 if person['hd'] not in white_listed_domains:
                     raise exceptions.AuthenticationFailed('Invalid domain')
 
-                password = make_password(person['id'])
-                try:
-                    user = User.objects.get(email=person['email'])
-                except:
-                    try:
-                        user = User.objects.create(
-                            username=person['name'],
-                            password=password,
-                            first_name=person['given_name'],
-                            last_name=person['family_name'],
-                            email=person['email']
-                        )
-                        profile = Profile.objects.get(user=user)
-                        profile.avatar = person['picture']
-                        profile.save()
-                    except:
-                        raise exceptions.AuthenticationFailed(
-                            'User could not be created'
-                        )
+                user, created = User.objects.get_or_create(
+                    username=person['name'],
+                    first_name=person['given_name'],
+                    last_name=person['family_name'],
+                    email=person['email'],
+                    defaults={'password': make_password(person['id'])}
+                )
+                if created:
+                    profile = Profile.objects.get(user=user)
+                    profile.avatar = person['picture']
+                    profile.save()
+
                 cache.set(cache_key, user, 3600)
 
             return (user, None)
