@@ -16,6 +16,7 @@ RUN apt-get install -y build-essential git
 RUN apt-get install -y python python-dev python-setuptools
 RUN apt-get install -y python-pip python-virtualenv
 RUN apt-get install -y nginx supervisor
+RUN apt-get install -y vim
 
 # stop supervisor service as we'll run it manually
 RUN service supervisor stop
