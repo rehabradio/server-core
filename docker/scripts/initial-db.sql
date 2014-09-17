@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.5
--- Started on 2014-09-17 17:36:22 BST
+-- Started on 2014-09-17 17:38:43 BST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1099,9 +1099,9 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 48, true);
 --
 
 INSERT INTO auth_user VALUES (2, 'pbkdf2_sha256$12000$xA3KCVhjG3oG$LElxCiX6DAu1Vphz9c0HswW6O8MlaY/iQosY16Mqi8E=', '2014-09-11 09:13:25.246261+00', false, 'testuser', '', '', '', false, true, '2014-09-11 09:13:25.246315+00');
-INSERT INTO auth_user VALUES (1, 'pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=', '2014-09-17 16:33:52.745471+00', true, 'admin', '', '', '', true, true, '2014-09-11 09:10:27.036345+00');
 INSERT INTO auth_user VALUES (5, '', '2014-09-17 16:34:24.279368+00', false, 'Bangor (Active) (Player)', '', '', '', false, true, '2014-09-17 16:34:24.279447+00');
 INSERT INTO auth_user VALUES (6, '', '2014-09-17 16:34:45.945152+00', false, 'Belfast (Passive) (Player)', '', '', '', false, true, '2014-09-17 16:34:45.945207+00');
+INSERT INTO auth_user VALUES (1, 'pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=', '2014-09-17 16:37:26.618231+00', true, 'admin', '', '', '', true, true, '2014-09-11 09:10:27.036345+00');
 
 
 --
@@ -1364,7 +1364,7 @@ INSERT INTO radio_players_player VALUES (6, 'Belfast (Passive)', 'Belfast', '415
 --
 
 INSERT INTO radio_playlists_playlist VALUES (1, 'Test Playlist (Public)', 'Public playlist', 1, '2014-09-11 09:15:35.761592+00', '2014-09-11 09:15:35.761639+00', 'public');
-INSERT INTO radio_playlists_playlist VALUES (2, 'Test Playlist (Private)', 'Private playlist', 1, '2014-09-11 09:15:48.763125+00', '2014-09-11 09:15:48.763174+00', 'private');
+INSERT INTO radio_playlists_playlist VALUES (2, 'Test Playlist (Private)', 'Private playlist', 2, '2014-09-11 09:15:48.763125+00', '2014-09-11 09:15:48.763174+00', 'private');
 
 
 --
@@ -2249,7 +2249,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2014-09-17 17:36:23 BST
+-- Completed on 2014-09-17 17:38:44 BST
 
 --
 -- PostgreSQL database dump complete
