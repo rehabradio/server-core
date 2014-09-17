@@ -14,6 +14,7 @@ from .models import Player
 class BaseTestCase(TestCase):
     """Load in default data for tests, and login user."""
     fixtures = ['radio/fixtures/testdata.json']
+    device_token = '4c7461d3-6faa-4db7-ad40-0c61cc42fac9'
     factory = APIRequestFactory()
     api_client = APIClient()
     paginated_attrs = ('count', 'next', 'previous', 'results')
@@ -35,6 +36,10 @@ class BaseTestCase(TestCase):
 
         login = self.api_client.login(username=username, password=password)
         self.assertEqual(login, True)
+
+        device_client = APIClient(HTTP_PLAYER_AUTH_TOKEN=self.device_token)
+        resp = device_client.get('/api/')
+        self.assertEqual(resp.status_code, 200)
 
 
 class PlayerViewSetTestCase(BaseTestCase):
@@ -121,7 +126,8 @@ class PlayerViewSetTestCase(BaseTestCase):
 
     def test_retrieve_with_token(self):
         """Return a player json object of a given record."""
-        resp = self.api_client.get('/api/players/b41bac6b-72fe-47fe-a984-79555c600a64/')
+        resp = self.api_client.get(
+            '/api/players/{0}/'.format(self.device_token))
         data = json.loads(resp.content)
 
         # Ensure request was successful

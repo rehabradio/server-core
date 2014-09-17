@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         cache_key = build_key('users-queryset')
         response = cache.get(cache_key)
-        if response is not None:
+        if response:
             return Response(response)
 
         queryset = User.objects.select_related('profile').all()

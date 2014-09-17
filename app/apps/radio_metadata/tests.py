@@ -294,7 +294,7 @@ class TrackViewSetTestCase(BaseTestCase):
         existing_records_count = Track.objects.all().count()
         post_data = {
             'source_type': 'spotify',
-            'source_id': '4bCOAuhvjsxbVBM5MM8oik',
+            'source_id': '7mitXLIMCflkhZiD34uEQI',
         }
 
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
