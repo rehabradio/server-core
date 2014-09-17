@@ -26,6 +26,7 @@ exclude_lines =
 [run]
 omit =
     vendors/*,
+    */migrations/*,
     radio/wsgi.py,
     radio/settings/live.py,
-    */migrations/*,
+    radio/utils/debug_toolbar,
