@@ -1,6 +1,7 @@
 # stdlib imports
 import json
 import os
+
 # third-party imports
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
@@ -77,3 +78,23 @@ class UserViewSetTestCase(BaseTestCase):
         self.assertEqual(resp.status_code, 404)
         # Ensure the returned json keys match the expected
         self.assertEqual(data['detail'], u'Not found')
+
+    def test_create(self):
+        """Add a player to the database.
+        Returns a player json object of the newly created record.
+        """
+        post_data = {
+            'username': 'tdduser',
+            'password': 'test'
+        }
+
+        resp = self.api_client.post('/admin/auth/user/add/', data=post_data)
+        # Ensure request was successful and user is redirected to player list
+        self.assertEqual(resp.status_code, 200)
+
+    def test_delete(self):
+        """Returns a 200 response."""
+        post_data = {'post': 'yes'}
+        resp = self.api_client.post('/admin/auth/user/2/delete/', data=post_data)
+        # Ensure request was successful
+        self.assertRedirects(resp, '/admin/auth/user/')

@@ -16,6 +16,7 @@ clean:
 	@find . -name '*.pyo' -exec rm -f {} +
 	@find . -name '*~' -exec rm -f {} +
 	@find . -empty -type d -delete
+	@-rm -R htmlcov
 	@-rm .coverage
 	@-rm coverage.xml
 	@-rm nosetests.xml
