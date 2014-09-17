@@ -9,7 +9,6 @@ import random
 from django.core.cache import cache
 from django.db.models import F
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import action, link
 from rest_framework.response import Response
 
 # local imports
@@ -18,31 +17,13 @@ from .serializers import (
     QueueSerializer, PaginatedQueueSerializer,
     QueueTrackSerializer, PaginatedQueueTrackSerializer,
     QueueTrackHistorySerializer, PaginatedQueueTrackHistorySerializer)
-from radio.exceptions import RecordDeleteFailed, RecordNotFound, RecordNotSaved
+from radio.exceptions import (
+    RecordDeleteFailed, RecordNotFound, RecordNotSaved, QueueEmpty)
 from radio.permissions import IsStaffOrOwnerToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
-from radio_metadata.models import Track
+from radio_metadata.views import get_associated_track
 from radio_playlists.models import PlaylistTrack
-
-
-def _add_random_track_to_queue(queue_id, user):
-    """Grabs a random track from the queues history,
-    and adds it back into the queue
-
-    returns track json object
-    """
-    track_ids = QueueTrackHistory.objects.filter(
-        queue_id=queue_id).values_list('track_id', flat=True)[:50]
-    if not track_ids:
-        track_ids = Track.objects.all().order_by(
-            'play_count').values_list('id', flat=True)[:50]
-    # Select a track ID at random
-    track_id = random.choice(track_ids)
-    # Add the track to the top of the queue
-    queue_track = QueueTrack.objects.custom_create(track_id, queue_id, user)
-    # Return the track instance
-    return queue_track
 
 
 class QueueViewSet(viewsets.ModelViewSet):
@@ -144,7 +125,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         else:
             track_ids = (request.DATA['track'],)
 
-        for (i, track_id) in enumerate(track_ids):
+        for track_id in track_ids:
             try:
                 queued_track = QueueTrack.objects.custom_create(
                     track_id, queue_id, self.request.user)
@@ -199,20 +180,38 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
-    @link()
-    def head(self, request, queue_id, *args, **kwargs):
+
+class QueueHeadViewSet(viewsets.ModelViewSet):
+    """Mopidy client endpoints.
+    User must be staff to delete.
+    """
+    queryset = QueueTrack.objects.all()
+    serializer_class = QueueTrackSerializer
+
+    def _cache_key(self, queue_id):
+        """Build key used for caching the queue tracks data."""
+        return build_key('queue-tracks-queryset', queue_id)
+
+    def _history_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-head-history', queue_id)
+
+    def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
         try:
-            queued_track = QueueTrack.objects.select_related(
-                'track', 'track__album', 'track__owner', 'owner'
-            ).get(queue_id=queue_id, position=1)
+            queued_track = QueueTrack.objects.get(
+                queue_id=queue_id, position=1)
         except:
-            queued_track = _add_random_track_to_queue(queue_id, request.user)
+            try:
+                queued_track = self._queue_radio(queue_id)
+            except:
+                raise QueueEmpty
+
         seralizer = QueueTrackSerializer(queued_track)
+
         return Response(seralizer.data)
 
-    @action()
-    def status(self, request, queue_id, *args, **kwargs):
+    def partial_update(self, request, queue_id, *args, **kwargs):
         """Updates the head track of a given queue,
         based on the mopidy playback status.
         """
@@ -237,37 +236,7 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
         serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
 
-    @action()
-    def event(self, request, queue_id, event, *args, **kwargs):
-        """Updates the head track of a given queue,
-        based on mopidy tracklist and playback events.
-        """
-        post_data = json.loads(request.DATA)
-
-        try:
-            queued_track = QueueTrack.objects.get(
-                queue_id=queue_id, position=1)
-        except:
-            raise RecordNotFound
-
-        try:
-            if event == 'track_playback_paused':
-                queued_track.state = 'paused'
-            else:
-                queued_track.state = 'playing'
-
-            if 'time_position' in post_data:
-                queued_track.time_position = post_data['time_position']
-
-            queued_track.save()
-        except:
-            raise RecordNotSaved
-
-        serializer = QueueTrackSerializer(queued_track)
-        return Response(serializer.data)
-
-    @action()
-    def pop(self, request, queue_id, *args, **kwargs):
+    def destroy(self, request, queue_id, *args, **kwargs):
         """Remove a track from the top of a given queue."""
         try:
             queued_track = QueueTrack.objects.get(
@@ -290,27 +259,59 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
+    def _queue_radio(self, queue_id):
+        """Add an associated track to a given queue,
+        using the queues track history.
+
+        Uses caching to create a tracklist of tracks,
+        to use as a base to find new songs.
+
+        Caching is reset when a track is manually added to the queue.
+        """
+        # Tracklist to be used to find next track
+        historic_tracks = cache.get(self._history_cache_key(queue_id))
+
+        # Build tracklist from queue history
+        if historic_tracks is None:
+            historic_tracks = []
+            queryset = QueueTrackHistory.objects.filter(
+                queue_id=queue_id).order_by().distinct('track_id')
+            for track in queryset:
+                serializer = QueueTrackHistorySerializer(track)
+                historic_tracks.append(serializer.data['track'])
+
+        # Pick a track from the tracklist at random,
+        # and remove it from the tracklist
+        track = random.choice(historic_tracks)
+        historic_tracks.remove(track)
+
+        # Use the tracks main artist to fetch new track
+        track = get_associated_track(track['artists'][0], self.request.user)
+
+        # Update the tracklist with the newly fetched track
+        historic_tracks.append(track)
+        cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
+
+        # Add the new track to the queue
+        queue_track = QueueTrack.objects.custom_create(
+            track['id'], queue_id, self.request.user, record=False)
+
+        return queue_track
+
 
 class QueueTrackHistoryViewSet(viewsets.ModelViewSet):
     """CRUD API endpoints that allow managing queue history tracks."""
     queryset = QueueTrackHistory.objects.all()
     serializer_class = QueueTrackHistorySerializer
 
-    def _cache_key(self, queue_id):
-        """Build key used for caching the playlist tracks data."""
-        return build_key('queue-history-queryset', queue_id)
-
     def list(self, request, queue_id=None):
         """Return a paginated list of historic queue track json objects."""
         page = int(request.QUERY_PARAMS.get('page', 1))
 
-        queryset = cache.get(self._cache_key(queue_id))
-        if queryset is None:
-            queryset = QueueTrackHistory.objects.prefetch_related(
-                'track', 'track__artists', 'track__album',
-                'track__owner', 'owner'
-            ).filter(queue_id=queue_id)
-            cache.set(self._cache_key(queue_id), queryset, 86400)
+        queryset = QueueTrackHistory.objects.prefetch_related(
+            'track', 'track__artists', 'track__album',
+            'track__owner', 'owner'
+        ).filter(queue_id=queue_id)
 
         response = paginate_queryset(
             PaginatedQueueTrackHistorySerializer, request, queryset, page)

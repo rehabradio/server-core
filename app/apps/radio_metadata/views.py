@@ -15,7 +15,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 # local imports
-from .models import Album, Artist, Track
+from .models import Track
 from .serializers import PaginatedTrackSerializer, TrackSerializer
 from radio.exceptions import (
     InvalidBackend, MissingParameter, OauthFailed, ThridPartyOauthRequired,
@@ -50,14 +50,22 @@ def _get_track_data(source_type, source_id):
         source_client = _build_client(source_type)
         track_data = source_client.lookup_track(source_id)
 
-        if source_type == 'spotify':
-            # Get or create relational album field
-            track_data['album'] = Album.objects.cached_get_or_create(
-                track_data['album'])
-
         cache.set(cache_key, track_data, 86400)
 
     return track_data
+
+
+def get_associated_track(artist, user):
+    source_client = _build_client(artist['source_type'])
+    track = source_client.fetch_associated_track(artist)
+
+    try:
+        track = Track.objects.cached_get_or_create(track, user)
+    except:
+        raise RecordNotSaved
+
+    serializer = TrackSerializer(track)
+    return serializer.data
 
 
 class MetadataAPIRootView(APIView):
@@ -409,11 +417,11 @@ class TrackViewSet(viewsets.ModelViewSet):
         try:
             track = Track.objects.cached_get_or_create(
                 track_data, self.request.user)
-            Artist.objects.cached_get_or_create(track_data['artists'])
-            serializer = TrackSerializer(track)
-            cache.delete(self.cache_key)
         except:
             raise RecordNotSaved
+
+        serializer = TrackSerializer(track)
+        cache.delete(self.cache_key)
 
         return Response(serializer.data)
 

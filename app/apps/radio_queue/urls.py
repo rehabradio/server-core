@@ -2,7 +2,12 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 # local imports
-from .views import QueueViewSet, QueueTrackViewSet, QueueTrackHistoryViewSet
+from .views import (
+    QueueViewSet,
+    QueueTrackViewSet,
+    QueueHeadViewSet,
+    QueueTrackHistoryViewSet
+)
 
 
 urlpatterns = patterns(
@@ -23,6 +28,7 @@ urlpatterns = patterns(
             'delete': 'destroy',
         }), name='radio-queue-detail'
     ),
+
     url(
         r'^(?P<queue_id>[0-9]+)/tracks/$',
         QueueTrackViewSet.as_view({
@@ -38,30 +44,16 @@ urlpatterns = patterns(
             'delete': 'destroy',
         }), name='radio-queue-track-detail'
     ),
+
     url(
         r'^(?P<queue_id>[0-9]+)/head/$',
-        QueueTrackViewSet.as_view({
-            'get': 'head',
+        QueueHeadViewSet.as_view({
+            'get': 'retrieve',
+            'patch': 'partial_update',
+            'delete': 'destroy',
         }), name='radio-queue-track-head'
     ),
-    url(
-        r'^(?P<queue_id>[0-9]+)/head/status/$',
-        QueueTrackViewSet.as_view({
-            'patch': 'status',
-        }), name='radio-queue-track-head-status'
-    ),
-    url(
-        r'^(?P<queue_id>[0-9]+)/head/events/(?P<event>[a-z_]+)/$',
-        QueueTrackViewSet.as_view({
-            'patch': 'event',
-        }), name='radio-queue-track-head-events'
-    ),
-    url(
-        r'^(?P<queue_id>[0-9]+)/head/pop/$',
-        QueueTrackViewSet.as_view({
-            'delete': 'pop',
-        }), name='radio-queue-track-head-pop'
-    ),
+
     url(
         r'^(?P<queue_id>[0-9]+)/history/$',
         QueueTrackHistoryViewSet.as_view({'get': 'list'}),

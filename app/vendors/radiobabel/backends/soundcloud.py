@@ -11,6 +11,7 @@ import soundcloud
 
 # local imports
 from radiobabel.errors import TrackNotFound, PlaylistNotFound
+from .utils import random_pick
 
 
 logger = logging.getLogger('radiobabel.backends.soundcloud')
@@ -141,8 +142,18 @@ class SoundcloudClient(object):
 
         return [_transform_track(x.obj) for x in tracks]
 
+    def fetch_associated_track(self, artist):
+        """Fetch a random associated track, using the soundcloud API.
+        """
+        url = 'tracks/{0}/related'.format(artist['source_id'])
+        tracks = self.client.get(url)
+
+        track = random_pick(tracks)
+
+        return _transform_track(track.obj)
+
     def playlists(self, user_id, token):
-        """Lookup user playlists using the Spotify Web API
+        """Lookup user playlists using the soundcloud Web API
 
         Returns standard radiobabel playlist list response.
         """
@@ -172,18 +183,3 @@ class SoundcloudClient(object):
             raise PlaylistNotFound('Soundcloud: {0}'.format(playlist_id))
 
         return [_transform_track(x) for x in playlist_tracks.tracks]
-
-    def favorites(self, user_id, token, limit=20, offset=0):
-        """Lookup user favourite tracks using the soundcloud Web API.
-
-        Returns standard radiobabel track list response.
-        """
-        logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
-
-        url = '/users/{0}/favorites'.format(user_id)
-        try:
-            fav_tracks = self.client.get(url, limit=limit, offset=offset)
-        except:
-            raise PlaylistNotFound('Soundcloud: {0}'.format(user_id))
-
-        return [_transform_track(x.obj) for x in fav_tracks]
