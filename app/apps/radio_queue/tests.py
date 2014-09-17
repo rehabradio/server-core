@@ -1,11 +1,12 @@
 # stdlib imports
 import json
 import os
-import time
+
 # third-party imports
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
+
 # local imports
 from .models import Queue, QueueTrack
 
@@ -71,6 +72,32 @@ class QueueViewSetTestCase(BaseTestCase):
         # Ensure the returned json keys match the expected
         self.assertTrue(set(self.paginated_attrs) <= set(data))
         self.assertTrue(set(self.queue_attrs) <= set(queues))
+
+    def test_create_with_track(self):
+        """Add a queue track to the database.
+        params - track
+
+        Returns a queue track json object of the newly created record.
+        """
+        # Count the number of records before the save
+        existing_records_count = Queue.objects.count()
+        post_data = {
+            'name': 'tmp queue',
+            'description': 'test'
+        }
+
+        resp = self.api_client.post('/api/queues/', data=post_data)
+        data = json.loads(resp.content)
+
+        new_records_count = Queue.objects.count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 201)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count+1, new_records_count)
+        # Ensure the returned json keys match the expected
+        self.assertRegexpMatches(str(data['id']), r'[0-9]+')
+        self.assertEqual(data['name'], post_data['name'])
+        self.assertEqual(data['description'], post_data['description'])
 
     def test_destroy(self):
         """Recursively remove a queue and its associated queue

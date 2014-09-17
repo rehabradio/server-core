@@ -317,6 +317,9 @@ class UserAuthView(APIView):
 class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
 
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+
     def list(self, request, source_type, format=None):
         """Perform metadata lookup on the user playlists."""
         cache_key = build_key('user-playlists', source_type, request.user.id)
