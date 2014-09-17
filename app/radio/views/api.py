@@ -54,9 +54,9 @@ class SwaggerView(APIView):
     renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None):
+        host = request.get_host()
         settings = {
-            #'basePath': 'http://localhost:8000/api/docs/api-docs',
-            'basePath': 'http://server-core.herokuapp.com/api/docs/api-docs',
+            'basePath': 'http://{0}/api/docs/api-docs'.format(host),
             'swaggerVersion': '1.2',
             'apiVersion': '0.1',
             'apis': [
@@ -67,7 +67,8 @@ class SwaggerView(APIView):
                 },
                 {
                     'path': '/api/players',
-                    'description': 'Devices connected or listening to the api server'
+                    'description': 'Devices connected or listening \
+                                        to the api server'
                 },
                 {
                     'path': '/api/playlists',
@@ -76,6 +77,10 @@ class SwaggerView(APIView):
                 {
                     'path': '/api/queues',
                     'description': 'Manage queues'
+                },
+                {
+                    'path': '/api/users',
+                    'description': 'Users'
                 }
             ],
             'info': {
