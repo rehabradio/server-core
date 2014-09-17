@@ -25,10 +25,9 @@ class PlayerTokenAuthBackend(authentication.BaseAuthentication):
 
             if user is None:
                 try:
-                    player = Player.objects.select_related(
-                        'owner'
+                    user = Player.objects.select_related(
+                        'user'
                     ).get(token=access_token)
-                    user = player.owner
                     cache.set(cache_key, user, 3600)
                 except:
                     raise exceptions.AuthenticationFailed()

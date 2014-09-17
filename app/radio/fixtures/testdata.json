@@ -664,7 +664,7 @@
         "is_active": true,
         "is_superuser": true,
         "is_staff": true,
-        "last_login": "2014-09-16T14:49:03.373Z",
+        "last_login": "2014-09-17T15:05:59.421Z",
         "groups": [],
         "user_permissions": [],
         "password": "pbkdf2_sha256$12000$ZpbgYedd62Pj$sMPYMRQnOr/kcEqmzPK3mdl41OBpo2wRNtigTZrC3+A=",
@@ -694,39 +694,21 @@
 },
 {
     "fields": {
-        "username": "Test Player",
+        "username": "",
         "first_name": "",
         "last_name": "",
         "is_active": true,
         "is_superuser": false,
-        "is_staff": true,
-        "last_login": "2014-09-11T09:14:51.523Z",
+        "is_staff": false,
+        "last_login": "2014-09-17T13:45:16.575Z",
         "groups": [],
         "user_permissions": [],
-        "password": "4c7461d3-6faa-4db7-ad40-0c61cc42fac9",
+        "password": "",
         "email": "",
-        "date_joined": "2014-09-11T09:14:51.523Z"
+        "date_joined": "2014-09-17T13:45:16.575Z"
     },
     "model": "auth.user",
-    "pk": 3
-},
-{
-    "fields": {
-        "username": "Test Player 2",
-        "first_name": "",
-        "last_name": "",
-        "is_active": true,
-        "is_superuser": false,
-        "is_staff": true,
-        "last_login": "2014-09-11T09:15:11.928Z",
-        "groups": [],
-        "user_permissions": [],
-        "password": "88b9c510-493c-42f1-b5d3-9c922d6d3554",
-        "email": "",
-        "date_joined": "2014-09-11T09:15:11.928Z"
-    },
-    "model": "auth.user",
-    "pk": 4
+    "pk": 6
 },
 {
     "fields": {
@@ -874,31 +856,16 @@
 },
 {
     "fields": {
-        "updated": "2014-09-11T09:14:51.572Z",
-        "name": "Test Player",
-        "created": "2014-09-11T09:14:51.572Z",
+        "name": "Test player",
         "queue": 1,
-        "owner": 3,
-        "token": "4c7461d3-6faa-4db7-ad40-0c61cc42fac9",
+        "user_permissions": [],
+        "token": "1d0fe980-3a97-40f7-9406-64f937766f29",
         "location": "Belfast",
+        "groups": [],
         "active": true
     },
     "model": "radio_players.player",
-    "pk": 1
-},
-{
-    "fields": {
-        "updated": "2014-09-11T09:15:11.948Z",
-        "name": "Test Player 2",
-        "created": "2014-09-11T09:15:11.948Z",
-        "queue": 1,
-        "owner": 4,
-        "token": "88b9c510-493c-42f1-b5d3-9c922d6d3554",
-        "location": "London",
-        "active": false
-    },
-    "model": "radio_players.player",
-    "pk": 2
+    "pk": 6
 },
 {
     "fields": {
@@ -1056,12 +1023,12 @@
 },
 {
     "fields": {
-        "updated": "2014-09-11T09:19:32.515Z",
+        "updated": "2014-09-17T15:22:22.124Z",
         "created": "2014-09-11T09:19:32.515Z",
         "track": 3,
-        "time_position": null,
+        "time_position": 87804,
         "queue": 1,
-        "state": null,
+        "state": "stopped",
         "owner": 1,
         "position": 1
     },
@@ -1164,5 +1131,44 @@
     },
     "model": "admin.logentry",
     "pk": 3
+},
+{
+    "fields": {
+        "action_flag": 1,
+        "action_time": "2014-09-17T13:42:58.157Z",
+        "object_repr": "Belfast - Test player",
+        "object_id": "5",
+        "change_message": "",
+        "user": 1,
+        "content_type": 10
+    },
+    "model": "admin.logentry",
+    "pk": 4
+},
+{
+    "fields": {
+        "action_flag": 3,
+        "action_time": "2014-09-17T13:45:06.132Z",
+        "object_repr": "Belfast - Test player",
+        "object_id": "5",
+        "change_message": "",
+        "user": 1,
+        "content_type": 10
+    },
+    "model": "admin.logentry",
+    "pk": 5
+},
+{
+    "fields": {
+        "action_flag": 1,
+        "action_time": "2014-09-17T13:45:16.635Z",
+        "object_repr": "Belfast - Test player",
+        "object_id": "6",
+        "change_message": "",
+        "user": 1,
+        "content_type": 10
+    },
+    "model": "admin.logentry",
+    "pk": 6
 }
 ]

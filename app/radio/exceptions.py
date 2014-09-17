@@ -49,3 +49,10 @@ class QueueEmpty(APIException):
     """
     status_code = 400
     default_detail = 'This queue has no tracks.'
+
+
+class UserIsNotPlayer(APIException):
+    """Simple exception used to show user is not a registered player.
+    """
+    status_code = 400
+    default_detail = 'User is not a registered player.'

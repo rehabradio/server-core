@@ -9,6 +9,6 @@ class PlayerAdmin(admin.ModelAdmin):
     fields = ['name', 'location', 'queue', 'active']
     list_display = (
         'name', 'location', 'token', 'queue',
-        'active', 'owner', 'created', 'updated')
+        'active', 'date_joined', 'last_login')
 
 admin.site.register(Player, PlayerAdmin)
