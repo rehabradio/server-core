@@ -3,8 +3,12 @@ import json
 import os
 
 # third-party imports
+from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APIClient
+
+# local imports
+from radio_users.models import Profile
 
 
 class BaseTestCase(TestCase):
@@ -80,3 +84,27 @@ class SwaggerTestCase(BaseTestCase):
         self.assertTrue(set(self.api_data) <= set(data))
         for collection in enumerate(data):
             self.assertIsNotNone(collection)
+
+
+class OAuthTestCase(BaseTestCase):
+
+    def test_login_success(self):
+        org_user_count = User.objects.count()
+        org_profile_count = Profile.objects.count()
+
+        token = 'valid-google-oauth-token'
+        device_client = APIClient(HTTP_X_GOOGLE_AUTH_TOKEN=token)
+        resp = device_client.get('/api/')
+
+        new_user_count = User.objects.count()
+        new_profile_count = Profile.objects.count()
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(org_user_count+1, new_user_count)
+        self.assertEqual(org_profile_count+1, new_profile_count)
+
+    def test_login_fail(self):
+        token = '**************'
+        device_client = APIClient(HTTP_X_GOOGLE_AUTH_TOKEN=token)
+        resp = device_client.get('/api/')
+        self.assertEqual(resp.status_code, 403)
