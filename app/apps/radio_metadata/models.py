@@ -8,6 +8,7 @@ from radio.utils.cache import build_key
 SOURCE_TYPES = [
     ('spotify', 'Spotify'),
     ('soundcloud', 'Soundcloud'),
+    ('youtube', 'Youtube'),
 ]
 
 

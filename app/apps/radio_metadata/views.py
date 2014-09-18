@@ -8,7 +8,7 @@ import collections
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect
-from radiobabel import SpotifyClient, SoundcloudClient
+from radiobabel import SpotifyClient, SoundcloudClient, YoutubeClient
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -27,11 +27,13 @@ from radio.utils.pagination import paginate_queryset
 
 spotify_client = SpotifyClient()
 soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
+youtube_client = YoutubeClient(settings.GOOGLE_OAUTH2_CLIENT_ID)
 
 
 def _build_client(source_type):
     """Builds the thrid party api client based on the given source type."""
     source_client = {
+        'youtube': youtube_client,
         'soundcloud': soundcloud_client,
         'spotify': spotify_client,
     }.get(source_type.lower())
@@ -117,6 +119,16 @@ class LookupRootView(APIView):
                         request=request
                     )),
                 ])),
+                ('youtube', collections.OrderedDict([
+                    ('tracks', reverse(
+                        'radio-data-lookup',
+                        args=[
+                            'youtube',
+                            'StTqXEQ2l-Y'
+                        ],
+                        request=request
+                    )),
+                ])),
             ])),
         ])
         return Response(response)
@@ -124,6 +136,7 @@ class LookupRootView(APIView):
 
 class LookupView(APIView):
     """Lookup tracks using any configured source_type."""
+    permission_classes = ()
 
     def get(self, request, source_type, source_id, format=None):
         cache_key = build_key('mtdt-lkp', source_type, source_id)
@@ -135,10 +148,12 @@ class LookupView(APIView):
         if source_client is None:
             raise InvalidBackend
 
+        results = source_client.lookup_track(source_id)
         try:
             results = source_client.lookup_track(source_id)
         except:
             raise RecordNotFound
+        return Response(results)
 
         response = TrackSerializer(results).data
         cache.set(cache_key, response, 86400)
@@ -184,6 +199,20 @@ class SearchRootView(APIView):
                             args=['spotify'],
                             request=request
                         ) + '?q=fascination',
+                    ]),
+                ])),
+                ('youtube', collections.OrderedDict([
+                    ('tracks', [
+                        reverse(
+                            'radio-data-search',
+                            args=['youtube'],
+                            request=request
+                        ) + '?q=everything%20is%20awesome',
+                        reverse(
+                            'radio-data-search',
+                            args=['youtube'],
+                            request=request
+                        ) + '?q=foo%20fighters',
                     ]),
                 ])),
             ])),
