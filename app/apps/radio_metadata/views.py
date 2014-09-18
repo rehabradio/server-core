@@ -27,7 +27,7 @@ from radio.utils.pagination import paginate_queryset
 
 spotify_client = SpotifyClient()
 soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
-youtube_client = YoutubeClient(settings.GOOGLE_OAUTH2_CLIENT_ID)
+youtube_client = YoutubeClient()
 
 
 def _build_client(source_type):
@@ -271,6 +271,11 @@ class UserRootView(APIView):
                         'radio-data-user-auth',
                         args=['spotify'],
                         request=request
+                    )),
+                    ('youtube', reverse(
+                        'radio-data-user-auth',
+                        args=['youtube'],
+                        request=request
                     ))
                 ])),
                 ('playlists', collections.OrderedDict([
@@ -282,6 +287,11 @@ class UserRootView(APIView):
                     ('spotify', reverse(
                         'radio-data-user-playlists',
                         args=['spotify'],
+                        request=request
+                    )),
+                    ('youtube', reverse(
+                        'radio-data-user-playlists',
+                        args=['youtube'],
                         request=request
                     ))
                 ])),
@@ -302,6 +312,9 @@ class UserAuthView(APIView):
         elif source_type.lower() == 'soundcloud':
             source_client_id = settings.SOUNDCLOUD_CLIENT_ID
             source_client_secret = settings.SOUNDCLOUD_CLIENT_SECRET
+        elif source_type.lower() == 'youtube':
+            source_client_id = settings.GOOGLE_OAUTH2_CLIENT_ID
+            source_client_secret = settings.GOOGLE_OAUTH2_CLIENT_SECRET
         else:
             raise InvalidBackend
 
@@ -317,12 +330,12 @@ class UserAuthView(APIView):
         try:
             # Prompt user to login
             if auth_code is None:
-                redirect_uri = source_client.login_url(
+                redirect_url = source_client.login_url(
                     request.build_absolute_uri(request.path),
                     source_client_id,
                     source_client_secret
                 )
-                return redirect(redirect_uri)
+                return redirect(redirect_url)
             # Else exchange the auth code for an oauth token
             else:
                 credentials = source_client.exchange_code(

@@ -8,6 +8,7 @@ import logging
 import re
 import string
 import unicodedata
+import urllib
 
 # third-party imports
 #from gdata import youtube
@@ -39,6 +40,24 @@ def _make_request(url, params=None):
     """Make a HTTP request to the Youtube API using the requests library
     """
     response = requests.get(url, params=params)
+    # raise an exception if 400 <= response.status_code <= 599
+    response.raise_for_status()
+    return response.json()
+
+
+def _make_post_request(url, data):
+    """Make a HTTP request to the Youtube API using the requests library
+    """
+    response = requests.post(url, data=data)
+    # raise an exception if 400 <= response.status_code <= 599
+    response.raise_for_status()
+    return response.json()
+
+
+def _make_oauth_request(url, token, params=None):
+    # Use token in authorization header of call
+    headers = {'Authorization': 'Bearer {}'.format(token)}
+    response = requests.get(url, headers=headers, params=params)
     # raise an exception if 400 <= response.status_code <= 599
     response.raise_for_status()
     return response.json()
@@ -96,12 +115,64 @@ def _transform_track(track):
 
 class YoutubeClient(object):
 
-    def __init__(self, client_id):
+    def __init__(self):
         """Initialise Youtube API client.
         """
         self.yt_api_endpoint = 'https://www.googleapis.com/youtube/v3/'
         self.yt_key = 'AIzaSyAl1Xq9DwdE_KD4AtPaE4EJl3WZe2zCqg4'
-        self.client_id = client_id
+
+    def login_url(self, callback_url, client_id, client_secret):
+        """Generates a login url, for the user to authenticate the app."""
+        params = {
+            'client_id': client_id,
+            'redirect_uri': callback_url,
+            'scope': 'https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/userinfo.profile',
+            'response_type': 'code',
+            'access_type': 'offline',
+        }
+        params = urllib.urlencode(params)
+        url = 'https://accounts.google.com/o/oauth2/auth?{0}'.format(params)
+        return url
+
+    def exchange_code(self, code, callback_url, client_id, client_secret):
+        """Fetch auth and user data from the spotify api
+
+        Returns a dictionary of a auth and user object.
+        """
+        data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': callback_url,
+            'client_id': client_id,
+            'client_secret': client_secret
+        }
+
+        auth_data = _make_post_request(
+            'https://accounts.google.com/o/oauth2/token',
+            data
+        )
+
+        params = {'alt': 'json', 'access_token': auth_data['access_token']}
+        r = requests.get(
+            'https://www.googleapis.com/oauth2/v1/userinfo',
+            params=params
+        )
+        user_obj = r.json()
+
+        user_data = {
+            'id': user_obj['id'],
+            'country': user_obj['locale'],
+            'username': user_obj['name'],
+            'profile_url': user_obj['link'],
+            'avatar_url': user_obj['picture']
+        }
+
+        response = {
+            'auth': auth_data,
+            'user': user_data
+        }
+
+        return response
 
     def lookup_track(self, track_id):
         """Lookup a single track using the Youtube API
