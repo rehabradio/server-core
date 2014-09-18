@@ -139,3 +139,18 @@ class YoutubeClient(object):
         response = _make_request(self.yt_api_endpoint+'search', params)
         tracks = _transform_search_response(response, offset)
         return tracks
+
+    def fetch_associated_track(self, source_id):
+        logger.info('Associated videos: {0}'.format(source_id))
+        params = {
+            'part': 'snippet',
+            'maxResults': 10,
+            'type': 'video',
+            'relatedToVideoId': source_id,
+            'key': self.yt_key,
+        }
+
+        response = _make_request(self.yt_api_endpoint+'search', params)
+        track = random_pick(response['items'])
+
+        return _transform_track(track)
