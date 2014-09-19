@@ -221,9 +221,12 @@ class SearchView(APIView):
     """Search tracks using any configured source_type and a query parameter.
     q -- lookup query (string)
     """
+    permission_classes = ()
 
     def get(self, request, source_type, format=None):
         page = int(request.QUERY_PARAMS.get('page', 1))
+        limit = 20
+        offset = (page-1)*limit
 
         query = request.QUERY_PARAMS.get('q', '')
         if not query:
@@ -238,8 +241,7 @@ class SearchView(APIView):
         if source_client is None:
             raise InvalidBackend
 
-        offset = (page-1)*20
-        queryset = source_client.search_tracks(query, page*200, offset)
+        queryset = source_client.search_tracks(query, limit, offset)
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
