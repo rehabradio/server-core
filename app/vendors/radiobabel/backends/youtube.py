@@ -11,7 +11,6 @@ import unicodedata
 import urllib
 
 # third-party imports
-#from gdata import youtube
 import requests
 
 # local imports
@@ -110,10 +109,10 @@ def _transform_track(track):
         ('source_id', track_id),
         ('name', track['snippet']['title']),
         ('duration_ms', 0),
-        ('preview_url', None),
+        ('preview_url', uri),
         ('uri', uri),
         ('track_number', 0),
-        ('artists', None),
+        ('artists', []),
         ('album', None),
         ('image_small', None),
         ('image_medium', None),
@@ -129,7 +128,11 @@ def _transform_track(track):
         transformed_track['track_number'] = track['snippet']['position']
 
     if 'contentDetails' in track:
-        transformed_track['duration_ms'] = track['contentDetails']['duration']
+        duration = re.findall(r'[0-9]+', track['contentDetails']['duration'])
+        minutes_to_seconds = int(duration[0]) * 60
+        seconds = minutes_to_seconds + int(duration[1])
+
+        transformed_track['duration_ms'] = seconds*1000
 
     return transformed_track
 
