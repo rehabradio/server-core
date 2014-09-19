@@ -285,7 +285,10 @@ class YoutubeClient(object):
         }
         url = '{0}playlists'.format(self.yt_api_endpoint)
 
-        response = _make_oauth_request(url, token, params)
+        try:
+            response = _make_oauth_request(url, token, params)
+        except:
+            raise PlaylistNotFound('Youtube: {0}'.format(user_id))
 
         transform_playlists = []
         for playlist in response['items']:
