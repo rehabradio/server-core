@@ -110,9 +110,10 @@ class TrackManager(models.Manager):
                     owner=owner
                 )
 
-                artists = Artist.objects.cached_get_or_create(track['artists'])
-                for artist in artists:
-                    record.artists.add(artist)
+                if track['artists']:
+                    artists = Artist.objects.cached_get_or_create(track['artists'])
+                    for artist in artists:
+                        record.artists.add(artist)
 
             cache.set(cache_key, record)
 

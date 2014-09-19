@@ -33,9 +33,9 @@ youtube_client = YoutubeClient()
 def _build_client(source_type):
     """Builds the thrid party api client based on the given source type."""
     source_client = {
-        'youtube': youtube_client,
         'soundcloud': soundcloud_client,
         'spotify': spotify_client,
+        'youtube': youtube_client,
     }.get(source_type.lower())
 
     return source_client
