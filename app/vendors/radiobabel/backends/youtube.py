@@ -78,12 +78,27 @@ def _transform_search_response(search_results, offset):
     return _track_list
 
 
+def _transform_playlist(playlist):
+    """Transform result into a format that more
+    closely matches our unified API.
+    """
+    transformed_playlist = dict([
+        ('source_type', 'youtube'),
+        ('source_id', playlist['id']),
+        ('name', playlist['snippet']['title']),
+        ('tracks', playlist['contentDetails']['itemCount']),
+    ])
+    return transformed_playlist
+
+
 def _transform_track(track):
     """Transform result into a format that more
     closely matches our unified API.
     """
     if isinstance(track['id'], dict):
         track_id = track['id']['videoId']
+    elif 'resourceId' in track['snippet']:
+        track_id = track['snippet']['resourceId']['videoId']
     else:
         track_id = track['id']
 
@@ -110,7 +125,29 @@ def _transform_track(track):
         transformed_track['image_medium'] = images['medium']['url']
         transformed_track['image_large'] = images['high']['url']
 
+    if 'position' in track['snippet']:
+        transformed_track['track_number'] = track['snippet']['position']
+
+    if 'contentDetails' in track:
+        transformed_track['duration_ms'] = track['contentDetails']['duration']
+
     return transformed_track
+
+
+def _get_page_token(url, params, page, token=None):
+    i = 0
+    params['pageToken'] = None
+
+    while i != page:
+        i = i+1
+        if token:
+            response = _make_oauth_request(url, token, params)
+        else:
+            response = _make_request(url, params)
+
+        params['pageToken'] = response['nextPageToken']
+
+    return params['pageToken']
 
 
 class YoutubeClient(object):
@@ -126,7 +163,10 @@ class YoutubeClient(object):
         params = {
             'client_id': client_id,
             'redirect_uri': callback_url,
-            'scope': 'https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/userinfo.profile',
+            'scope': '{0} {1}'.format(
+                'https://www.googleapis.com/auth/youtube',
+                'https://www.googleapis.com/auth/userinfo.profile',
+            ),
             'response_type': 'code',
             'access_type': 'offline',
         }
@@ -181,12 +221,13 @@ class YoutubeClient(object):
 
         params = {
             'id': track_id,
-            'part': 'snippet',
+            'part': 'snippet, contentDetails',
             'key': self.yt_key,
         }
+        url = '{0}videos'.format(self.yt_api_endpoint)
 
         try:
-            track = _make_request(self.yt_api_endpoint+'videos', params)
+            track = _make_request(url, params)
         except:
             raise TrackNotFound('Youtube: {0}'.format(track_id))
 
@@ -206,8 +247,13 @@ class YoutubeClient(object):
             'q': query,
             'key': self.yt_key,
         }
+        url = '{0}search'.format(self.yt_api_endpoint)
 
-        response = _make_request(self.yt_api_endpoint+'search', params)
+        if offset:
+            page = offset/limit
+            params['pageToken'] = _get_page_token(url, params, page)
+
+        response = _make_request(url, params)
         tracks = _transform_search_response(response, offset)
         return tracks
 
@@ -220,8 +266,53 @@ class YoutubeClient(object):
             'relatedToVideoId': source_id,
             'key': self.yt_key,
         }
+        url = '{0}search'.format(self.yt_api_endpoint)
 
-        response = _make_request(self.yt_api_endpoint+'search', params)
+        response = _make_request(url, params)
         track = random_pick(response['items'])
 
         return _transform_track(track)
+
+    def playlists(self, user_id, token):
+        """Lookup user playlists using the Spotify Web API
+
+        Returns standard radiobabel playlist list response.
+        """
+        logger.info('Playlist lookup: {0}'.format(user_id))
+        params = {
+            'part': 'snippet, contentDetails',
+            'mine': True
+        }
+        url = '{0}playlists'.format(self.yt_api_endpoint)
+
+        response = _make_oauth_request(url, token, params)
+
+        transform_playlists = []
+        for playlist in response['items']:
+            transform_playlists.append(_transform_playlist(playlist))
+
+        return transform_playlists
+
+    def playlist_tracks(self, playlist_id, user_id, token, limit=20, offset=0):
+        """Lookup user playlists using the Spotify Web API
+
+        Returns standard radiobabel track list response.
+        """
+        logger.info('Playlist tracks lookup: {0}'.format(user_id))
+        # Max limit for the youtube api is 50
+        if limit > 50:
+            limit = 50
+        params = {
+            'part': 'snippet',
+            'playlistId': playlist_id,
+            'maxResults': limit,
+        }
+        url = '{0}playlistItems'.format(self.yt_api_endpoint)
+
+        if offset:
+            page = offset/limit
+            params['pageToken'] = _get_page_token(url, params, page, token)
+
+        response = _make_oauth_request(url, token, params)
+
+        return _transform_search_response(response, offset)

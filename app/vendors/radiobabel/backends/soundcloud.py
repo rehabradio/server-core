@@ -138,7 +138,7 @@ class SoundcloudClient(object):
         logger.info('Searching: Limit {0}, Offset {1}'.format(limit, offset))
 
         tracks = self.client.get(
-            '/tracks', q=query, limit=limit, offset=offset)
+            '/tracks', q=query, limit=200, offset=offset)
 
         return [_transform_track(x.obj) for x in tracks]
 
