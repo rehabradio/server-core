@@ -221,7 +221,6 @@ class SearchView(APIView):
     """Search tracks using any configured source_type and a query parameter.
     q -- lookup query (string)
     """
-    permission_classes = ()
 
     def get(self, request, source_type, format=None):
         page = int(request.QUERY_PARAMS.get('page', 1))
