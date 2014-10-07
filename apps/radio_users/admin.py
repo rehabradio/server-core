@@ -9,6 +9,10 @@ class UserAdmin(UserAdmin):
         'username', 'email', 'first_name', 'last_name',
         'is_active', 'date_joined', 'is_staff')
 
+    def get_queryset(self, request):
+        qs = super(UserAdmin, self).get_queryset(request)
+        return qs.exclude(profile__isnull=True)
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

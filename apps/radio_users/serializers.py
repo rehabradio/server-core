@@ -3,19 +3,9 @@ from django.contrib.auth.models import User
 from rest_framework import pagination
 from rest_framework import serializers
 
-from .models import Profile
-
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ('avatar',)
-
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(source='profile.avatar', read_only=True)
-    last_login = serializers.DateTimeField(read_only=True)
-    date_joined = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = User
@@ -31,17 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
             'last_login',
             'date_joined'
         )
-        write_only_fields = ('password',)
-
-    def restore_object(self, attrs, instance=None):
-        # call set_password on user object. Without this
-        # the password will be stored in plain text.
-        user = super(UserSerializer, self).restore_object(attrs, instance)
-        if instance is None:
-            user.username = attrs['username'].lower()
-            user.set_password(attrs['password'])
-
-        return user
 
 
 class PaginatedUserSerializer(pagination.PaginationSerializer):

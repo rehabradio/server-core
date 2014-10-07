@@ -1,11 +1,14 @@
 # stdlib imports
 import json
 import os
+
 # third-party imports
 from django.core.cache import cache
+from django.db import transaction
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.test import APIClient
+
 # local imports
 from .models import Track
 from radio.utils.cache import build_key
@@ -65,20 +68,10 @@ class LookupViewTestCase(BaseTestCase):
     """Uses a backend(spotify/soundcloud) and a source ID,
     fetch a track from the given backend api.
     """
-    def test_spotify_auth(self):
+    def test_auth(self):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
-        resp = self.api_client.get(
-            '/api/metadata/lookup/spotify/6MeNtkNT4ENE5yohNvGqd4/'
-        )
-        self.assertEqual(resp.status_code, 403)
-
-    def test_soundcloud_auth(self):
-        """Return a 403 response error with detail message."""
-        self.api_client.logout()
-        resp = self.api_client.get(
-            '/api/metadata/lookup/soundcloud/153868082/'
-        )
+        resp = self.api_client.get('/api/metadata/lookup/')
         self.assertEqual(resp.status_code, 403)
 
     def test_get_spotify(self):
@@ -96,6 +89,17 @@ class LookupViewTestCase(BaseTestCase):
         """Return a json object for soundcloud backend."""
         resp = self.api_client.get(
             '/api/metadata/lookup/soundcloud/153868082/'
+        )
+        data = json.loads(resp.content)
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.track_attrs) <= set(data))
+
+    def test_get_youtube(self):
+        """Return a json object for youtube backend."""
+        resp = self.api_client.get(
+            '/api/metadata/lookup/youtube/StTqXEQ2l-Y/'
         )
         data = json.loads(resp.content)
         # Ensure request was successful
@@ -149,20 +153,10 @@ class SearchViewTestCase(BaseTestCase):
     """Uses a backend(spotify/soundcloud) and a `q` parament,
     to search for tracks from the given backend api.
     """
-    def test_spotify_auth(self):
+    def test_auth(self):
         """Return a 403 response error with detail message."""
         self.api_client.logout()
-        resp = self.api_client.get(
-            '/api/metadata/search/spotify/?q=Haim'
-        )
-        self.assertEqual(resp.status_code, 403)
-
-    def test_soundcloud_auth(self):
-        """Return a 403 response error with detail message."""
-        self.api_client.logout()
-        resp = self.api_client.get(
-            '/api/metadata/search/soundcloud/?q=Haim'
-        )
+        resp = self.api_client.get('/api/metadata/search/')
         self.assertEqual(resp.status_code, 403)
 
     def test_get_spotify(self):
@@ -187,15 +181,27 @@ class SearchViewTestCase(BaseTestCase):
         self.assertTrue(set(self.paginated_attrs) <= set(data))
         self.assertTrue(set(self.track_attrs) <= set(tracks))
 
+    def test_get_youtube(self):
+        """Return a json object for youtube backend."""
+        resp = self.api_client.get(
+            '/api/metadata/search/youtube/?q=everything%20is%20awesome')
+        data = json.loads(resp.content)
+        tracks = data['results'][0]
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.paginated_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(tracks))
+
     def test_get_cached(self):
-        inital_response = self.api_client.get('/api/metadata/search/spotify/?q=Haim')
-        resp = self.api_client.get('/api/metadata/search/spotify/?q=Haim')
+        self.api_client.get('/api/metadata/search/youtube/?q=Haim')
+        resp = self.api_client.get('/api/metadata/search/youtube/?q=Haim')
         return_data = json.loads(resp.content)
 
-        cache_key = build_key('mtdttrcksrch', 'spotify', 'Haim', '1')
+        cache_key = build_key('mtdttrcksrch', 'youtube', 'Haim', '1')
         cached_data = cache.get(cache_key)
 
-        #self.assertEqual(return_data, cached_data)
+        self.assertEqual(return_data, cached_data)
 
     def test_get_bad_backend(self):
         """Throw a 404 response error with a detail message."""
@@ -236,7 +242,13 @@ class UserAuthViewTestCase(BaseTestCase):
 
     def test_get_soundcloud_redirect(self):
         """Return a valid response."""
-        resp = self.api_client.get('/api/metadata/user/authenticate/soundcloud/')
+        resp = self.api_client.get(
+            '/api/metadata/user/authenticate/soundcloud/')
+        self.assertEqual(resp.status_code, 302)
+
+    def test_get_youtube_redirect(self):
+        """Return a valid response."""
+        resp = self.api_client.get('/api/metadata/user/authenticate/youtube/')
         self.assertEqual(resp.status_code, 302)
 
     def test_get_with_bad_backend(self):
@@ -257,6 +269,11 @@ class UserPlaylistViewSetTestCase(BaseTestCase):
     def test_list_spotify_with_no_oauth(self):
         """Return a list of playlist json objects."""
         resp = self.api_client.get('/api/metadata/user/playlists/spotify/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_list_youtube_with_no_oauth(self):
+        """Return a list of playlist json objects."""
+        resp = self.api_client.get('/api/metadata/user/playlists/youtube/')
         self.assertEqual(resp.status_code, 403)
 
 
@@ -286,7 +303,7 @@ class TrackViewSetTestCase(BaseTestCase):
         self.assertTrue(set(self.paginated_attrs) <= set(data))
         self.assertTrue(set(track_attrs) <= set(tracks))
 
-    def test_create(self):
+    def test_create_spotify(self):
         """Add a track to the database.
         Returns a track json object of the newly created record.
         """
@@ -294,10 +311,50 @@ class TrackViewSetTestCase(BaseTestCase):
         existing_records_count = Track.objects.all().count()
         post_data = {
             'source_type': 'spotify',
-            'source_id': '4bCOAuhvjsxbVBM5MM8oik',
+            'source_id': '7mitXLIMCflkhZiD34uEQI',
         }
 
         resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+        new_records_count = Track.objects.all().count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count+1, new_records_count)
+
+    def test_create_soundcloud(self):
+        """Add a track to the database.
+        Returns a track json object of the newly created record.
+        """
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'source_type': 'soundcloud',
+            'source_id': 153868082,
+        }
+
+        with transaction.atomic():
+            resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+
+        new_records_count = Track.objects.all().count()
+        # Ensure request was successful
+        self.assertEqual(resp.status_code, 200)
+        # Ensure a new record was created in the database
+        self.assertEqual(existing_records_count+1, new_records_count)
+
+    def test_create_youtube(self):
+        """Add a track to the database.
+        Returns a track json object of the newly created record.
+        """
+        # Count the number of records before the save
+        existing_records_count = Track.objects.all().count()
+        post_data = {
+            'source_type': 'youtube',
+            'source_id': 'StTqXEQ2l-Y',
+        }
+
+        with transaction.atomic():
+            resp = self.api_client.post('/api/metadata/tracks/', data=post_data)
+
         new_records_count = Track.objects.all().count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)

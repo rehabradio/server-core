@@ -8,6 +8,7 @@ from radio.utils.cache import build_key
 SOURCE_TYPES = [
     ('spotify', 'Spotify'),
     ('soundcloud', 'Soundcloud'),
+    ('youtube', 'Youtube'),
 ]
 
 
@@ -22,9 +23,6 @@ class MetadataBase(models.Model):
     class Meta:
         abstract = True
         unique_together = (('source_type', 'source_id'),)
-
-    def __unicode__(self):
-        return self.name
 
 
 class AlbumManager(models.Manager):
@@ -112,9 +110,10 @@ class TrackManager(models.Manager):
                     owner=owner
                 )
 
-                artists = Artist.objects.cached_get_or_create(track['artists'])
-                for artist in artists:
-                    record.artists.add(artist)
+                if track['artists']:
+                    artists = Artist.objects.cached_get_or_create(track['artists'])
+                    for artist in artists:
+                        record.artists.add(artist)
 
             cache.set(cache_key, record)
 

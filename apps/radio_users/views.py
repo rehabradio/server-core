@@ -4,7 +4,6 @@
 # Third party imports
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -20,7 +19,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminUser,)
 
     def list(self, request):
         """Return a paginated list of queue json objects."""
@@ -28,10 +26,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
         cache_key = build_key('users-queryset')
         response = cache.get(cache_key)
-        if response is not None:
+        if response:
             return Response(response)
 
-        queryset = User.objects.select_related('profile').all()
+        queryset = User.objects.exclude(profile__isnull=True)
         response = paginate_queryset(
             PaginatedUserSerializer, request, queryset, page)
 

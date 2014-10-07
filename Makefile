@@ -16,6 +16,7 @@ clean:
 	@find . -name '*.pyo' -exec rm -f {} +
 	@find . -name '*~' -exec rm -f {} +
 	@find . -empty -type d -delete
+	@-rm -R htmlcov
 	@-rm .coverage
 	@-rm coverage.xml
 	@-rm nosetests.xml
@@ -31,6 +32,6 @@ test: clean db_start
 	foreman run $(VENV_PREFIX)python manage.py makemigrations
 	foreman run $(VENV_PREFIX)python manage.py migrate
 	foreman run $(VENV_PREFIX)coverage erase
-	foreman run $(VENV_PREFIX)coverage run --source='.' manage.py test apps
+	foreman run $(VENV_PREFIX)coverage run --source='.' manage.py test apps radio
 	foreman run $(VENV_PREFIX)coverage report -m
 	foreman run $(VENV_PREFIX)coverage xml

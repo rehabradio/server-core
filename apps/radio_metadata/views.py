@@ -8,7 +8,7 @@ import collections
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect
-from radiobabel import SpotifyClient, SoundcloudClient
+from radiobabel import SpotifyClient, SoundcloudClient, YoutubeClient
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -27,6 +27,7 @@ from radio.utils.pagination import paginate_queryset
 
 spotify_client = SpotifyClient()
 soundcloud_client = SoundcloudClient(settings.SOUNDCLOUD_CLIENT_ID)
+youtube_client = YoutubeClient()
 
 
 def _build_client(source_type):
@@ -34,6 +35,7 @@ def _build_client(source_type):
     source_client = {
         'soundcloud': soundcloud_client,
         'spotify': spotify_client,
+        'youtube': youtube_client,
     }.get(source_type.lower())
 
     return source_client
@@ -55,9 +57,9 @@ def _get_track_data(source_type, source_id):
     return track_data
 
 
-def get_associated_track(artist, user):
-    source_client = _build_client(artist['source_type'])
-    track = source_client.fetch_associated_track(artist)
+def get_associated_track(source_id, source_type, user):
+    source_client = _build_client(source_type)
+    track = source_client.fetch_associated_track(source_id)
 
     try:
         track = Track.objects.cached_get_or_create(track, user)
@@ -114,6 +116,16 @@ class LookupRootView(APIView):
                     ('tracks', reverse(
                         'radio-data-lookup',
                         args=['spotify', '6MeNtkNT4ENE5yohNvGqd4'],
+                        request=request
+                    )),
+                ])),
+                ('youtube', collections.OrderedDict([
+                    ('tracks', reverse(
+                        'radio-data-lookup',
+                        args=[
+                            'youtube',
+                            'StTqXEQ2l-Y'
+                        ],
                         request=request
                     )),
                 ])),
@@ -186,6 +198,20 @@ class SearchRootView(APIView):
                         ) + '?q=fascination',
                     ]),
                 ])),
+                ('youtube', collections.OrderedDict([
+                    ('tracks', [
+                        reverse(
+                            'radio-data-search',
+                            args=['youtube'],
+                            request=request
+                        ) + '?q=everything%20is%20awesome',
+                        reverse(
+                            'radio-data-search',
+                            args=['youtube'],
+                            request=request
+                        ) + '?q=foo%20fighters',
+                    ]),
+                ])),
             ])),
         ])
         return Response(response)
@@ -198,6 +224,8 @@ class SearchView(APIView):
 
     def get(self, request, source_type, format=None):
         page = int(request.QUERY_PARAMS.get('page', 1))
+        limit = 20
+        offset = (page-1)*limit
 
         query = request.QUERY_PARAMS.get('q', '')
         if not query:
@@ -212,8 +240,7 @@ class SearchView(APIView):
         if source_client is None:
             raise InvalidBackend
 
-        offset = (page-1)*20
-        queryset = source_client.search_tracks(query, page*200, offset)
+        queryset = source_client.search_tracks(query, limit, offset)
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
@@ -245,6 +272,11 @@ class UserRootView(APIView):
                         'radio-data-user-auth',
                         args=['spotify'],
                         request=request
+                    )),
+                    ('youtube', reverse(
+                        'radio-data-user-auth',
+                        args=['youtube'],
+                        request=request
                     ))
                 ])),
                 ('playlists', collections.OrderedDict([
@@ -256,6 +288,11 @@ class UserRootView(APIView):
                     ('spotify', reverse(
                         'radio-data-user-playlists',
                         args=['spotify'],
+                        request=request
+                    )),
+                    ('youtube', reverse(
+                        'radio-data-user-playlists',
+                        args=['youtube'],
                         request=request
                     ))
                 ])),
@@ -276,6 +313,9 @@ class UserAuthView(APIView):
         elif source_type.lower() == 'soundcloud':
             source_client_id = settings.SOUNDCLOUD_CLIENT_ID
             source_client_secret = settings.SOUNDCLOUD_CLIENT_SECRET
+        elif source_type.lower() == 'youtube':
+            source_client_id = settings.GOOGLE_OAUTH2_CLIENT_ID
+            source_client_secret = settings.GOOGLE_OAUTH2_CLIENT_SECRET
         else:
             raise InvalidBackend
 
@@ -291,12 +331,12 @@ class UserAuthView(APIView):
         try:
             # Prompt user to login
             if auth_code is None:
-                redirect_uri = source_client.login_url(
+                redirect_url = source_client.login_url(
                     request.build_absolute_uri(request.path),
                     source_client_id,
                     source_client_secret
                 )
-                return redirect(redirect_uri)
+                return redirect(redirect_url)
             # Else exchange the auth code for an oauth token
             else:
                 credentials = source_client.exchange_code(
@@ -316,6 +356,9 @@ class UserAuthView(APIView):
 
 class UserPlaylistViewSet(viewsets.GenericViewSet):
     """Lookup tracks using any configured source_type."""
+
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
 
     def list(self, request, source_type, format=None):
         """Perform metadata lookup on the user playlists."""

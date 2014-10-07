@@ -286,7 +286,12 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         historic_tracks.remove(track)
 
         # Use the tracks main artist to fetch new track
-        track = get_associated_track(track, self.request.user)
+        source_id = track['source_id']
+        if track['source_type'] == 'spotify':
+            source_id = track['artists'][0]['source_id']
+
+        track = get_associated_track(
+            source_id, track['source_type'], self.request.user)
 
         # Update the tracklist with the newly fetched track
         historic_tracks.append(track)
