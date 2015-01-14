@@ -1,4 +1,4 @@
-VENV_PREFIX =/opt/venv/bin/
+VENV_PREFIX = foreman run /opt/venv/bin/
 
 help:
 	@echo "db_start - start postgres server"
@@ -23,15 +23,15 @@ clean:
 
 run: clean db_start
 	# run the development server
-	foreman run $(VENV_PREFIX)python manage.py makemigrations
-	foreman run $(VENV_PREFIX)python manage.py migrate
-	foreman run $(VENV_PREFIX)python manage.py runserver 0.0.0.0:8000
+	$(VENV_PREFIX)python manage.py makemigrations
+	$(VENV_PREFIX)python manage.py migrate
+	$(VENV_PREFIX)python manage.py runserver 0.0.0.0:8000
 
 test: clean db_start
 	# run tests with a coverage report
-	foreman run $(VENV_PREFIX)python manage.py makemigrations
-	foreman run $(VENV_PREFIX)python manage.py migrate
-	foreman run $(VENV_PREFIX)coverage erase
-	foreman run $(VENV_PREFIX)coverage run --source='.' manage.py test apps radio
-	foreman run $(VENV_PREFIX)coverage report -m
-	foreman run $(VENV_PREFIX)coverage xml
+	$(VENV_PREFIX)python manage.py makemigrations
+	$(VENV_PREFIX)python manage.py migrate
+	$(VENV_PREFIX)coverage erase
+	$(VENV_PREFIX)coverage run --source='.' manage.py test apps radio
+	$(VENV_PREFIX)coverage report -m
+	$(VENV_PREFIX)coverage xml
