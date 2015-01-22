@@ -126,10 +126,10 @@ class Track(MetadataBase):
     album = models.ForeignKey(Album, null=True)
 
     # track metadata
-    duration_ms = models.IntegerField()
-    preview_url = models.URLField()
+    duration_ms = models.IntegerField(null=True)
+    preview_url = models.URLField(null=True)
     uri = models.CharField(max_length=500)
-    track_number = models.IntegerField()
+    track_number = models.IntegerField(null=True)
     image_small = models.URLField(null=True)
     image_medium = models.URLField(null=True)
     image_large = models.URLField(null=True)
