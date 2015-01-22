@@ -126,15 +126,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
         'radio.google_oauth.GoogleOauthBackend',
         'radio.player_token_auth.PlayerTokenAuthBackend',
-    ),
+    )
 }
-
-# Django session settings
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
 
 # Logging settings
 LOGGING = {
