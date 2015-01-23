@@ -1,13 +1,50 @@
 # third-party imports
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+
 # local imports
 from radio_metadata.models import Track
+from radio.utils.redis_management import send_notification
 
 
 PROTECTION_OPTIONS = [
     ('private', 'Private'),
     ('public', 'Public'),
 ]
+
+
+def _notification(status, playlist_id):
+    channel = 'playlists'
+    data = {
+        'status': status,
+        'data': {
+            'playlist_id': playlist_id
+        }
+    }
+
+    send_notification(channel, data)
+
+
+def update_notification(sender, instance, created, **kwargs):
+    status = ('updated', 'created')[int(bool(created))]
+
+    # Check if it is a track or playlist update
+    if getattr(instance, 'playlist'):
+        playlist_id = instance.playlist.id
+    else:
+        playlist_id = instance.id
+
+    return _notification(status, playlist_id)
+
+
+def delete_notification(sender, **kwargs):
+    # Check if it is a track or playlist update
+    if getattr(kwargs['instance'], 'playlist'):
+        playlist_id = kwargs['instance'].playlist.id
+    else:
+        playlist_id = kwargs['instance'].id
+
+    return _notification('deleted', playlist_id)
 
 
 class PlaylistManager(models.Manager):
@@ -64,3 +101,10 @@ class PlaylistTrack(models.Model):
 
     class Meta:
         ordering = ('position',)
+
+
+post_save.connect(update_notification, sender=Playlist)
+post_save.connect(update_notification, sender=PlaylistTrack)
+
+post_delete.connect(delete_notification, sender=Playlist)
+post_delete.connect(delete_notification, sender=PlaylistTrack)
