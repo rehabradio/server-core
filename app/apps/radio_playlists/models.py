@@ -13,38 +13,46 @@ PROTECTION_OPTIONS = [
 ]
 
 
-def _notification(status, playlist_id):
+def _notification(status, playlist_id, is_track):
     channel = 'playlists'
     data = {
         'status': status,
         'data': {
-            'playlist_id': playlist_id
+            'playlist_id': playlist_id,
+            'is_track': is_track
         }
     }
+
+    if track_id:
+        data['data']['track_id'] = track_id
 
     send_notification(channel, data)
 
 
 def update_notification(sender, instance, created, **kwargs):
+    is_track = False
     status = ('updated', 'created')[int(bool(created))]
 
     # Check if it is a track or playlist update
     if getattr(instance, 'playlist'):
         playlist_id = instance.playlist.id
+        is_track = True
     else:
         playlist_id = instance.id
 
-    return _notification(status, playlist_id)
+    return _notification(status, playlist_id, is_track)
 
 
 def delete_notification(sender, **kwargs):
+    is_track = False
     # Check if it is a track or playlist update
     if getattr(kwargs['instance'], 'playlist'):
         playlist_id = kwargs['instance'].playlist.id
+        is_track = True
     else:
         playlist_id = kwargs['instance'].id
 
-    return _notification('deleted', playlist_id)
+    return _notification('deleted', playlist_id, is_track)
 
 
 class PlaylistManager(models.Manager):
