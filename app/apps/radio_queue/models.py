@@ -8,6 +8,48 @@ from radio_metadata.models import Track
 from radio.utils.cache import build_key
 
 
+def _notification(status, queue_id, is_track):
+    channel = 'queues'
+    data = {
+        'status': status,
+        'data': {
+            'queue_id': queue_id,
+            'is_track': is_track
+        }
+    }
+
+    if track_id:
+        data['data']['track_id'] = track_id
+
+    send_notification(channel, data)
+
+
+def update_notification(sender, instance, created, **kwargs):
+    is_track = False
+    status = ('updated', 'created')[int(bool(created))]
+
+    # Check if it is a track or queue update
+    if getattr(instance, 'queue'):
+        queue_id = instance.queue.id
+        is_track = True
+    else:
+        queue_id = instance.id
+
+    return _notification(status, queue_id, is_track)
+
+
+def delete_notification(sender, **kwargs):
+    is_track = False
+    # Check if it is a track or queue update
+    if getattr(kwargs['instance'], 'queue'):
+        queue_id = kwargs['instance'].queue.id
+        is_track = True
+    else:
+        queue_id = kwargs['instance'].id
+
+    return _notification('deleted', queue_id, is_track)
+
+
 class Queue(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=500)
@@ -25,7 +67,7 @@ class Queue(models.Model):
 class QueueTrackManager(models.Manager):
 
     def _history_cache_key(self, queue_id):
-        """Build key used for caching the playlist tracks data."""
+        """Build key used for caching the queue tracks data."""
         return build_key('queue-head-history', queue_id)
 
     def reset_track_positions(self, queue_id):
@@ -80,3 +122,10 @@ class QueueTrackHistory(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+
+post_save.connect(update_notification, sender=Queue)
+post_save.connect(update_notification, sender=QueueTrack)
+
+post_delete.connect(delete_notification, sender=Queue)
+post_delete.connect(delete_notification, sender=QueueTrack)
