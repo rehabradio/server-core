@@ -6,6 +6,7 @@ from django.db.models.signals import post_save, post_delete
 # local imports
 from radio_metadata.models import Track
 from radio.utils.cache import build_key
+from radio.utils.redis_management import send_notification
 
 
 def _notification(status, queue_id, is_track):
@@ -18,9 +19,6 @@ def _notification(status, queue_id, is_track):
         }
     }
 
-    if track_id:
-        data['data']['track_id'] = track_id
-
     send_notification(channel, data)
 
 
@@ -29,7 +27,7 @@ def update_notification(sender, instance, created, **kwargs):
     status = ('updated', 'created')[int(bool(created))]
 
     # Check if it is a track or queue update
-    if getattr(instance, 'queue'):
+    if hasattr(instance, 'queue'):
         queue_id = instance.queue.id
         is_track = True
     else:
@@ -41,7 +39,7 @@ def update_notification(sender, instance, created, **kwargs):
 def delete_notification(sender, **kwargs):
     is_track = False
     # Check if it is a track or queue update
-    if getattr(kwargs['instance'], 'queue'):
+    if hasattr(kwargs['instance'], 'queue'):
         queue_id = kwargs['instance'].queue.id
         is_track = True
     else:

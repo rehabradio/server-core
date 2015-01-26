@@ -23,9 +23,6 @@ def _notification(status, playlist_id, is_track):
         }
     }
 
-    if track_id:
-        data['data']['track_id'] = track_id
-
     send_notification(channel, data)
 
 
@@ -34,7 +31,7 @@ def update_notification(sender, instance, created, **kwargs):
     status = ('updated', 'created')[int(bool(created))]
 
     # Check if it is a track or playlist update
-    if getattr(instance, 'playlist'):
+    if hasattr(instance, 'playlist'):
         playlist_id = instance.playlist.id
         is_track = True
     else:
@@ -46,7 +43,7 @@ def update_notification(sender, instance, created, **kwargs):
 def delete_notification(sender, **kwargs):
     is_track = False
     # Check if it is a track or playlist update
-    if getattr(kwargs['instance'], 'playlist'):
+    if hasattr(kwargs['instance'], 'playlist'):
         playlist_id = kwargs['instance'].playlist.id
         is_track = True
     else:
