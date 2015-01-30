@@ -78,8 +78,14 @@ class PlaylistTrackManager(models.Manager):
         records = self.filter(playlist_id=playlist_id)
 
         for (i, track) in enumerate(records):
+            # Disconnect the signal while updating the playlist track position
+            post_save.disconnect(update_notification, sender=PlaylistTrack)
+
             track.position = i+1
             track.save()
+
+        # Re-connect the signal after all track positions are updated
+        post_save.connect(update_notification, sender=PlaylistTrack)
 
     def custom_create(self, track_id, playlist, owner):
         """Create playlist track."""

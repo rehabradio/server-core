@@ -9,8 +9,7 @@ from radio.utils.cache import build_key
 from radio.utils.redis_management import send_notification
 
 
-def _notification(status, queue_id, is_track):
-    channel = 'queues'
+def _notification(channel, status, queue_id, is_track):
     data = {
         'status': status,
         'data': {
@@ -23,20 +22,23 @@ def _notification(status, queue_id, is_track):
 
 
 def update_notification(sender, instance, created, **kwargs):
+    channel = 'queues'
     is_track = False
     status = ('updated', 'created')[int(bool(created))]
 
     # Check if it is a track or queue update
     if hasattr(instance, 'queue'):
+        print(instance.state)
         queue_id = instance.queue.id
         is_track = True
     else:
         queue_id = instance.id
 
-    return _notification(status, queue_id, is_track)
+    return _notification(channel, status, queue_id, is_track)
 
 
 def delete_notification(sender, **kwargs):
+    channel = 'queues'
     is_track = False
     # Check if it is a track or queue update
     if hasattr(kwargs['instance'], 'queue'):
@@ -45,7 +47,7 @@ def delete_notification(sender, **kwargs):
     else:
         queue_id = kwargs['instance'].id
 
-    return _notification('deleted', queue_id, is_track)
+    return _notification(channel, 'deleted', queue_id, is_track)
 
 
 class Queue(models.Model):
@@ -73,8 +75,14 @@ class QueueTrackManager(models.Manager):
         records = self.filter(queue_id=queue_id)
 
         for (i, track) in enumerate(records):
+            # Disconnect the signal while updating the playlist track position
+            post_save.disconnect(update_notification, sender=QueueTrack)
+
             track.position = i+1
             track.save()
+
+        # Re-connect the signal after all track positions are updated
+        post_save.connect(update_notification, sender=QueueTrack)
 
     def custom_create(self, track_id, queue_id, owner, record=True):
         """Create queue track."""
