@@ -53,7 +53,8 @@ def head_notification(sender, instance, **kwargs):
         try:
             org_head = QueueTrack.objects.get(queue_id=instance.queue.id, position=1)
         except:
-            return _notification('queue-heads', 'removed', instance.queue.id, True)
+            return
+            # return _notification('queue-heads', 'removed', instance.queue.id, True)
 
         if org_head is not None:
             # Check to see if new track is at the queue head
