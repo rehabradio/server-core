@@ -1,7 +1,7 @@
 # third-party imports
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete
 
 # local imports
 from radio_metadata.models import Track
@@ -22,23 +22,20 @@ def _notification(channel, status, queue_id, is_track):
 
 
 def update_notification(sender, instance, created, **kwargs):
-    channel = 'queues'
     is_track = False
     status = ('updated', 'created')[int(bool(created))]
 
     # Check if it is a track or queue update
     if hasattr(instance, 'queue'):
-        print(instance.state)
         queue_id = instance.queue.id
         is_track = True
     else:
         queue_id = instance.id
 
-    return _notification(channel, status, queue_id, is_track)
+    return _notification('queues', status, queue_id, is_track)
 
 
 def delete_notification(sender, **kwargs):
-    channel = 'queues'
     is_track = False
     # Check if it is a track or queue update
     if hasattr(kwargs['instance'], 'queue'):
@@ -47,7 +44,25 @@ def delete_notification(sender, **kwargs):
     else:
         queue_id = kwargs['instance'].id
 
-    return _notification(channel, 'deleted', queue_id, is_track)
+    return _notification('queues', 'deleted', queue_id, is_track)
+
+
+def head_notification(sender, instance, **kwargs):
+    if hasattr(instance, 'id'):
+        QueueTrack.objects.filter(queue_id=instance.queue.id, position=1)
+        try:
+            org_head = QueueTrack.objects.get(queue_id=instance.queue.id, position=1)
+        except:
+            return _notification('queue-heads', 'removed', instance.queue.id, True)
+
+        if org_head is not None:
+            # Check to see if new track is at the queue head
+            if org_head.id == instance.id:
+                org_track = QueueTrack.objects.get(id=instance.id)
+
+                # Check to see if the playing state has changed
+                if org_track.state != instance.state:
+                    return _notification('queue-heads', 'updated', instance.queue.id, True)
 
 
 class Queue(models.Model):
@@ -132,6 +147,8 @@ class QueueTrackHistory(models.Model):
 
 post_save.connect(update_notification, sender=Queue)
 post_save.connect(update_notification, sender=QueueTrack)
+
+pre_save.connect(head_notification, sender=QueueTrack)
 
 post_delete.connect(delete_notification, sender=Queue)
 post_delete.connect(delete_notification, sender=QueueTrack)
