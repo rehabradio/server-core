@@ -25,6 +25,10 @@ def update_notification(sender, instance, created, **kwargs):
     is_track = False
     status = ('updated', 'created')[int(bool(created))]
 
+    # Check to ensure it is not reporting on the head track
+    if instance.position == 1:
+        return
+
     # Check if it is a track or queue update
     if hasattr(instance, 'queue'):
         queue_id = instance.queue.id
