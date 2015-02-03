@@ -244,6 +244,8 @@ class SearchView(APIView):
         response = paginate_queryset(
             PaginatedTrackSerializer, request, queryset, page)
 
+        response['query'] = query
+
         cache.set(cache_key, response, 86400)
         return Response(response)
 
