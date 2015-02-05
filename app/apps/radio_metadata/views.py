@@ -460,13 +460,13 @@ class TrackViewSet(viewsets.ModelViewSet):
                 raise RecordNotFound
 
         try:
+            cache.delete(self.cache_key)
             track = Track.objects.cached_get_or_create(
                 track_data, self.request.user)
         except:
             raise RecordNotSaved
 
         serializer = TrackSerializer(track)
-        cache.delete(self.cache_key)
 
         return Response(serializer.data)
 
@@ -478,8 +478,8 @@ class TrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
-            track.delete()
             cache.delete(self.cache_key)
+            track.delete()
         except:
             raise RecordDeleteFailed
 

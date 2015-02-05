@@ -52,8 +52,8 @@ class PlaylistViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
-            playlist.delete()
             cache.delete(self.cache_key)
+            playlist.delete()
         except:
             raise RecordDeleteFailed
 
@@ -115,9 +115,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
                 detail='Could not save track. Playlist is marked private.')
 
         try:
+            cache.delete(self._cache_key(playlist_id))
             playlist_track = PlaylistTrack.objects.custom_create(
                 track_id, playlist, request.user)
-            cache.delete(self._cache_key(playlist_id))
         except:
             raise RecordNotSaved
 
@@ -135,9 +135,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         except:
             raise RecordNotFound
         try:
+            cache.delete(self._cache_key(playlist_track.playlist.id))
             playlist_track.position = request.DATA['position']
             playlist_track.save()
-            cache.delete(self._cache_key(playlist_track.playlist.id))
         except:
             raise RecordNotSaved
 
@@ -156,9 +156,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
         try:
             playlist_id = playlist_track.playlist.id
+            cache.delete(self._cache_key(playlist_id))
             playlist_track.delete()
             PlaylistTrack.objects.reset_track_positions(playlist_id)
-            cache.delete(self._cache_key(playlist_id))
         except:
             raise RecordDeleteFailed
 

@@ -57,8 +57,8 @@ class QueueViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
-            queue.delete()
             cache.delete(self.cache_key)
+            queue.delete()
         except:
             raise RecordDeleteFailed
 
@@ -127,13 +127,13 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
 
         for track_id in track_ids:
             try:
+                cache.delete(self._cache_key(queue_id))
                 queued_track = QueueTrack.objects.custom_create(
                     track_id, queue_id, self.request.user)
                 queued_tracks.append(QueueTrackSerializer(queued_track).data)
             except:
                 raise RecordNotSaved
 
-        cache.delete(self._cache_key(queue_id))
         return Response(queued_tracks)
 
     def partial_update(self, request, queue_id, pk, *args, **kwargs):
@@ -148,12 +148,11 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
+            cache.delete(self._cache_key(queue_id))
             queued_track.position = request.DATA['position']
             queued_track.save()
         except:
             raise RecordNotSaved
-
-        cache.delete(self._cache_key(queue_id))
 
         serializer = QueueTrackSerializer(queued_track)
         return Response(serializer.data)
@@ -170,13 +169,13 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
+            cache.delete(self._cache_key(queue_id))
             queued_track.delete()
         except:
             raise RecordDeleteFailed
 
         # reset the remaining tracks into their new positions
         QueueTrack.objects.reset_track_positions(queue_id)
-        cache.delete(self._cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
@@ -245,6 +244,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             raise RecordNotFound
 
         try:
+            cache.delete(self._cache_key(queue_id))
             track = queued_track.track
             track.play_count = F('play_count') + 1
             track.save()
@@ -255,7 +255,6 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         # reset the remaining tracks into their new positions
         QueueTrack.objects.reset_track_positions(queue_id)
-        cache.delete(self._cache_key(queue_id))
 
         return Response({'detail': 'Track successfully removed from queue.'})
 
