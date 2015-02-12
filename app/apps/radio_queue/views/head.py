@@ -35,6 +35,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Build key used for caching the queue tracks data."""
         return build_key('queue-head-track', queue_id)
 
+    def _random_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-random-track', queue_id)
+
     def _history_cache_key(self, queue_id):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-history', queue_id)
@@ -46,10 +50,19 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         head_track = cache.get(self._cache_key(queue_id))
         if head_track is None:
             queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
+
+            # Prepare a random track in the case of the queue being empty
+            if len(queued_tracks) <= 1:
+                random_track = cache.get(self._random_cache_key(queue_id))
+                if random_track is None:
+                    head_track = self._queue_radio(queue_id)
+                    cache.set(self._cache_key(queue_id), head_track, 3600)
+
             if len(queued_tracks):
                 head_track = queued_tracks[0]
             elif random:
-                head_track = self._queue_radio(queue_id)
+                head_track = random_track
+
             cache.set(self._cache_key(queue_id), head_track, 3600)
 
         return head_track

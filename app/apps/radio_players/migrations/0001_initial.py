@@ -8,8 +8,8 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('radio_queue', '0001_initial'),
         ('auth', '0001_initial'),
-        ('radio_queue', '0010_auto_20140826_1415'),
     ]
 
     operations = [
@@ -21,12 +21,11 @@ class Migration(migrations.Migration):
                 ('location', models.CharField(max_length=500)),
                 ('token', models.CharField(max_length=500)),
                 ('active', models.BooleanField(default=False)),
+                ('owner', models.CharField(default=b'', max_length=500)),
                 ('queue', models.ForeignKey(to='radio_queue.Queue', null=True)),
             ],
             options={
-                'abstract': False,
-                'verbose_name': 'user',
-                'verbose_name_plural': 'users',
+                'verbose_name': b'Player',
             },
             bases=('auth.user',),
         ),

@@ -14,12 +14,31 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='QueuedTrack',
+            name='Queue',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('started', models.DateTimeField(null=True)),
-                ('position', models.PositiveIntegerField(null=True)),
-                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True)),
+                ('name', models.CharField(max_length=500)),
+                ('description', models.CharField(max_length=500)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('updated', models.DateTimeField(auto_now=True)),
+                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'ordering': (b'name',),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='QueueTrack',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('position', models.PositiveIntegerField()),
+                ('state', models.CharField(max_length=500, null=True)),
+                ('time_position', models.IntegerField(null=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('updated', models.DateTimeField(auto_now=True)),
+                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('queue', models.ForeignKey(to='radio_queue.Queue')),
                 ('track', models.ForeignKey(to='radio_metadata.Track')),
             ],
             options={
@@ -28,27 +47,16 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='QueuedTrackHistory',
+            name='QueueTrackHistory',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('queue', models.ForeignKey(to='radio_queue.Queue')),
                 ('track', models.ForeignKey(to='radio_metadata.Track')),
             ],
             options={
                 'ordering': (b'created',),
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='QueuedTrackVote',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('value', models.IntegerField(choices=[(-1, -1), (0, 0), (1, 1)])),
-                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('queued_track', models.ForeignKey(to='radio_queue.QueuedTrack')),
-            ],
-            options={
             },
             bases=(models.Model,),
         ),
