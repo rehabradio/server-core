@@ -2,17 +2,11 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 # local imports
-from .views import (
-    LookupRootView,
-    LookupView,
-    MetadataAPIRootView,
-    SearchRootView,
-    SearchView,
-    UserRootView,
-    UserAuthView,
-    UserPlaylistViewSet,
-    TrackViewSet,
-)
+from .views.base import MetadataAPIRootView
+from .views.lookup import LookupRootView, LookupView
+from .views.search import SearchRootView, SearchView
+from .views.user import UserRootView, UserAuthView, UserPlaylistViewSet
+from .views.tracks import TrackViewSet
 
 urlpatterns = patterns(
     '',
@@ -22,16 +16,14 @@ urlpatterns = patterns(
         r'^lookup/(?P<source_type>[^/]+)/(?P<source_id>[^/]+)/$',
         LookupView.as_view(), name='radio-data-lookup'
     ),
+
     url(r'^search/$', SearchRootView.as_view(), name='radio-data-search-root'),
     url(
         r'^search/(?P<source_type>[^/]+)/$',
         SearchView.as_view(), name='radio-data-search'
     ),
-    url(
-        r'^user/$',
-        UserRootView.as_view(),
-        name='radio-data-user-root'
-    ),
+
+    url(r'^user/$', UserRootView.as_view(), name='radio-data-user-root'),
     url(
         r'^user/authenticate/(?P<source_type>[^/]+)/$',
         UserAuthView.as_view(), name='radio-data-user-auth'
