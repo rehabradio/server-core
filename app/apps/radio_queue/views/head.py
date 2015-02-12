@@ -33,24 +33,35 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
     def _cache_key(self, queue_id):
         """Build key used for caching the queue tracks data."""
-        return build_key('queue-tracks-queryset', queue_id)
+        return build_key('queue-head-track', queue_id)
 
     def _history_cache_key(self, queue_id):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-history', queue_id)
 
+    def _get_head_track(self, queue_id):
+        """Look up the track at the top of a given queue.
+        Returns serialized track or None.
+        """
+        head_track = cache.get(self._cache_key(queue_id))
+        if head_track is None:
+            queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
+            if len(queued_tracks):
+                head_track = queued_tracks[0]
+                cache.set(self._cache_key(queue_id), head_track, 3600)
+
+        return head_track
+
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
-        queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
-        if len(queued_tracks):
-            queued_track = queued_tracks[0]
-        else:
+        head_track = self._get_head_track(queue_id)
+        if head_track is None:
             try:
-                queued_track = self._queue_radio(queue_id)
+                head_track = self._queue_radio(queue_id)
             except:
                 raise QueueEmpty
 
-        seralizer = QueueTrackSerializer(queued_track)
+        seralizer = QueueTrackSerializer(head_track)
 
         return Response(seralizer.data)
 
@@ -60,40 +71,36 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """
         post_data = json.loads(request.DATA)
 
-        try:
-            queued_track = QueueTrack.objects.get(
-                queue_id=queue_id, position=1)
-        except:
+        head_track = self._get_head_track(queue_id)
+        if head_track is None:
             raise RecordNotFound
 
         try:
             if 'state' in post_data:
-                queued_track.state = post_data['state']
+                head_track.state = post_data['state']
             if 'time_position' in post_data:
-                queued_track.time_position = post_data['time_position']
-
-            queued_track.save()
+                head_track.time_position = post_data['time_position']
+            cache.set(self._cache_key(queue_id), head_track, 3600)
+            head_track.save()
         except:
             raise RecordNotSaved
 
-        serializer = QueueTrackSerializer(queued_track)
+        serializer = QueueTrackSerializer(head_track)
         return Response(serializer.data)
 
     def destroy(self, request, queue_id, *args, **kwargs):
         """Remove a track from the top of a given queue."""
-        queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
-        if len(queued_tracks):
-            queued_track = queued_tracks[0]
-        else:
+        head_track = self._get_head_track(queue_id)
+        if head_track is None:
             raise RecordNotFound
 
         try:
             cache.delete(self._cache_key(queue_id))
-            track = queued_track.track
+            track = head_track.track
             track.play_count = F('play_count') + 1
             track.save()
 
-            queued_track.delete()
+            head_track.delete()
         except:
             raise RecordDeleteFailed
 
