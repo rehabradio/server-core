@@ -2,12 +2,10 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 # local imports
-from .views import (
-    QueueViewSet,
-    QueueTrackViewSet,
-    QueueHeadViewSet,
-    QueueTrackHistoryViewSet
-)
+from .views.head import QueueHeadViewSet
+from .views.history import QueueTrackHistoryViewSet
+from .views.queues import QueueViewSet
+from .views.tracks import QueueTrackViewSet
 
 
 urlpatterns = patterns(

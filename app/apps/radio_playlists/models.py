@@ -77,10 +77,10 @@ class PlaylistTrackManager(models.Manager):
         """Set positions of a given playlist track list."""
         records = self.filter(playlist_id=playlist_id)
 
-        for (i, track) in enumerate(records):
-            # Disconnect the signal while updating the playlist track position
-            post_save.disconnect(update_notification, sender=PlaylistTrack)
+        # Disconnect the signal while updating the playlist track position
+        post_save.disconnect(update_notification, sender=PlaylistTrack)
 
+        for (i, track) in enumerate(records):
             track.position = i+1
             track.save()
 
