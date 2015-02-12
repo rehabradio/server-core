@@ -26,6 +26,7 @@ class MetadataBase(models.Model):
 
 
 class AlbumManager(models.Manager):
+
     def cached_get_or_create(self, album):
         """Get or create an album record from db,
         Returns an Album model reference.
@@ -45,10 +46,12 @@ class AlbumManager(models.Manager):
 
 
 class Album(MetadataBase):
+
     objects = AlbumManager()
 
 
 class ArtistManager(models.Manager):
+
     def cached_get_or_create(self, artists):
         """Get or create artist records from db.
         Returns a list of artist json objects
@@ -72,10 +75,12 @@ class ArtistManager(models.Manager):
 
 
 class Artist(MetadataBase):
+
     objects = ArtistManager()
 
 
 class TrackManager(models.Manager):
+
     def cached_get_or_create(self, track, owner):
         """Saves a track to the db, unless one already exists.
         Returns a track json object
