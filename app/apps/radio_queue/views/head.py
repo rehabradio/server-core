@@ -39,7 +39,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-history', queue_id)
 
-    def _get_head_track(self, queue_id):
+    def _get_head_track(self, queue_id, random=False):
         """Look up the track at the top of a given queue.
         Returns serialized track or None.
         """
@@ -48,18 +48,17 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
             if len(queued_tracks):
                 head_track = queued_tracks[0]
-                cache.set(self._cache_key(queue_id), head_track, 3600)
+            elif random:
+                head_track = self._queue_radio(queue_id)
+            cache.set(self._cache_key(queue_id), head_track, 3600)
 
         return head_track
 
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
-        head_track = self._get_head_track(queue_id)
+        head_track = self._get_head_track(queue_id, random=True)
         if head_track is None:
-            try:
-                head_track = self._queue_radio(queue_id)
-            except:
-                raise QueueEmpty
+            raise QueueEmpty
 
         seralizer = QueueTrackSerializer(head_track)
 
@@ -89,25 +88,30 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, queue_id, *args, **kwargs):
-        """Remove a track from the top of a given queue."""
+        """Remove a track from the top of a given queue, and return the next track."""
         head_track = self._get_head_track(queue_id)
         if head_track is None:
             raise RecordNotFound
 
         try:
-            cache.delete(self._cache_key(queue_id))
+            # Update the play count for the given track
             track = head_track.track
             track.play_count = F('play_count') + 1
             track.save()
 
+            cache.delete(self._cache_key(queue_id))
             head_track.delete()
         except:
             raise RecordDeleteFailed
 
         # reset the remaining tracks into their new positions
         QueueTrack.objects.reset_track_positions(queue_id)
+        # Call get_head_track method to reset cache
+        new_head_track = self._get_head_track(queue_id, random=True)
 
-        return Response({'detail': 'Track successfully removed from queue.'})
+        seralizer = QueueTrackSerializer(new_head_track)
+
+        return Response(seralizer.data)
 
     def _queue_radio(self, queue_id):
         """Add an associated track to a given queue,
@@ -126,6 +130,11 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             historic_tracks = []
             queryset = QueueTrackHistory.objects.filter(
                 queue_id=queue_id).order_by().distinct('track_id')
+
+            # If there is nothing in the queues track history, then exit
+            if not queryset:
+                return None
+
             for track in queryset:
                 serializer = QueueTrackHistorySerializer(track)
                 historic_tracks.append(serializer.data['track'])

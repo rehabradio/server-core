@@ -93,8 +93,13 @@ class QueueHeadViewSetTestCase(BaseTestCase):
         # Ensure the record was removed from the database
         self.assertEqual(existing_records_count-1, new_records_count)
         # Ensure "detail" message is set, and the message matches expected
-        self.assertEqual(
-            data['detail'], u'Track successfully removed from queue.')
+
+        # Ensure the next track is returned
+        data = json.loads(resp.content)
+        track = data['track']
+        # Ensure the returned json keys match the expected
+        self.assertTrue(set(self.queue_track_attrs) <= set(data))
+        self.assertTrue(set(self.track_attrs) <= set(track))
 
     def test_delete_with_empty_queue(self):
         """Returns a 404 response with detail message."""
