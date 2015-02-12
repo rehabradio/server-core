@@ -15,6 +15,7 @@ class Player(User):
     token = models.CharField(max_length=500)
     queue = models.ForeignKey(Queue, null=True)
     active = models.BooleanField(default=False)
+    owner = models.CharField(max_length=500, default='')
 
     # Use UserManager to get the create_user method, etc.
     objects = UserManager()
@@ -22,14 +23,8 @@ class Player(User):
     def __unicode__(self):
         return u'%s - %s' % (self.location, self.name)
 
-    def clean(self):
-        """Ensures that only one player is active on a given queue."""
-        active_player = Player.objects.filter(
-            queue=self.queue, active=True).exclude(id=self.id)
-
-        if self.active and active_player:
-            raise ValidationError(
-                "A player is already active on the selected queue")
+    class Meta:
+        verbose_name = "Player"
 
     def save(self, *args, **kwargs):
         """Create a unique token for the record (mopidy auth token).
@@ -39,3 +34,11 @@ class Player(User):
             self.token = uuid.uuid4()
 
             super(Player, self).save()
+
+    def clean(self):
+        """Ensures that only one player is active on a given queue."""
+        active_player = Player.objects.filter(
+            queue=self.queue, active=True).exclude(id=self.id)
+
+        if self.active and active_player:
+            raise ValidationError("A player is already active on the selected queue")

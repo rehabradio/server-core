@@ -12,11 +12,4 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         view_name = 'radio-players-detail'
-        fields = (
-            'id',
-            'name',
-            'location',
-            'queue',
-            'active',
-            'date_joined',
-        )
+        fields = ('id', 'name', 'location', 'queue', 'date_joined', 'active', 'owner')

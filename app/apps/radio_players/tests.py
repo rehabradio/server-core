@@ -18,13 +18,7 @@ class BaseTestCase(TestCase):
     factory = APIRequestFactory()
     fixtures = ['radio/fixtures/testdata.json']
     paginated_attrs = ('count', 'next', 'previous', 'results')
-    player_attrs = (
-        'id',
-        'name',
-        'location',
-        'queue',
-        'active',
-    )
+    player_attrs = ('id', 'name', 'location', 'queue', 'active', 'owner')
 
     def setUp(self):
         """Ensure Auth is required and log in the test user."""
