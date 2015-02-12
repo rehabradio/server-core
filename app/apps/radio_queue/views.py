@@ -22,7 +22,7 @@ from radio.exceptions import (
 from radio.permissions import IsStaffOrOwnerToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
-from radio_metadata.views import get_associated_track
+from radio_metadata.views.tracks import get_associated_track
 from radio_playlists.models import PlaylistTrack
 
 
@@ -197,10 +197,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, queue_id, *args, **kwargs):
         """Fetch the top track in a given queue."""
-        try:
-            queued_track = QueueTrack.objects.get(
-                queue_id=queue_id, position=1)
-        except:
+        queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
+        if len(queued_tracks):
+            queued_track = queued_tracks[0]
+        else:
             try:
                 queued_track = self._queue_radio(queue_id)
             except:
@@ -237,10 +237,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, queue_id, *args, **kwargs):
         """Remove a track from the top of a given queue."""
-        try:
-            queued_track = QueueTrack.objects.get(
-                queue_id=queue_id, position=1)
-        except:
+        queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
+        if len(queued_tracks):
+            queued_track = queued_tracks[0]
+        else:
             raise RecordNotFound
 
         try:
