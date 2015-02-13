@@ -43,10 +43,11 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-history', queue_id)
 
-    def _get_head_track(self, queue_id, random=False):
+    def get_head_track(self, queue_id, random=False):
         """Look up the track at the top of a given queue.
         Returns serialized track or None.
         """
+        random_track = None
         head_track = cache.get(self._cache_key(queue_id))
         if head_track is None:
             queued_tracks = QueueTrack.objects.filter(queue_id=queue_id)
@@ -56,7 +57,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 random_track = cache.get(self._random_cache_key(queue_id))
                 if random_track is None:
                     head_track = self._queue_radio(queue_id)
-                    cache.set(self._cache_key(queue_id), head_track, 3600)
+                    cache.set(self._random_cache_key(queue_id), head_track, 3600)
 
             if len(queued_tracks):
                 head_track = queued_tracks[0]
@@ -67,9 +68,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         return head_track
 
-    def retrieve(self, request, queue_id, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         """Fetch the top track in a given queue."""
-        head_track = self._get_head_track(queue_id, random=True)
+        player = cache.get(build_key('player', request.user.id))
+        head_track = self.get_head_track(player.queue.id, random=True)
         if head_track is None:
             raise QueueEmpty
 
@@ -77,13 +79,17 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         return Response(seralizer.data)
 
-    def partial_update(self, request, queue_id, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         """Updates the head track of a given queue,
         based on the mopidy playback status.
         """
+        player = cache.get(build_key('player', request.user.id))
         post_data = json.loads(request.DATA)
 
-        head_track = self._get_head_track(queue_id)
+        if post_data['queue_id'] != player.queue.id or not request.user.active:
+            return Response({})
+
+        head_track = self.get_head_track(player.queue.id)
         if head_track is None:
             raise RecordNotFound
 
@@ -92,7 +98,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                 head_track.state = post_data['state']
             if 'time_position' in post_data:
                 head_track.time_position = post_data['time_position']
-            cache.set(self._cache_key(queue_id), head_track, 3600)
+            cache.set(self._cache_key(player.queue.id), head_track, 3600)
             head_track.save()
         except:
             raise RecordNotSaved
@@ -100,27 +106,32 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         serializer = QueueTrackSerializer(head_track)
         return Response(serializer.data)
 
-    def destroy(self, request, queue_id, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         """Remove a track from the top of a given queue, and return the next track."""
-        head_track = self._get_head_track(queue_id)
-        if head_track is None:
-            raise RecordNotFound
+        player = cache.get(build_key('player', request.user.id))
+        post_data = json.loads(request.DATA)
 
-        try:
-            # Update the play count for the given track
-            track = head_track.track
-            track.play_count = F('play_count') + 1
-            track.save()
+        # Ensure device is still listening to the same queue
+        if post_data['queue_id'] == player.queue.id and request.user.active:
+            head_track = self.get_head_track(player.queue.id)
+            if head_track is None:
+                raise RecordNotFound
+            try:
+                # Update the play count for the given track
+                track = head_track.track
+                track.play_count = F('play_count') + 1
+                track.save()
 
-            cache.delete(self._cache_key(queue_id))
-            head_track.delete()
-        except:
-            raise RecordDeleteFailed
+                cache.delete(self._cache_key(player.queue.id))
+                head_track.delete()
+            except:
+                raise RecordDeleteFailed
 
-        # reset the remaining tracks into their new positions
-        QueueTrack.objects.reset_track_positions(queue_id)
+            # reset the remaining tracks into their new positions
+            QueueTrack.objects.reset_track_positions(player.queue.id)
+
         # Call get_head_track method to reset cache
-        new_head_track = self._get_head_track(queue_id, random=True)
+        new_head_track = self.get_head_track(player.queue.id, random=True)
 
         seralizer = QueueTrackSerializer(new_head_track)
 

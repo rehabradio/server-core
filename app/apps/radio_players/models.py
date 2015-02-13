@@ -33,7 +33,7 @@ class Player(User):
             self.username = '{0} (Player)'.format(self.name)
             self.token = uuid.uuid4()
 
-            super(Player, self).save()
+        super(Player, self).save(args, kwargs)
 
     def clean(self):
         """Ensures that only one player is active on a given queue."""

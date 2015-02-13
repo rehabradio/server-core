@@ -1,8 +1,10 @@
 # thrid party imports
 from django.contrib import admin
+from django.core.cache import cache
 
 # local imports
 from .models import Player
+from radio.utils.cache import build_key
 
 
 class PlayerAdmin(admin.ModelAdmin):
@@ -17,6 +19,9 @@ class PlayerAdmin(admin.ModelAdmin):
         """
         if change is False:
             obj.owner = request.user.id
-            obj.save()
+
+        obj.save()
+
+        cache.set(build_key('player', obj.id), obj)
 
 admin.site.register(Player, PlayerAdmin)

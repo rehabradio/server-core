@@ -44,7 +44,7 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^(?P<queue_id>[0-9]+)/head/$',
+        r'^head/$',
         QueueHeadViewSet.as_view({
             'get': 'retrieve',
             'patch': 'partial_update',
