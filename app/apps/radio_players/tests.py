@@ -48,8 +48,7 @@ class PlayerViewSetTestCase(BaseTestCase):
         post_data = {
             'name': 'Test player 2',
             'location': 'Bangor',
-            'queue': 1,
-            'active': False
+            'queue': 1
         }
 
         resp = self.api_client.post(
@@ -61,37 +60,24 @@ class PlayerViewSetTestCase(BaseTestCase):
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
 
-    def test_create_with_active_not_unique(self):
-        """Try to create a track, with a empty post data.
-        Returns a 404 response with detail message.
+    def test_update(self):
+        """Update a player from the database.
+        Returns a player json object of the updated record.
         """
         # Count the number of records before the save
         existing_records_count = Player.objects.all().count()
-
         post_data = {
-            'name': 'TDD player',
-            'location': 'test env',
-            'queue': 1,
-            'active': True,
+            'active': False,
+            'queue': 2
         }
-        resp = self.api_client.post(
-            '/admin/radio_players/player/add/',
-            data=post_data
-        )
-        new_records_count = Player.objects.all().count()
 
-        # Ensure error message was returned
-        self.assertContains(
-            resp, "A player is already active on the selected queue")
-        # Ensure a new record was not created in the database
-        self.assertEqual(existing_records_count, new_records_count)
-
-    def test_profile(self):
-        """Return a player json object of a given record."""
-        resp = self.device_client.get('/api/players/profile/')
+        resp = self.api_client.put('/api/players/5/', data=post_data)
         data = json.loads(resp.content)
-
+        new_records_count = Player.objects.all().count()
         # Ensure request was successful
         self.assertEqual(resp.status_code, 200)
-        # Ensure the returned json keys match the expected
-        self.assertTrue(set(self.player_attrs) <= set(data))
+        # Ensure a the record was updated
+        # and a new records was not added to the database
+        self.assertEqual(existing_records_count, new_records_count)
+        self.assertEqual(data['active'], post_data['active'])
+        self.assertEqual(data['queue']['id'], post_data['queue'])
