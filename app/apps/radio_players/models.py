@@ -1,12 +1,11 @@
-# std-lib imports
-import uuid
-
 # third-party imports
 from django.contrib.auth.models import User, UserManager
-from django.core.exceptions import ValidationError
+from django.core.cache import cache
 from django.db import models
 
+# local imports
 from radio_queue.models import Queue
+from radio.utils.cache import build_key
 
 
 class Player(User):
@@ -27,18 +26,13 @@ class Player(User):
         verbose_name = "Player"
 
     def save(self, *args, **kwargs):
-        """Create a unique token for the record (mopidy auth token).
+        """Set some default values.
         """
-        if self._state.adding:
-            self.username = '{0} (Player)'.format(self.name)
-            self.token = uuid.uuid4()
+        # If no other tracks are active on the queue, then set active to true
+        queryset = Player.objects.filter(queue=self.queue, active=True)
+        if not queryset.count():
+            self.active = True
 
         super(Player, self).save(args, kwargs)
 
-    def clean(self):
-        """Ensures that only one player is active on a given queue."""
-        active_player = Player.objects.filter(
-            queue=self.queue, active=True).exclude(id=self.id)
-
-        if self.active and active_player:
-            raise ValidationError("A player is already active on the selected queue")
+        cache.set(build_key('player', self.id), self)
