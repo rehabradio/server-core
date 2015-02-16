@@ -1,15 +1,23 @@
 # stdlib imports
 import json
 
+# thrid-party imports
+from rest_framework.test import APIClient
+
 # local imports
 from .test_base import BaseTestCase
 from ..models import QueueTrack
 
 
 class QueueHeadViewSetTestCase(BaseTestCase):
+
+    def setUp(self):
+        """Ensure Auth is required and log in the test user."""
+        self.api_client = APIClient(HTTP_PLAYER_AUTH_TOKEN="8a5b353d-cf76-4f1c-b874-3a64eb8836fe")
+
     def test_get(self):
         """Returns the queue track in position 1, in a given queue."""
-        resp = self.api_client.get('/api/queues/1/head/')
+        resp = self.api_client.get('/api/queues/head/')
         data = json.loads(resp.content)
         track = data['track']
         # Ensure request was successful
@@ -20,22 +28,28 @@ class QueueHeadViewSetTestCase(BaseTestCase):
 
     def test_radio(self):
         """Returns the queue track in position 1, in a given queue."""
-        previous_track = None
         for i in range(10):
-            get_resp = self.api_client.get('/api/queues/1/head/')
+            get_resp = self.api_client.get('/api/queues/head/')
             data = json.loads(get_resp.content)
             # Ensure request was successful
             self.assertEqual(get_resp.status_code, 200)
             # Ensure the returned json keys match the expected
             self.assertTrue(set(self.queue_track_attrs) <= set(data))
             self.assertTrue(set(self.track_attrs) <= set(data['track']))
-            self.assertNotEqual(previous_track, data['track'])
-            previous_track = data['track']
-            delete_resp = self.api_client.delete('/api/queues/1/head/')
+
+            json_data = json.dumps({'queue_id': 1}, indent=2)
+            delete_resp = self.api_client.delete('/api/queues/head/', data=json_data, format='json')
+            d_data = json.loads(delete_resp.content)
             self.assertEqual(delete_resp.status_code, 200)
 
+            self.assertTrue(set(self.queue_track_attrs) <= set(d_data))
+            self.assertTrue(set(self.track_attrs) <= set(d_data['track']))
+
+            # Ensure returned track is different from the original track
+            self.assertNotEqual(d_data, data)
+
     def test_get_with_empty_queue(self):
-        """Adds a random track to the queue, if queue is empty."""
+        """Ensure a valid response is always returned even if no tracks can be found."""
         records_count = QueueTrack.objects.filter(queue=2).count()
         self.assertEqual(records_count, 0)
 
@@ -43,9 +57,8 @@ class QueueHeadViewSetTestCase(BaseTestCase):
         data = json.loads(resp.content)
 
         # Ensure request was successful
-        self.assertEqual(resp.status_code, 400)
-        # Ensure the returned json keys match the expected
-        self.assertEqual(data['detail'], u'This queue has no tracks.')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIsNone(data['track'])
 
     def test_patch(self):
         """Update a the head track of a given queue.
@@ -54,13 +67,14 @@ class QueueHeadViewSetTestCase(BaseTestCase):
         existing_records_count = QueueTrack.objects.filter(
             queue=1).count()
         post_data = {
+            'queue_id': 1,
             'state': 'playing',
             'time_position': 12345
         }
         json_data = json.dumps(post_data, indent=2)
 
         resp = self.api_client.patch(
-            '/api/queues/1/head/',
+            '/api/queues/head/',
             data=json_data,
             format='json'
         )
@@ -85,7 +99,9 @@ class QueueHeadViewSetTestCase(BaseTestCase):
             queue=1
         ).count()
 
-        resp = self.api_client.delete('/api/queues/1/head/')
+        json_data = json.dumps({'queue_id': 1}, indent=2)
+
+        resp = self.api_client.delete('/api/queues/head/', data=json_data, format='json')
         data = json.loads(resp.content)
         new_records_count = QueueTrack.objects.filter(queue=1).count()
         # Ensure request was successful

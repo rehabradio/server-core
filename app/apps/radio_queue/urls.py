@@ -44,12 +44,21 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^head/$',
+        r'^(?P<queue_id>[0-9]+)/head/$',
         QueueHeadViewSet.as_view({
             'get': 'retrieve',
             'patch': 'partial_update',
             'delete': 'destroy',
         }), name='radio-queue-track-head'
+    ),
+
+    url(
+        r'^head/$',
+        QueueHeadViewSet.as_view({
+            'get': 'retrieve',
+            'patch': 'partial_update',
+            'delete': 'destroy',
+        }), name='radio-queue-player'
     ),
 
     url(
