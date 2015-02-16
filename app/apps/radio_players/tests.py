@@ -59,25 +59,3 @@ class PlayerViewSetTestCase(BaseTestCase):
         self.assertRedirects(resp, '/admin/radio_players/player/')
         # Ensure a new record was created in the database
         self.assertEqual(existing_records_count+1, new_records_count)
-
-    def test_update(self):
-        """Update a player from the database.
-        Returns a player json object of the updated record.
-        """
-        # Count the number of records before the save
-        existing_records_count = Player.objects.all().count()
-        post_data = {
-            'active': False,
-            'queue': 2
-        }
-
-        resp = self.api_client.put('/api/players/5/', data=post_data)
-        data = json.loads(resp.content)
-        new_records_count = Player.objects.all().count()
-        # Ensure request was successful
-        self.assertEqual(resp.status_code, 200)
-        # Ensure a the record was updated
-        # and a new records was not added to the database
-        self.assertEqual(existing_records_count, new_records_count)
-        self.assertEqual(data['active'], post_data['active'])
-        self.assertEqual(data['queue']['id'], post_data['queue'])
