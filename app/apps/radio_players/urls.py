@@ -17,7 +17,7 @@ urlpatterns = patterns(
         r'^(?P<pk>[\w\-_]+)/$',
         PlayerViewSet.as_view({
             'get': 'retrieve',
-            'put': 'update',
+            'patch': 'partial_update',
         }),
         name='radio-players-detail'
     ),
