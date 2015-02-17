@@ -214,7 +214,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         # Update the tracklist with the newly fetched track
         historic_tracks.append(track)
-        cache.set(self._history_cache_key(queue_id), historic_tracks, 86400)
+        cache.set(self._history_cache_key(queue_id), historic_tracks)
 
         # Add the new track to the queue
         queue_track = QueueTrack.objects.custom_create(
