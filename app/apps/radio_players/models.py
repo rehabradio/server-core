@@ -32,6 +32,8 @@ class Player(User):
         queryset = Player.objects.filter(queue=self.queue, active=True)
         if not queryset.count():
             self.active = True
+        elif queryset.exclude(id=self.id).count():
+            self.active = False
 
         super(Player, self).save(args, kwargs)
 
