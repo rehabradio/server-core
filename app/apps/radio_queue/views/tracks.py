@@ -16,6 +16,7 @@ from radio.exceptions import RecordNotSaved
 from radio.permissions import IsStaffOrOwnerToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
+from radio_metadata.views.tracks import track_exists
 from radio_playlists.models import PlaylistTrack
 
 
@@ -66,10 +67,16 @@ class QueueTrackViewSet(viewsets.ModelViewSet):
             track_ids = ()
             for playlist_track in playlist_tracks:
                 track_ids = track_ids + (playlist_track.track.id,)
-
         else:
             track_ids = (request.DATA['track'],)
 
+        # Ensure track exists in the database, and still exists at its source.
+        for track_id in track_ids:
+            # Throws an exception if track is not found,
+            # or source no longer exists
+            track_exists(track_id=track_id)
+
+        # Save each track to the queue
         for track_id in track_ids:
             try:
                 cache.delete(self._cache_key(queue_id))

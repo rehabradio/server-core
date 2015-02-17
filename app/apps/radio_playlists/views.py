@@ -8,14 +8,19 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 # local imports
-from .models import Playlist, PlaylistTrack
-from .serializers import (
-    PlaylistSerializer, PaginatedPlaylistSerializer,
-    PlaylistTrackSerializer, PaginatedPlaylistTrackSerializer)
-from radio.exceptions import RecordDeleteFailed, RecordNotFound, RecordNotSaved
+from .models import Playlist
+from .models import PlaylistTrack
+from .serializers import PlaylistSerializer
+from .serializers import PaginatedPlaylistSerializer
+from .serializers import PlaylistTrackSerializer
+from .serializers import PaginatedPlaylistTrackSerializer
+from radio.exceptions import RecordDeleteFailed
+from radio.exceptions import RecordNotFound
+from radio.exceptions import RecordNotSaved
 from radio.permissions import IsOwnerOrReadOnly
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
+from radio_metadata.views.tracks import track_exists
 
 
 class PlaylistViewSet(viewsets.ModelViewSet):
@@ -107,6 +112,9 @@ class PlaylistTrackViewSet(viewsets.ModelViewSet):
         """
         track_id = request.POST['track']
         playlist_id = kwargs['playlist_id']
+
+        # Ensure track exists both locally and at its source.
+        track_exists(track_id=track_id)
 
         playlist = Playlist.objects.get(id=playlist_id)
         if (playlist.protection != 'public'

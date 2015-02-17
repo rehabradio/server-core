@@ -9,8 +9,12 @@ from rest_framework.response import Response
 # local imports
 from .base import build_client
 from ..models import Track
-from ..serializers import PaginatedTrackSerializer, TrackSerializer
-from radio.exceptions import RecordDeleteFailed, RecordNotFound, RecordNotSaved
+from ..serializers import PaginatedTrackSerializer
+from ..serializers import TrackSerializer
+from radio.exceptions import RecordDeleteFailed
+from radio.exceptions import RecordNotFound
+from radio.exceptions import RecordNotSaved
+from radio.exceptions import RecordNoLongerExists
 from radio.permissions import IsStaffToDelete
 from radio.utils.cache import build_key
 from radio.utils.pagination import paginate_queryset
@@ -32,7 +36,28 @@ def _get_track_data(source_type, source_id):
     return track_data
 
 
+def track_exists(track_id):
+    """Looks up the track using the thrid party client
+    to ensure the track has not be removed from source.
+    """
+    try:
+        track = Track.objects.get(pk=track_id)
+    except:
+        raise RecordNotFound('The track could not be found.')
+
+    source_client = build_client(track.source_type)
+    try:
+        source_client.lookup_track(track.source_id)
+    except:
+        cache.delete(build_key('tracklist-queryset'))
+        track.delete()
+
+        raise RecordNoLongerExists
+
+
 def get_associated_track(source_id, source_type, user):
+    """Fetches a random track based on a given track.
+    """
     source_client = build_client(source_type)
     track = source_client.fetch_associated_track(source_id)
 

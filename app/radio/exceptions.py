@@ -56,3 +56,10 @@ class UserIsNotPlayer(APIException):
     """
     status_code = 400
     default_detail = 'User is not a registered player.'
+
+
+class RecordNoLongerExists(APIException):
+    """Simple exception used to show user is not a registered player.
+    """
+    status_code = 404
+    default_detail = 'The source record could not be found.'

@@ -273,11 +273,11 @@ class PlaylistTrackViewSetTestCase(BaseTestCase):
         new_records_count = PlaylistTrack.objects.filter(playlist=1).count()
 
         # Ensure request failed
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 404)
         # Ensure a new record was not added to the database
         self.assertEqual(existing_records_count, new_records_count)
         # Ensure validation flags where raised for each field
-        self.assertEqual(data['detail'], u'The record could not be saved.')
+        self.assertEqual(data['detail'], u'The track could not be found.')
 
     def test_create_on_private_playlist(self):
         """Try to create a track, empty post variables.

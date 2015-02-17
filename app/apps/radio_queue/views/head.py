@@ -21,6 +21,7 @@ from radio.exceptions import RecordNotSaved
 from radio.exceptions import RecordNotFound
 from radio.utils.cache import build_key
 from radio_metadata.views.tracks import get_associated_track
+from radio_metadata.views.tracks import track_exists
 from radio_players.models import Player
 
 
@@ -71,6 +72,16 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             # If there are tracks in the queue, then grab the top track
             if len(queued_tracks):
                 head_track = queued_tracks[0]
+                # Ensure track exists at source,
+                # else remove track and run method again.
+                try:
+                    # Throws an exception if track is not found,
+                    # or source no longer exists
+                    track_exists(track_id=head_track.track.id)
+                except:
+                    cache.delete(self._cache_key(queue_id))
+                    cache.delete(build_key('queue-tracks-queryset', queue_id))
+                    return self.get_head_track(queue_id, is_active, random)
             else:
                 # Else use a randomly selected track
                 head_track = self._queue_radio(queue_id)
