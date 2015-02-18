@@ -160,22 +160,19 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             queue_tracks = QueueTrack.objects.filter(queue_id=queue_id)
             if len(queue_tracks):
                 head_track = queue_tracks[0]
-            else:
-                raise RecordNotFound
+                try:
+                    # Update the play count for the given track
+                    track = head_track.track
+                    track.play_count = F('play_count') + 1
+                    track.save()
 
-            try:
-                # Update the play count for the given track
-                track = head_track.track
-                track.play_count = F('play_count') + 1
-                track.save()
+                    cache.delete(self._cache_key(queue_id))
+                    head_track.delete()
+                except:
+                    raise RecordDeleteFailed
 
-                cache.delete(self._cache_key(queue_id))
-                head_track.delete()
-            except:
-                raise RecordDeleteFailed
-
-            # reset the remaining tracks into their new positions
-            QueueTrack.objects.reset_track_positions(queue_id)
+                # reset the remaining tracks into their new positions
+                QueueTrack.objects.reset_track_positions(queue_id)
 
         # Call get_head_track method to reset cache
         new_head_track = self.get_head_track(queue_id, is_active, random=True)
