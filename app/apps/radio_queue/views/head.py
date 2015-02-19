@@ -34,6 +34,10 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Build key used for caching the queue tracks data."""
         return build_key('queue-head-track', queue_id)
 
+    def _queue_cache_key(self, queue_id):
+        """Build key used for caching the playlist tracks data."""
+        return build_key('queue-tracks-queryset', queue_id)
+
     def _history_cache_key(self, queue_id):
         """Build key used for caching the playlist tracks data."""
         return build_key('queue-head-history', queue_id)
@@ -87,6 +91,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
             if head_track:
                 expire_in = (head_track.track.duration_ms/1000)
+                cache.delete(self._queue_cache_key(queue_id))
                 cache.set(self._cache_key(queue_id), head_track, expire_in)
 
         return head_track
@@ -164,6 +169,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                     track.save()
 
                     cache.delete(self._cache_key(queue_id))
+                    cache.delete(self._queue_cache_key(queue_id))
                     head_track.delete()
                 except:
                     raise RecordDeleteFailed
