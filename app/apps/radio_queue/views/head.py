@@ -81,8 +81,9 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
                     cache.delete(build_key('queue-tracks-queryset', queue_id))
                     return self.get_head_track(queue_id, is_active, random)
             else:
-                # Else use a randomly selected track
-                head_track = self._queue_radio(queue_id)
+                if random:
+                    # Else use a randomly selected track
+                    head_track = self._queue_radio(queue_id)
 
             if head_track:
                 expire_in = (head_track.track.duration_ms/1000)
