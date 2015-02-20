@@ -151,10 +151,6 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             post_data = json.loads(request.DATA)
             post_queue_id = post_data['queue_id']
 
-        # Let all requests destory the cache, this prevents loop on the same track.
-        cache.delete(self._cache_key(post_queue_id))
-        cache.delete(self._queue_cache_key(post_queue_id))
-
         # Ensure the post data matches the queue,
         # and user is active and allowed to update record.
         if post_queue_id == queue_id and is_active:
