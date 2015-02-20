@@ -123,18 +123,20 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         head_track = self.get_head_track(queue_id, is_active)
 
-        # Ensure the post data matches the queue,
-        # and user is active and allowed to update record.
-        if post_data['queue_id'] == queue_id and is_active:
+        # Ensure it is updating the expected record
+        if head_track.id == post_data['track_id']:
+            # Ensure the post data matches the queue,
+            # and user is active and allowed to update record.
+            if post_data['queue_id'] == queue_id and is_active:
 
-            if 'state' in post_data:
-                head_track.state = post_data['state']
-            if 'time_position' in post_data:
-                head_track.time_position = post_data['time_position']
+                if 'state' in post_data:
+                    head_track.state = post_data['state']
+                if 'time_position' in post_data:
+                    head_track.time_position = post_data['time_position']
 
-            # Set the cache to expire when track finishes
-            time_til_end = head_track.track.duration_ms - head_track.time_position
-            cache.set(self._cache_key(queue_id), head_track, (time_til_end/1000))
+                # Set the cache to expire when track finishes
+                time_til_end = head_track.track.duration_ms - head_track.time_position
+                cache.set(self._cache_key(queue_id), head_track, (time_til_end/1000))
 
         serializer = QueueTrackSerializer(head_track)
         return Response(serializer.data)
