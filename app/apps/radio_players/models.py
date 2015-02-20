@@ -38,3 +38,5 @@ class Player(User):
         super(Player, self).save(args, kwargs)
 
         cache.set(build_key('player', self.id), self)
+
+        return self

@@ -46,19 +46,20 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Fetches the player data.
         This is used over `self.request.user` to allow active updates on the player.
         """
-        # If player is not active, save the record, which will try to set active to true
-        # if it is the only player listening on a given queue
-        if self.request.user.active is False:
-            Player.objects.get(pk=self.request.user).save()
-
         c_key = build_key('player', self.request.user.id)
         player = cache.get(c_key)
-        # If no player data is found in cache, then use the current user data
-        if player is None:
-            player = self.request.user
-            cache.set(c_key, self.request.user)
 
-        return player
+        # If no player is found, trigger a model save which caches the player record
+        # This ensures that players are always up to date.
+        if player:
+            # If player is not active, save the record, which will try to set active to true
+            # if it is the only player listening on a given queue
+            if player.active is False:
+                player = Player.objects.get(pk=self.request.user).save()
+        else:
+            player = Player.objects.get(pk=self.request.user).save()
+
+        return player.active, player.queue.id
 
     def get_head_track(self, queue_id, is_active, random=False):
         """Look up the track at the top of a given queue.
@@ -101,9 +102,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         is_active = True
 
         if queue_id is None:
-            player = self._get_player()
-            is_active = player.active
-            queue_id = player.queue.id
+            is_active, queue_id = self._get_player()
 
         head_track = self.get_head_track(queue_id, is_active, random=True)
         seralizer = QueueTrackSerializer(head_track)
@@ -120,9 +119,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         post_data = json.loads(request.DATA)
 
         if queue_id is None:
-            player = self._get_player()
-            is_active = player.active
-            queue_id = player.queue.id
+            is_active, queue_id = self._get_player()
 
         head_track = self.get_head_track(queue_id, is_active)
 
@@ -150,11 +147,13 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         post_queue_id = queue_id
 
         if queue_id is None:
-            player = self._get_player()
-            is_active = player.active
-            queue_id = player.queue.id
+            is_active, queue_id = self._get_player()
             post_data = json.loads(request.DATA)
             post_queue_id = post_data['queue_id']
+
+        # Let all requests destory the cache, this prevents loop on the same track.
+        cache.delete(self._cache_key(post_queue_id))
+        cache.delete(self._queue_cache_key(post_queue_id))
 
         # Ensure the post data matches the queue,
         # and user is active and allowed to update record.
