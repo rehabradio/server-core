@@ -25,6 +25,22 @@ class Player(User):
     class Meta:
         verbose_name = "Player"
 
+    def get_player(self, user_id):
+        c_key = build_key('player', user_id)
+        player = cache.get(c_key)
+
+        # If no player is found, trigger a model save which caches the player record
+        # This ensures that players are always up to date.
+        if player:
+            # If player is not active, save the record, which will try to set active to true
+            # if it is the only player listening on a given queue
+            if player.active is False:
+                player = Player.objects.get(pk=user_id).save()
+        else:
+            player = Player.objects.get(pk=user_id).save()
+
+        return player
+
     def save(self, *args, **kwargs):
         """Set some default values.
         """
