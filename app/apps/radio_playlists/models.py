@@ -13,45 +13,6 @@ PROTECTION_OPTIONS = [
 ]
 
 
-def _notification(status, playlist_id, is_track):
-    channel = 'playlists'
-    data = {
-        'status': status,
-        'data': {
-            'playlist_id': playlist_id,
-            'is_track': is_track
-        }
-    }
-
-    send_notification(channel, data)
-
-
-def update_notification(sender, instance, created, **kwargs):
-    is_track = False
-    status = ('updated', 'created')[int(bool(created))]
-
-    # Check if it is a track or playlist update
-    if hasattr(instance, 'playlist'):
-        playlist_id = instance.playlist.id
-        is_track = True
-    else:
-        playlist_id = instance.id
-
-    return _notification(status, playlist_id, is_track)
-
-
-def delete_notification(sender, **kwargs):
-    is_track = False
-    # Check if it is a track or playlist update
-    if hasattr(kwargs['instance'], 'playlist'):
-        playlist_id = kwargs['instance'].playlist.id
-        is_track = True
-    else:
-        playlist_id = kwargs['instance'].id
-
-    return _notification('deleted', playlist_id, is_track)
-
-
 class PlaylistManager(models.Manager):
     pass
 
@@ -112,6 +73,45 @@ class PlaylistTrack(models.Model):
 
     class Meta:
         ordering = ('position',)
+
+
+def _notification(status, playlist_id, is_track):
+    channel = 'playlists'
+    data = {
+        'status': status,
+        'data': {
+            'playlist_id': playlist_id,
+            'is_track': is_track
+        }
+    }
+
+    send_notification(channel, data)
+
+
+def update_notification(sender, instance, created, **kwargs):
+    is_track = False
+    status = ('updated', 'created')[int(bool(created))]
+
+    # Check if it is a track or playlist update
+    if hasattr(instance, 'playlist'):
+        playlist_id = instance.playlist.id
+        is_track = True
+    else:
+        playlist_id = instance.id
+
+    return _notification(status, playlist_id, is_track)
+
+
+def delete_notification(sender, **kwargs):
+    is_track = False
+    # Check if it is a track or playlist update
+    if hasattr(kwargs['instance'], 'playlist'):
+        playlist_id = kwargs['instance'].playlist.id
+        is_track = True
+    else:
+        playlist_id = kwargs['instance'].id
+
+    return _notification('deleted', playlist_id, is_track)
 
 
 post_save.connect(update_notification, sender=Playlist)
