@@ -107,13 +107,16 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             queue_id = player.queue.id
             post_data = json.loads(request.DATA)
 
+        if is_active is False:
+            return Response()
+
         head_track = self.get_head_track(queue_id, is_active)
 
         # Ensure it is updating the expected record
         if head_track.id == post_data['track_id']:
             # Ensure the post data matches the queue,
             # and user is active and allowed to update record.
-            if post_data['queue_id'] == queue_id and is_active:
+            if post_data['queue_id'] == queue_id:
 
                 if 'state' in post_data:
                     head_track.state = post_data['state']
