@@ -80,7 +80,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, queue_id=None, *args, **kwargs):
         """Fetch the top track in a given queue."""
-        is_active = True
+        is_active = False
 
         if queue_id is None:
             player = Player().get_player(self.request.user.id)
@@ -98,7 +98,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
 
         NOTE All updates only affect the cached record and not the database record.
         """
-        is_active = True
+        is_active = False
         post_data = request.DATA
 
         if queue_id is None:
@@ -134,7 +134,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
         """Remove a track from the top of a given queue,
         and return the next track.
         """
-        is_active = True
+        is_active = False
         post_queue_id = queue_id
 
         if queue_id is None:
