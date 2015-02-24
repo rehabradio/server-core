@@ -14,10 +14,17 @@ urlpatterns = patterns(
         name='radio-players-list'
     ),
     url(
-        r'^(?P<pk>[\w\-_]+)/$',
+        r'^(?P<pk>[0-9]+)/$',
         PlayerViewSet.as_view({
             'get': 'retrieve',
             'patch': 'partial_update',
+        }),
+        name='radio-players-detail'
+    ),
+    url(
+        r'^(?P<token>[\w\-_]+)/$',
+        PlayerViewSet.as_view({
+            'get': 'retrieve'
         }),
         name='radio-players-detail'
     ),
