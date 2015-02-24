@@ -108,7 +108,7 @@ class QueueHeadViewSet(viewsets.ModelViewSet):
             post_data = json.loads(request.DATA)
 
         if is_active is False:
-            return Response()
+            return Response([])
 
         head_track = self.get_head_track(queue_id, is_active)
 
