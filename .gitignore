@@ -1,6 +1,6 @@
 # MAC
 .DS_Store
- 
+
 # Windows
 Thumbs.db
 
@@ -20,8 +20,8 @@ Thumbs.db
 *.pyc
 *.env
 
-/app/databases/*
-/app/staticfiles/*
-/app/htmlcov/*
-app/.coverage
-app/coverage.xml
+/databases/*
+/staticfiles/*
+/htmlcov/*
+.coverage
+coverage.xml
