@@ -32,82 +32,6 @@ Platform
 * Queueing/Asynchronous operation: RQ (via Django-RQ)
 
 
-Installing Docker
-=================
-
-***
-
-This application uses [Docker][docker] to provide a standard development
-environment for all developers on a project, this is the preferred method of
-installation/development.
-
-Linux
------------------------------------------
-
-Docker is best supported on Linux, you can probably find packages for your
-preferred distribution [here][docker_install].
-
-**Note:** Please don't run docker as root (or with sudo), it'll cause files
-created within the container to be owned by root on the host system. This will
-prevent you from editing/deleting the files using your regular user account.
-
-Adding your user to the `docker` group will allow to run docker without root
-privileges. Running `sudo gpasswd -a $USER docker` and logging out/in again
-should do the trick.
-
-You can now skip ahead to **"Getting the application"** below.
-
-OSX
------------------------------------------
-
-Installing and configuring Docker on OSX isn't quite as straightforward as it
-is on Linux (yet). The [boot2docker][boot2docker] project provides a
-lightweight Linux VM that acts as a (mostly) transparent way to run docker on
-OSX.
-
-First, install Docker and boot2docker following the instructions on
-[this page][docker_osx_install]. Once you've installed Docker and launched
-`boot2docker` for the first time, you need to stop it again so we can make
-further modifications: `$ boot2docker stop`.
-
-Since Docker on OSX is technically running inside a virtual machine and not
-directly on the host OS, any volumes mounted will be on the VM's filesystem
-and any bound ports will be exposed only to the boot2docker VM. We can work
-around these limitations with a few tweaks to our setup.
-
-In order to mount folders from your host OS into the boot2docker VM you'll
-need to download a version of the boot2docker iso with Virtualbox's Guest
-Additions installed:
-
-    $ mkdir -p ~/.boot2docker
-    $ curl http://static.dockerfiles.io/boot2docker-v1.2.0-virtualbox-guest-additions-v4.3.14.iso -o ~/.boot2docker/boot2docker.iso
-
-Next, you need to tell Virtualbox to mount your `/Users` directory inside the
-VM:
-
-    $ VBoxManage sharedfolder add boot2docker-vm -name home -hostpath /Users
-
-And that should be it. Letâ€™s verify:
-
-    $ boot2docker up
-    $ boot2docker ssh "ls /Users"
-
-You should see a list of all user's home folders from your host OS. Next, we
-need to forward the appropriate ports so that we can reach the running
-appengine development server directly from the host OS:
-
-    $ VBoxManage controlvm boot2docker-vm natpf1 "aesdk,tcp,127.0.0.1,8080,,8080"
-    $ VBoxManage controlvm boot2docker-vm natpf1 "aesdkadmin,tcp,127.0.0.1,8000,,8000"
-
-And you should be ready to go, just follow the rest of the setup guide.
-
-Windows
------------------------------------------
-
-![Tumbleweed](http://media.giphy.com/media/5x89XRx3sBZFC/giphy.gif)
-
-
-
 Foreman
 -----------------------------------------
 Foreman requires a `.env` file to work. Please ensure you create this file
@@ -174,8 +98,8 @@ Deploying to Heroku
 =================
 
 ***
-To push your app up to heroku, the recommended method with git. 
-Note all of the following commands shoud be run from outside of the docker container. 
+To push your app up to heroku, the recommended method with git.
+Note all of the following commands shoud be run from outside of the docker container.
 
 Create your ssh key (or use existing key)
 

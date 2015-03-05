@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'radio.wsgi.application'
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 import dj_database_url
 
-database_url = os.environ.get('LOCAL_DATABASE_URL', None)
+database_url = os.environ.get('DATABASE_URL', None)
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -97,8 +97,18 @@ DATABASES = {
         default=database_url
     )
 }
-# Internationalization
-# https://docs.djangoproject.com/en/dev/topics/i18n/
+
+# Django Caching settings
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.cache.RedisCache',
+        'LOCATION': os.environ.get('REDIS_LOCATION', '127.0.0.1:6379:1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'SOCKET_TIMEOUT': 5,
+        },
+    }
+}
 
 LANGUAGE_CODE = 'en-gb'
 

@@ -1,26 +1,27 @@
-# The name of the project is used throughout the makefile to provide
-# project-specific docker containers.
-PROJNAME = rehabradio
-
-
 help:
-	@echo "build - Build container"
-	@echo "start - Start container $(PROJNAME)"
-	@echo "resume - Resume container $(PROJNAME)"
-	@echo "run - Run container and start database and web server (non-interactive)"
-	@echo "test - Run container and run test suite (non-interactive)"
+	@echo "db_start - start postgres server"
+	@echo "clean - remove build artifacts"
+	@echo "run - run the local development server for testing/debugging purposes"
+	@echo "test - run all of the app's tests and print a coverage report"
 
-build:
-	cd docker; docker build -t="rehabstudio/$(PROJNAME)" .
+clean:
+	# remove build artifacts from tree
+	@find . -name '*.pyc' -exec rm -f {} +
+	@find . -name '*.pyo' -exec rm -f {} +
+	@find . -name '*~' -exec rm -f {} +
+	@find . -empty -type d -delete
 
-start: build
-	docker run -t -i --workdir="/app" --name="$(PROJNAME)" -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME)
+run: clean
+	# run the development server
+	foreman run python manage.py makemigrations
+	foreman run python manage.py migrate
+	foreman run python manage.py runserver 0.0.0.0:8000
 
-resume:
-	docker start -i $(PROJNAME)
-
-run: build
-	docker run --rm -t -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app run
-
-test: build
-	docker run --rm -t -v "$(CURDIR)/app:/app" -p 0.0.0.0:8000:8000 rehabstudio/$(PROJNAME) make -C /app test
+test: clean
+	# run tests with a coverage report
+	foreman run python manage.py makemigrations
+	foreman run python manage.py migrate
+	foreman run coverage erase
+	foreman run coverage run --source='.' manage.py test apps radio
+	foreman run coverage report -m
+	foreman run coverage xml
